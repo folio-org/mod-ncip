@@ -1,0 +1,7 @@
+{
+  "srvcId": "${artifactId}-${version}",
+  "nodeId": "localhost",
+  "descriptor": {
+    "exec": "java -jar -jar  -Dprop_files=/mnt/ncip -Dport=%p -Dhttp.port=%p -Dlog_level=debug -Dprop_files=src/main/resources ../${artifactId}/target/${artifactId}-fat.jar"
+  }
+}

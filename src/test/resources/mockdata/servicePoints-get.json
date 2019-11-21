@@ -1,0 +1,16 @@
+{
+  "servicepoints" : [ {
+    "id" : "29faacf1-4ba4-42c7-8b2a-566b259e4641",
+    "name" : "Fairchild Martindale",
+    "code" : "FAIRCHILD",
+    "discoveryDisplayName" : "Fairchild Martindale",
+    "shelvingLagTime" : 10,
+    "pickupLocation" : true,
+    "holdShelfExpiryPeriod" : {
+      "duration" : 5,
+      "intervalId" : "Days"
+    },
+    "staffSlips" : [ ]
+  } ],
+  "totalRecords" : 1
+}

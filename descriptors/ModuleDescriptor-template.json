@@ -1,0 +1,66 @@
+{
+  "id": "mod-ncip-1.0",
+  "name": "NCIP Module",
+   "provides": [
+    {
+      "id": "mod-ncip",
+      "version": "1.0",
+       "handlers": [
+        {
+          "methods": [ "POST","GET" ],
+          "pathPattern": "/ncip"
+        },
+        {
+          "methods": [ "GET" ],
+          "pathPattern": "/ncipconfigcheck"
+        }
+      ]
+    }
+  ],
+   "requires": [
+      {
+        "id":"instance-types",
+        "version" : "2.0"
+      },
+      {
+        "id:":"identifier-types",
+        "version" : "1.2"
+      },
+      {
+        "id":"material-types",
+        "version":"2.2"
+      },
+      {
+        "id":"locations",
+        "version":"3.0"
+      },
+      {
+        "id":"service-points",
+        "version":"3.2"
+      },
+      {
+        "id":"loan-types",
+        "version":"2.2"
+      },
+      {
+        "id":"holdings-storage",
+        "version":"3.1"
+      },
+      {
+        "id":"inventory",
+        "version":"9.4"
+      },
+      {
+        "id":"circulation",
+        "version":"7.11"
+      }
+  ],
+  "permissionSets": [],
+  "launchDescriptor": {
+    "dockerImage": "${artifactId}:${version}",
+    "dockerArgs": {
+      "HostConfig": { "PortBindings": { "8081/tcp":  [{ "HostPort": "%p" }] } }
+    },
+    "dockerPull" : false
+  }
+}

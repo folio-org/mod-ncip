@@ -1,0 +1,9 @@
+//HOLD SHELF NOTES
+The AcceptItem service places a hold on the item it creates.
+The 'Requests' module has a 'Pickup Preference' field with options - 'hold shelf' or 'delivery'
+The NCIP request contains 'PickupLocation'.  I thought about a configuration
+that would allow the service to translate a pickup location to Pickup Preference = delivery
+However...when Pickup Preference = delivery, a patron delivery address is required.  I don't
+think there is a way for me to derive that location - so I've hardcoded pickup preference
+to 'hold shelf'
+
