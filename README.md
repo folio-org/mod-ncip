@@ -136,3 +136,35 @@ If the service is able to retrieve a UUID for each of the settings in your confi
     </Problem>
 
     
+### About the NCIP services
+This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  Then endpoint for all services is the same:
+
+POST to .../ncip    (if you are calling the service directly)
+POST to ..../circapi/ncip (if you are calling mod-ncip through edge-ncip)
+
+The module determines which service is being called based on the XML passed into the service.
+These particular four services are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog XC toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
+
+#### Supported Services
+
+##### Lookup User
+The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "ok" value in the response to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
+
+This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
+
+##### Accept Item
+
+
+##### Checkout Item
+
+
+
+##### Checkin Item
+
+
+### Adding support for additional services to mod-ncip
+
+### More about the Extensible Catalog NCIP Toolkit
+
+#### Additional resources
+ 
