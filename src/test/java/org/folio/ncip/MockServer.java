@@ -69,6 +69,9 @@ public class MockServer {
 	 private static final Logger logger = LoggerFactory.getLogger(MockServer.class);
 	 
 
+	
+	
+	
 	  static HashMap<String, Integer> params = new HashMap<>();
 
 	  private final int port;
@@ -81,7 +84,7 @@ public class MockServer {
 	  
 	  
 	  void start() throws InterruptedException, ExecutionException, TimeoutException {
-		  // Setup Mock Server...
+		    // Setup Mock Server...
 		  final Promise<Void> promise = Promise.promise();
 		   folioNcipHelper  = new FolioNcipHelper(promise);
 		   HttpServer server = vertx.createHttpServer();
@@ -204,6 +207,7 @@ public class MockServer {
 			   vertx.executeBlocking(promise -> {
 				   InputStream responseMsgInputStream = null;
 				   try {
+				   	    //FolioNcipHelper folioNcipHelper = new FolioNcipHelper(ctx);
 				   		responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
 						}
 						catch(Exception e) {
@@ -215,7 +219,7 @@ public class MockServer {
 							//THIS REALLY SHOULD BE AN NCIP RESONSE THAT MIRRORS THE NCIP REQUEST TYPE (WITH PROBLEM ELEMENT) HOWEVER...
 							//THAT IS NOT POSSIBLE IF WE'VE REACHED HERE BECAUSE ONLY THE MESSAGE HANDLER CAN CONSTRUCT A RESPONSE OBJECT
 							//WE SHOULDN'T EVER GET HERE - FAMOUS LAST WORDS
-							.end("<Problem><message>probem processing NCIP request</message><exception>" + e.getLocalizedMessage() + "</exception></Problem>");
+							.end("<Problem><message>problem processing NCIP request</message><exception>" + e.getLocalizedMessage() + "</exception></Problem>");
 						}
 		
 					  String inputStreamString = new Scanner(responseMsgInputStream,"UTF-8").useDelimiter("\\A").next();

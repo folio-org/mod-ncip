@@ -27,7 +27,7 @@ public class MainVerticle extends AbstractVerticle {
 
 		final String portStr = System.getProperty(SYS_PORT, DEFAULT_PORT);
 		final int port = Integer.parseInt(portStr);
-		logger.info("Using port: " + port);		  
+		logger.info("mod-ncip is using port: " + port);		  
 		folioNcipHelper  = new FolioNcipHelper(promise);
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
@@ -53,7 +53,7 @@ public class MainVerticle extends AbstractVerticle {
 			//THIS REALLY SHOULD BE AN NCIP RESONSE THAT MIRRORS THE NCIP REQUEST TYPE (WITH PROBLEM ELEMENT) HOWEVER...
 			//THAT IS NOT POSSIBLE IF WE'VE REACHED HERE BECAUSE ONLY THE MESSAGE HANDLER CAN CONSTRUCT A RESPONSE OBJECT
 			//WE SHOULDN'T EVER GET HERE - FAMOUS LAST WORDS
-			.end("<Problem><message>probem processing NCIP request</message><exception>" + e.toString()+ "</exception></Problem>");
+			.end("<Problem><message>problem processing NCIP request</message><exception>" + e.toString()+ "</exception></Problem>");
 		}
 		ctx.response()
 		.setStatusCode(200)
@@ -80,7 +80,7 @@ public class MainVerticle extends AbstractVerticle {
 				//THIS REALLY SHOULD BE AN NCIP RESONSE THAT MIRRORS THE NCIP REQUEST TYPE (WITH PROBLEM ELEMENT) HOWEVER...
 				//THAT IS NOT POSSIBLE IF WE'VE REACHED HERE BECAUSE ONLY THE MESSAGE HANDLER CAN CONSTRUCT A RESPONSE OBJECT
 				//WE SHOULDN'T EVER GET HERE IF THE MODULE IS SET UP PROPERLY - FAMOUS LAST WORDS
-				.end("<Problem><message>probem processing NCIP request</message><exception>" + e.getLocalizedMessage() + "</exception></Problem>");
+				.end("<Problem><message>problem processing NCIP request</message><exception>" + e.getLocalizedMessage() + "</exception></Problem>");
 			}
 
 			String inputStreamString = new Scanner(responseMsgInputStream,"UTF-8").useDelimiter("\\A").next();
