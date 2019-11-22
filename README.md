@@ -43,6 +43,14 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
    <td>The location of the property files for the module.  More details about the property files below.
    </td>
   </tr>
+  <tr>
+   <td>okapi_url
+   </td>
+   <td>string
+   </td>
+   <td>You may not need this if you are accessing the NCIP module through the edge-ncip module
+   </td>
+  </tr>
 </table>
 
 

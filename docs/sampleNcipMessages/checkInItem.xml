@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding='UTF-8'?>
+<NCIPMessage version='http://www.niso.org/schemas/ncip/v2_0/ncip_v2_0.xsd'>xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ <CheckInItem>
+ <InitiationHeader>
+		<FromAgencyId>
+			<AgencyId>Relais</AgencyId>
+		</FromAgencyId>
+		<ToAgencyId>
+			<AgencyId>LEH</AgencyId>
+		</ToAgencyId>
+	</InitiationHeader> 
+   <ItemId>
+      <AgencyId>LEH</AgencyId>
+	  <ItemIdentifierValue>LEH-201911071039</ItemIdentifierValue>
+   </ItemId>
+   <ItemElementType>Bibliographic Description</ItemElementType>
+ </CheckInItem>
+</NCIPMessage>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NCIPMessage version="http://www.niso.org/schemas/ncip/v2_0/ncip_v2_0.xsd"
+   xmlns="http://www.niso.org/2008/ncip">
+  <LookupUser>
+  <InitiationHeader>
+				<FromAgencyId>
+					<AgencyId>Relais</AgencyId>
+				</FromAgencyId>
+				<ToAgencyId>
+					<AgencyId>LEHI</AgencyId>
+				</ToAgencyId>
+   		  </InitiationHeader> 
+    <UserId>
+      <AgencyId>Relais</AgencyId>
+      <UserIdentifierValue>8377630</UserIdentifierValue>
+    </UserId>
+    <UserElementType>Name Information</UserElementType>
+    <UserElementType>User Address Information</UserElementType>
+    <UserElementType>User Privilege</UserElementType>
+    <UserElementType>User Id</UserElementType>
+  </LookupUser>
+</NCIPMessage>
