@@ -154,6 +154,8 @@ The lookup user service determines whether or not a patron is permitted to borro
 
 This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
 
+[https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/lookupUser.xml] (Sample request XMl)
+
 ##### Accept Item
 The accept item service is called when a requested item arrives from another library.  This service essentially creates the temporary record and places it on hold.
 It is probably the most complicated of the existing four service.  It:
