@@ -1,7 +1,7 @@
 # mod-ncip
 NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
-**DRAFT** in progress...adding code and documentation to GIT
+**README DRAFT** in progress...adding code and documentation to GIT
 
 
 
@@ -68,10 +68,10 @@ When the module is started properties are initialized for each tenant.  It deter
 
 
 
-1. rules.drl - this file contains Drools rules used by the “LookupUser” NCIP service.  It allows you to block users by the amount of fines they owe or the number of checked out items.  If you do not want to use these rules comment them out or delete them.  (Leave the file in place) \
+1. rules.drl - this file contains Drools rules used by the “LookupUser” NCIP service.  It allows you to block users by the amount of fines they owe or the number of checked out items.  If you do not want to use these rules, comment them out or delete. (Leave the file in place) \
 Moving forward this functionality can be removed if it is not necessary or as FOLIO evolves. \
 
-2. toolkit.properties - This module was built using the Extensible Catalog NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) \
+2. toolkit.properties - This module was built using the Extensible Catalog NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) \
 
 3. ncip.properties - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
 
@@ -114,13 +114,13 @@ The configuration settings are fairly self-explanatory with the exception of the
  The inventory module is evolving so this may become unnecessary.  For now it expects the configuration value to be there.  The AcceptItem service will not work without it.  Let me know if I should remove it.
 
 
-When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this but it is a one time initialization.
+When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this, but it is a one time initialization.
 
 
 As you are setting up this module and the values in FOLIO you can use a utility service that validates the values you have set:
 
 
-If you are using the edge-ncip module to access the ncip services send a GET request to: [http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey
+If you are using the edge-ncip module to access the ncip services send a GET request to: [http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey] (http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey)
 
 
 You can access it directly through the NCIP module by sending a GET request to: [http://okapiurl/ncipconfigcheck](http://okapiurl/ncipconfigcheck)
@@ -143,7 +143,7 @@ POST to .../ncip    (if you are calling the service directly)
 POST to ..../circapi/ncip (if you are calling mod-ncip through edge-ncip)
 
 The module determines which service is being called based on the XML passed into the service.
-These particular four services are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog XC toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
+These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog XC toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
 
 #### Supported Services
 
@@ -153,10 +153,22 @@ The lookup user service determines whether or not a patron is permitted to borro
 This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
 
 ##### Accept Item
+The accept item service is called when a requested item arrives from another library.  This service essentially creates the temporary record and places it on hold.
+It is probably the most complicated of the existing four service.  It:
 
+1. Creates an instance (which is noted as 'Suppress from discovery')
+2. Creates a holding record (which is noted as 'Suppress from discovery')
+3. Creates an item (which is noted as 'Suppress from discovery')
+4. Places a hold (page request) on the item for the patron
+
+If something goes wrong with any of these four steps it does attempt to delete any instance, holding or item that may have been created along the way. 
+
+In regards to placing the hold, the 'Requests' module has a 'Pickup Preference' field with options - 'hold shelf' or 'delivery'.  The NCIP request contains 'PickupLocation'.  I thought about a configuration that would allow the service to translate a pickup location to Pickup Preference = delivery
+However, when Pickup Preference = delivery, a patron delivery address is required.  I don't think there is a way for me to derive that location - so I've hardcoded pickup preference to 'hold shelf'.
 
 ##### Checkout Item
-
+The checkout item service is called when an item is checked out (either a temporary item being circulated to a local patron or a local item being loaned to another library).
+In the 1.0 version of this module, this service does check for blocks on the patron and looks at the active indicator.  If if finds blocks or if the patron is not 'active' the call to the service will fail.  If/when JIRA UXPROD-1683 is completed this check can be removed.
 
 
 ##### Checkin Item
