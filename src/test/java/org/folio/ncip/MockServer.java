@@ -69,9 +69,6 @@ public class MockServer {
 	 private static final Logger logger = LoggerFactory.getLogger(MockServer.class);
 	 
 
-	
-	
-	
 	  static HashMap<String, Integer> params = new HashMap<>();
 
 	  private final int port;
@@ -84,7 +81,7 @@ public class MockServer {
 	  
 	  
 	  void start() throws InterruptedException, ExecutionException, TimeoutException {
-		    // Setup Mock Server...
+		  // Setup Mock Server...
 		  final Promise<Void> promise = Promise.promise();
 		   folioNcipHelper  = new FolioNcipHelper(promise);
 		   HttpServer server = vertx.createHttpServer();
@@ -207,7 +204,6 @@ public class MockServer {
 			   vertx.executeBlocking(promise -> {
 				   InputStream responseMsgInputStream = null;
 				   try {
-				   	    //FolioNcipHelper folioNcipHelper = new FolioNcipHelper(ctx);
 				   		responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
 						}
 						catch(Exception e) {
