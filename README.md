@@ -117,13 +117,15 @@ The configuration settings are fairly self-explanatory with the exception of the
 When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this, but it is a one time initialization.
 
 
-As you are setting up this module and the values in FOLIO you can use a utility service that validates the values you have set:
+As you are setting up this module and the values in FOLIO you can use a utility service that validates the values you have set in the ncip.properties file:
 
 
-If you are using the edge-ncip module to access the ncip services send a GET request to: [http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey] (http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey)
+If you are using the edge-ncip module to access the ncip services send a GET request to: 
+[http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey] (http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey)
 
 
-You can access it directly through the NCIP module by sending a GET request to: [http://okapiurl/ncipconfigcheck](http://okapiurl/ncipconfigcheck)
+You can access it directly through the NCIP module by sending a GET request to: 
+[http://okapiurl/ncipconfigcheck] (http://okapiurl/ncipconfigcheck)
 
 
 If the service is able to retrieve a UUID for each of the settings in your configuration file it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
@@ -137,7 +139,7 @@ If the service is able to retrieve a UUID for each of the settings in your confi
 
     
 ### About the NCIP services
-This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  Then endpoint for all services is the same:
+This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all services is the same:
 
 POST to .../ncip    (if you are calling the service directly)
 POST to ..../circapi/ncip (if you are calling mod-ncip through edge-ncip)
@@ -148,7 +150,7 @@ These particular four services were selected because they are required to intera
 #### Supported Services
 
 ##### Lookup User
-The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "ok" value in the response to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
+The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "ok" value to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
 
 This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
 
@@ -163,8 +165,9 @@ It is probably the most complicated of the existing four service.  It:
 
 If something goes wrong with any of these four steps it does attempt to delete any instance, holding or item that may have been created along the way. 
 
-In regards to placing the hold, the 'Requests' module has a 'Pickup Preference' field with options - 'hold shelf' or 'delivery'.  The NCIP request contains 'PickupLocation'.  I thought about a configuration that would allow the service to translate a pickup location to Pickup Preference = delivery
+In regards to placing the hold, the 'Requests' module has a 'Pickup Preference' field with options - 'hold shelf' or 'delivery'.  The NCIP request contains 'PickupLocation'.  I thought about a configuration that would allow the service to translate a pickup location to Pickup Preference = delivery.  
 However, when Pickup Preference = delivery, a patron delivery address is required.  I don't think there is a way for me to derive that location - so I've hardcoded pickup preference to 'hold shelf'.
+The "PickupLocation" that is included in the request is recorded in the FOLIO "Pickup Service Point" field.  In our current NCIP implementation using OLE at Lehigh, we support three pickup locations (Linderman, Fairchild and Delivery).  I'm guessing that will stay the same for our FOLIO implemenation.  One of those three will be record in the FOLIO "Pickup Service Point" field.  
 
 ##### Checkout Item
 The checkout item service is called when an item is checked out (either a temporary item being circulated to a local patron or a local item being loaned to another library).
@@ -172,6 +175,7 @@ In the 1.0 version of this module, this service does check for blocks on the pat
 
 
 ##### Checkin Item
+The checkin item service is called when an item is checked in.  This service can include patron information in the response.  However, if the CheckInItem service is called and there is not an outstanding loan, no patron information will be included in the response. 
 
 
 ### Adding support for additional services to mod-ncip
