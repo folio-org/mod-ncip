@@ -46,9 +46,9 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 </table>
 
 
-Property Files
+### Property Files
 
-Setup
+#### Setup
 
 There should be a set of three property files for each tenant.  The folder structure for the files should duplicate the examples included in the project (in the resources folder) which is:
 
@@ -56,7 +56,7 @@ There should be a set of three property files for each tenant.  The folder struc
 
 When the module is started properties are initialized for each tenant.  It determines tenants by looking in the **tenants **folder.
 
-More about each property file
+#### More about each property file
 
 
 
