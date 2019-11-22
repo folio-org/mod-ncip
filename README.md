@@ -9,13 +9,13 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 
 
-Installing the module
+### Installing the module
 
 
 
 *   The module requires Java 11
 
-Configuration
+### Configuration
 
 
 <table>
@@ -68,41 +68,17 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 3. ncip.properties - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
 
         **#accept item**
-
-
         relais.instance.type.name=PALCI
-
-
         relais.instance.source=PALCI
-
-
         relais.item.material.type.name=PALCI
-
-
         relais.item.perm.loan.type.name=PALCI
-
-
         relais.item.status.name=Available
-
-
         relais.item.perm.location.code=PALCI_LEHIGH
-
-
         relais.holdings.perm.location.code=PALCI_LEHIGH
-
-
         relais.instance.custom.identifier.name=PALCI Request ID
-
-
         **#check out**
-
-
         relais.checkout.service.point.code=FAIRCHILD
-
-
         **#check in**
-
-
         relais.checkin.service.point.code=FAIRCHILD
 
 
@@ -111,14 +87,10 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 
     
 
-<p id="gdcalert1" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/MOD-NCIP-DRAFT-DOCUMENTATION0.png). Store image on your image server and adjust path/filename if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert2">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
-
-
-![alt_text](images/MOD-NCIP-DRAFT-DOCUMENTATION0.png "image_tooltip")
+![Illustrates NCIP message pointing out the agency ID](docs/images/ncipMessageIllustratesAgencyId.png?raw=true "Illustrates NCIP message pointing out the agency ID")
 
 
 
-    Illustrates NCIP message pointing out the agency ID.
 
 
     The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.   I used the “instance.custom.identifier.name” so I could search for the item in the inventory module.  It shows up like this and is searchable:
@@ -129,11 +101,9 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 <p id="gdcalert2" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/MOD-NCIP-DRAFT-DOCUMENTATION1.png). Store image on your image server and adjust path/filename if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert3">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
 
 
-![alt_text](images/MOD-NCIP-DRAFT-DOCUMENTATION1.png "image_tooltip")
+![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
 
 
-
-    Illustrates the details of an instance record pointing out the custom identifier used by this module.
 
 
     The inventory module is evolving so this may become unnecessary.  For now it expects the configuration value to be there.  The AcceptItem service will not work without it.  Let me know if I should remove it.
