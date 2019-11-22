@@ -103,28 +103,28 @@ The configuration settings are fairly self-explanatory with the exception of the
 
 
 
-    The inventory module is evolving so this may become unnecessary.  For now it expects the configuration value to be there.  The AcceptItem service will not work without it.  Let me know if I should remove it.
+ The inventory module is evolving so this may become unnecessary.  For now it expects the configuration value to be there.  The AcceptItem service will not work without it.  Let me know if I should remove it.
 
 
-    When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this but it is a one time initialization.
+When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this but it is a one time initialization.
 
 
-    As you are setting up this module and the values in FOLIO you can use a utility service that validates the values you have set:
+As you are setting up this module and the values in FOLIO you can use a utility service that validates the values you have set:
 
 
-    If you are using the edge-ncip module to access the ncip services send a GET request to: [http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey
+If you are using the edge-ncip module to access the ncip services send a GET request to: [http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey
 
 
-    You can access it directly through the NCIP module by sending a GET request to: [http://okapiurl/ncipconfigcheck](http://okapiurl/ncipconfigcheck)
+You can access it directly through the NCIP module by sending a GET request to: [http://okapiurl/ncipconfigcheck](http://okapiurl/ncipconfigcheck)
 
 
-    If the service is able to retrieve a UUID for each of the settings in your configuration file it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
+If the service is able to retrieve a UUID for each of the settings in your configuration file it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 
 
-    ```
+    
     <Problem>
         <message>problem processing NCIP request</message>
         <exception>java.lang.Exception: The lookup of PALCI_NOTREAL could not be found for relais.instance.type.name</exception>
     </Problem>
 
-    ```
+    
