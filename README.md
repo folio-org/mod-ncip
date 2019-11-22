@@ -156,7 +156,7 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 
     ```
     <Problem>
-        <message>probem processing NCIP request</message>
+        <message>problem processing NCIP request</message>
         <exception>java.lang.Exception: The lookup of PALCI_NOTREAL could not be found for relais.instance.type.name</exception>
     </Problem>
 
