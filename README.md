@@ -195,7 +195,10 @@ Update the toolkit.properties file with the new service name pointing it to the 
 
 ![Illustrates updating the toolkit.properties file by adding a configuration for the Request Item Service](docs/images/newServiceToolkit.png?raw=true "Illustrates updating the toolkit.properties file")
 
-
+#### Step 2: Create the class you configured in step 1
+The new class should implement the Toolkit's interface for this service.  In this example your new class would implement the RequestItemService interface.  This means your class is required to have a 'performService' method as illustrated below.
+When an NCIP request is received, the toolkit looks at the XML in the body of the request to to decide which class will process it (based on the configuration in the toolkit.properties file).  For example, if a request comes in that contains the RequestItem Service XML, the toolkit will instantiate your implemenation of the RequestItem service and then the performService method will be called.  You can see this in the 'ncipProcess' method in the FolioNcipHelper class.
+![Illustrates the new FolioRequestItemService class](docs/images/newServiceToolkit.png?raw=true "Illustrates the new FolioRequestItemService class")
 
 #### Additional resources
 [http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html](http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html)
