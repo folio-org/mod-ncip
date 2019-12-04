@@ -191,6 +191,9 @@ The XC NCIP Toolkit supports all of the services in the [NCIP 2 protocol](http:/
 To illustrate the steps required to add support for additional services I've used the "Request Item" service as an example:
 
 #### Step 1: Update the toolkit.properties file
+Update the toolkit.properties file with the new service name pointing it to the class that you will create which will process the requests for this service:
+
+![Illustrates updating the toolkit.properties file by adding a configuration for the Request Item Service](docs/images/newServiceToolkit.png?raw=true "Illustrates updating the toolkit.properties file")
 
 
 
