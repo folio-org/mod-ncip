@@ -179,10 +179,17 @@ In the 1.0 version of this module, this service does check for blocks on the pat
 ##### Checkin Item
 The checkin item service is called when an item is checked in.  This service can include patron information in the response.  However, if the CheckInItem service is called and there is not an outstanding loan, no patron information will be included in the response. 
 
+### About the Extensible Catalog NCIP Toolkit
+
+The eXtensible Catalog (XC) NCIP Toolkit was developed to act as a standalone Web application that would receive NCIP requests, communicate with your ILS (via a ‘connector’) and send back an XML response.
+
+The FOLIO “mod-ncip” module merges the OKAPI microservices framework with the classes from the core XC NCIP Toolkit project.  The core XC NCIP toolkit libraries provides functionality to transform incoming XML to objects, shepards each request to a specific service and then transforms objects back to XML for the response. 
+
+The XC NCIP Toolkit supports all of the services in the [NCIP 2 protocol](http://www.ncip.info/uploads/7/1/4/6/7146749/z39-83-1-2012_ncip.pdf).  This means adding new services to the FOLIO module will involve a small amount of setup plus writing the code that will call the FOLIO APIs to process the request.
 
 ### Adding support for additional services to mod-ncip
 
-### More about the Extensible Catalog NCIP Toolkit
+
 
 #### Additional resources
  
