@@ -218,7 +218,7 @@ When an NCIP request is received, the toolkit looks at the XML in the body of th
 
 ![Illustrates the new FolioRequestItemService class](docs/images/requestItemService.png?raw=true "Illustrates the new FolioRequestItemService class")
 
-The RequestItemInitiationData (in this example) contains all of the values that were contained in the XML in the body of the request. The RequestItemInitiationData object should contains values like 'requestType' and itemIds.
+The RequestItemInitiationData (in this example) contains all of the values that were contained in the XML in the body of the request. The RequestItemInitiationData object should contains values like 'requestType' and 'itemIds'.
 
 The performService method is responsible for returning the response data object (in this example RequestItemResponseData).  This is the object that will be transformed into the XML that will be included in the response. 
 
