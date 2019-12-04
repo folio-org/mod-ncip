@@ -155,6 +155,7 @@ The lookup user service determines whether or not a patron is permitted to borro
 This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
 
 Sample XML Request
+
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/lookupUser.xml
 
 ##### Accept Item
@@ -174,6 +175,7 @@ The "PickupLocation" that is included in the request is recorded in the FOLIO "P
 
 
 Sample XML Request
+
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/acceptItem.xml
 
 ##### Checkout Item
@@ -181,12 +183,14 @@ The checkout item service is called when an item is checked out (either a tempor
 In the 1.0 version of this module, this service does check for blocks on the patron and looks at the active indicator.  If if finds blocks or if the patron is not 'active' the call to the service will fail.  If/when JIRA UXPROD-1683 is completed this check can be removed.
 
 Sampple XML Request
+
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkOutItem.xml
 
 ##### Checkin Item
 The checkin item service is called when an item is checked in.  This service can include patron information in the response.  However, if the CheckInItem service is called and there is not an outstanding loan, no patron information will be included in the response. 
 
 Sample XML Request
+
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
 
 ### About the Extensible Catalog NCIP Toolkit
