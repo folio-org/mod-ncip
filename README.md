@@ -207,7 +207,10 @@ To illustrate the steps required to add support for additional services I've use
 #### Step 1: Update the toolkit.properties file
 Update the toolkit.properties file with the new service name pointing it to the class that you will create which will process the requests for this service:
 
+Note: Correct capitalization is important for this configuration.  CheckinItemService did not work.  CheckInItemService worked and it took a bit to figure out what the problem was.
+
 ![Illustrates updating the toolkit.properties file by adding a configuration for the Request Item Service](docs/images/newServiceToolkit.png?raw=true "Illustrates updating the toolkit.properties file")
+
 
 #### Step 2: Create the class you configured in step 1
 The new class should implement the Toolkit's interface for this service.  In this example your new class would implement the RequestItemService interface.  This means your class is required to have a 'performService' method as illustrated below.
