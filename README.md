@@ -192,4 +192,14 @@ The XC NCIP Toolkit supports all of the services in the [NCIP 2 protocol](http:/
 
 
 #### Additional resources
- 
+[http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html](http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html)
+
+[https://web.archive.org/web/20160416142842/http://code.google.com/p/xcncip2toolkit/wiki/DriverSummary](https://web.archive.org/web/20160416142842/http://code.google.com/p/xcncip2toolkit/wiki/DriverSummary)
+
+[https://web.archive.org/web/20130508170543/http://www.extensiblecatalog.org/news/oclc-contributes-ncip-20-code-xc-ncip-toolkit](https://web.archive.org/web/20130508170543/http://www.extensiblecatalog.org/news/oclc-contributes-ncip-20-code-xc-ncip-toolkit)
+
+[https://code.google.com/archive/p/xcnciptoolkit/](https://code.google.com/archive/p/xcnciptoolkit/)
+
+[https://www.carli.illinois.edu/frequently-asked-questions-about-xc](https://www.carli.illinois.edu/frequently-asked-questions-about-xc)
+
+[https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html](https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html) 
