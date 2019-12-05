@@ -69,13 +69,13 @@ When the module is started, properties are initialized for each tenant.  It dete
 
 
 1. rules.drl - this file contains Drools rules used by the “LookupUser” NCIP service.  It allows you to block users by the amount of fines they owe or the number of checked out items.  If you do not want to use these rules, comment them out or delete. (Leave the file in place) \
-Moving forward this functionality can be removed if it is not necessary or as FOLIO evolves. \
+Moving forward this functionality can be removed if it is not necessary or as FOLIO evolves. 
 
-2. toolkit.properties - This module was built using the Extensible Catalog NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) \
+2. toolkit.properties - This module was built using the Extensible Catalog NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) 
 
 3. ncip.properties - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
 
-        **#accept item**
+        ***#accept item***
         relais.instance.type.name=PALCI
         relais.instance.source=PALCI
         relais.item.material.type.name=PALCI
