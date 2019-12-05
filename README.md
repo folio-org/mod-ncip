@@ -3,7 +3,10 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 **README DRAFT** in progress...adding code and documentation to GIT
 
-
+## To Do
+- [ ] Need a home for XC NCIP Toolkit JAR files - working with Jakub
+- [ ] Test module with Q4
+- [ ] Do I need to build in more tests?
 
 
 
@@ -238,7 +241,7 @@ You can look at the existing services for examples.  The FolioCheckInItemService
 
 ![Illustrates the new FolioRemoteServiceManager class](docs/images/remoteServiceManager.png?raw=true "Illustrates FolioRemoteServiceManager class")
 
-#### XC NCIP Toolkit Additional resources
+#### XC NCIP Toolkit - Additional resources
 [http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html](http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html)
 
 [https://web.archive.org/web/20160416142842/http://code.google.com/p/xcncip2toolkit/wiki/DriverSummary](https://web.archive.org/web/20160416142842/http://code.google.com/p/xcncip2toolkit/wiki/DriverSummary)
