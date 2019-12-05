@@ -9,11 +9,11 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 
 
-### Installing the module
+## Installing the module
 
 
 
-*   The module requires Java 11
+The module requires Java 11
 
 ### Configuration
 
@@ -58,11 +58,11 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 #### Setup
 
-There should be a set of three property files for each tenant.  The folder structure for the files should duplicate the examples included in the project (in the resources folder) which is:
+There should be a set of three property files for each tenant.  The folder structure for the files should be:
 
 /the property file location you specify/**tenants**/your tenant id/the 3 property files
 
-When the module is started properties are initialized for each tenant.  It determines tenants by looking in the **tenants **folder.
+When the module is started, properties are initialized for each tenant.  It determines tenants by looking in the **tenants** folder.
 
 #### More about each property file
 
@@ -222,11 +222,13 @@ The RequestItemInitiationData (in this example) contains all of the values that 
 
 The performService method is responsible for returning the response data object (in this example RequestItemResponseData).  This is the object that will be transformed into the XML that will be included in the response. 
 
-The RemoteServiceManager (FolioRemoteServiceManager) input parameter (for the performService method) contains the NCIP property values (from the ncip.properties file).  The RemoteServiceManager interface has no methods.  The methods written for this class should be whatever is needed for your implementation.  More about this class from the XC documentation:
+The RemoteServiceManager interface has no methods.  The methods written for this class should be whatever is needed for your implementation.  More about this class from the XC documentation:
  
  "The methods that are written for the RemoteServiceManager implementation class are whatever is needed by the implementations of NCIPService (e.g. LookupItemService, RequestItemService, etc.). It’s certainly possible to put all of the functionality required to access the ILS in the implementations of NCIPService, and that might make sense. But what the RemoteServiceManager provides is a shared object for accessing the ILS, in case you need that to maintain state, cache objects..."
  
  In FOLIO's mod-ncip module, the FolioRemoteServiceManager class is the point where the FOLIO APIs (like check out item) are called.  You can continue this pattern for your new service if you think it makes sense.
+ 
+ The RemoteServiceManager (FolioRemoteServiceManager) input parameter (for the performService method) contains the NCIP property values (from the ncip.properties file).  
 
 #### Step 4: Create a method in the FolioRemoteServiceManager class 
 Create a method (or methods) in the FolioRemoteServiceManager class that will take care of the interaction with the FOLIO API.  The FolioRequestItemService (performService method) could then call this method.
