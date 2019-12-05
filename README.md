@@ -141,7 +141,8 @@ If the service is able to retrieve a UUID for each of the settings in your confi
 ### About the NCIP services
 This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all services is the same:
 
-POST to .../ncip    (if you are calling the service directly)
+POST to .../ncip    (if you are calling the mod-ncip directly)
+
 POST to ..../circapi/ncip (if you are calling mod-ncip through edge-ncip)
 
 The module determines which service is being called based on the XML passed into the service.
@@ -162,16 +163,16 @@ https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/lookup
 The accept item service is called when a requested item arrives from another library.  This service essentially creates the temporary record and places it on hold.
 It is probably the most complicated of the existing four service.  It:
 
-1. Creates an instance (which is noted as 'Suppress from discovery')
-2. Creates a holding record (which is noted as 'Suppress from discovery')
-3. Creates an item (which is noted as 'Suppress from discovery')
+1. Creates an instance (which is set as 'Suppress from discovery')
+2. Creates a holding record (which is set as 'Suppress from discovery')
+3. Creates an item (which is set as 'Suppress from discovery')
 4. Places a hold (page request) on the item for the patron
 
 If something goes wrong with any of these four steps it does attempt to delete any instance, holding or item that may have been created along the way. 
 
 In regards to placing the hold, the 'Requests' module has a 'Pickup Preference' field with options - 'hold shelf' or 'delivery'.  The NCIP request contains 'PickupLocation'.  I thought about a configuration that would allow the service to translate a pickup location to Pickup Preference = delivery.  
 However, when Pickup Preference = delivery, a patron delivery address is required.  I don't think there is a way for me to derive that location - so I've hardcoded pickup preference to 'hold shelf'.
-The "PickupLocation" that is included in the request is recorded in the FOLIO "Pickup Service Point" field.  In our current NCIP implementation using OLE at Lehigh, we support three pickup locations (Linderman, Fairchild and Delivery).  I'm guessing that will stay the same for our FOLIO implemenation.  One of those three will be record in the FOLIO "Pickup Service Point" field.  
+The "PickupLocation" that is included in the request is recorded in the FOLIO "Pickup Service Point" field.  For example...in our current NCIP implementation using OLE at Lehigh, we support three pickup locations (Linderman, Fairchild and Delivery).  I'm guessing that will stay the same for our FOLIO implemenation.  One of those three will be recorded in the FOLIO "Pickup Service Point" field.  
 
 
 Sample XML Request
@@ -182,7 +183,7 @@ https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/accept
 The checkout item service is called when an item is checked out (either a temporary item being circulated to a local patron or a local item being loaned to another library).
 In the 1.0 version of this module, this service does check for blocks on the patron and looks at the active indicator.  If if finds blocks or if the patron is not 'active' the call to the service will fail.  If/when JIRA UXPROD-1683 is completed this check can be removed.
 
-Sampple XML Request
+Sample XML Request
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkOutItem.xml
 
