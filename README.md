@@ -227,9 +227,9 @@ The RemoteServiceManager interface has no methods.  The methods written for this
  
  "The methods that are written for the RemoteServiceManager implementation class are whatever is needed by the implementations of NCIPService (e.g. LookupItemService, RequestItemService, etc.). It’s certainly possible to put all of the functionality required to access the ILS in the implementations of NCIPService, and that might make sense. But what the RemoteServiceManager provides is a shared object for accessing the ILS, in case you need that to maintain state, cache objects..."
  
- In FOLIO's mod-ncip module, the FolioRemoteServiceManager class is the point where the FOLIO APIs (like check out item) are called.  You can continue this pattern for your new service if you think it makes sense.
+ In FOLIO's mod-ncip module, the FolioRemoteServiceManager class is the point where the FOLIO APIs (like check out item) are called.  You can continue this pattern for your new service if you think it makes sense.  The example above illustrates the request item service calling the RemoteServiceManagers 'requestItem' method.  The FolioRemoteServiceManager class contains all of the NCIP property values.
  
- The RemoteServiceManager (FolioRemoteServiceManager) input parameter (for the performService method) contains the NCIP property values (from the ncip.properties file).  
+ 
 
 #### Step 4: Create a method in the FolioRemoteServiceManager class 
 Create a method (or methods) in the FolioRemoteServiceManager class that will take care of the interaction with the FOLIO API.  The FolioRequestItemService (performService method) could then call this method.
@@ -238,7 +238,7 @@ You can look at the existing services for examples.  The FolioCheckInItemService
 
 ![Illustrates the new FolioRemoteServiceManager class](docs/images/remoteServiceManager.png?raw=true "Illustrates FolioRemoteServiceManager class")
 
-#### Additional resources
+#### XC NCIP Toolkit Additional resources
 [http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html](http://catalogablog.blogspot.com/2009/03/extensible-catalog-ncip-toolkit.html)
 
 [https://web.archive.org/web/20160416142842/http://code.google.com/p/xcncip2toolkit/wiki/DriverSummary](https://web.archive.org/web/20160416142842/http://code.google.com/p/xcncip2toolkit/wiki/DriverSummary)
