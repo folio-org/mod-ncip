@@ -84,9 +84,9 @@ Moving forward this functionality can be removed if it is not necessary or as FO
         relais.item.perm.location.code=PALCI_LEHIGH
         relais.holdings.perm.location.code=PALCI_LEHIGH
         relais.instance.custom.identifier.name=PALCI Request ID
-        **#check out**
+        #check out
         relais.checkout.service.point.code=FAIRCHILD
-        **#check in**
+        #check in
         relais.checkin.service.point.code=FAIRCHILD
 
 
@@ -117,15 +117,15 @@ The configuration settings are fairly self-explanatory with the exception of the
 When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this, but it is a one time initialization.
 
 
-As you are setting up this module and the values in FOLIO you can use a utility service that validates the values you have set in the ncip.properties file:
+As you are setting up mod-nicp, the ncip.properties file and the settings values in FOLIO, you can use this utility service to validate the values you have set in the ncip.properties file (it attempts to look up each value you have configured):
 
 
 If you are using the edge-ncip module to access the ncip services send a GET request to: 
-[http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey] (http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey)
+http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey
 
 
 You can access it directly through the NCIP module by sending a GET request to: 
-[http://okapiurl/ncipconfigcheck] (http://okapiurl/ncipconfigcheck)
+http://okapiurl/ncipconfigcheck
 
 
 If the service is able to retrieve a UUID for each of the settings in your configuration file it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
@@ -145,7 +145,7 @@ POST to .../ncip    (if you are calling the service directly)
 POST to ..../circapi/ncip (if you are calling mod-ncip through edge-ncip)
 
 The module determines which service is being called based on the XML passed into the service.
-These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog XC toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
+These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog (XC) NCIP toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
 
 #### Supported Services
 
