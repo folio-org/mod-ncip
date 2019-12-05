@@ -75,7 +75,7 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 
 3. ncip.properties - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
 
-        ***#accept item***
+        #accept item
         relais.instance.type.name=PALCI
         relais.instance.source=PALCI
         relais.item.material.type.name=PALCI
