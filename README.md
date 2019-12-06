@@ -77,9 +77,11 @@ When the module is started, properties are initialized for each tenant.  It dete
 1. rules.drl - this file contains Drools rules used by the “LookupUser” NCIP service.  It allows you to block users by the amount of fines they owe or the number of checked out items.  If you do not want to use these rules, comment them out or delete. (Leave the file in place) \
 Moving forward this functionality can be removed if it is not necessary or as FOLIO evolves. 
 
-2. toolkit.properties - This module was built using the Extensible Catalog NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) 
+2. toolkit.properties - This module was built using the Extensible Catalog (XC) NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) 
 
 3. ncip.properties - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
+
+You can find examples of these property files and folder structure in the /src/main/resources folder.
 
         #accept item
         relais.instance.type.name=PALCI
@@ -145,7 +147,7 @@ If the service is able to retrieve a UUID for each of the settings in your confi
 
     
 ### About the NCIP services
-This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all services is the same:
+This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all of the services is the same:
 
 POST to .../ncip    (if you are calling the mod-ncip directly)
 
@@ -161,7 +163,7 @@ The lookup user service determines whether or not a patron is permitted to borro
 
 This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
 
-Sample XML Request
+Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/lookupUser.xml
 
@@ -181,7 +183,7 @@ However, when Pickup Preference = delivery, a patron delivery address is require
 The "PickupLocation" that is included in the request is recorded in the FOLIO "Pickup Service Point" field.  For example...in our current NCIP implementation using OLE at Lehigh, we support three pickup locations (Linderman, Fairchild and Delivery).  I'm guessing that will stay the same for our FOLIO implemenation.  One of those three will be recorded in the FOLIO "Pickup Service Point" field.  
 
 
-Sample XML Request
+Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/acceptItem.xml
 
@@ -189,14 +191,14 @@ https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/accept
 The checkout item service is called when an item is checked out (either a temporary item being circulated to a local patron or a local item being loaned to another library).
 In the 1.0 version of this module, this service does check for blocks on the patron and looks at the active indicator.  If if finds blocks or if the patron is not 'active' the call to the service will fail.  If/when JIRA UXPROD-1683 is completed this check can be removed.
 
-Sample XML Request
+Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkOutItem.xml
 
 ##### Checkin Item
 The checkin item service is called when an item is checked in.  This service can include patron information in the response.  However, if the CheckInItem service is called and there is not an outstanding loan, no patron information will be included in the response. 
 
-Sample XML Request
+Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
 
