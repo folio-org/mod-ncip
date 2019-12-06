@@ -18,7 +18,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 The module requires Java 11
 
-This module does have a companion 'edge' module - edge-ncip that can be used to expose this service to external applications.
+This module does have a companion 'edge' module - edge-ncip - that can be used to expose this service to external applications.
 https://github.com/folio-org/edge-ncip
 
 ### Configuration
