@@ -5,7 +5,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 ## To Do
 - [ ] Need a home for XC NCIP Toolkit JAR files - working with Jakub
-- [ ] Test module with Q4
+- [x] Test module with Q4
 - [ ] Do I need to build in more tests?
 
 
