@@ -98,7 +98,7 @@ You can find examples of these property files and folder structure in the /src/m
         relais.checkin.service.point.code=FAIRCHILD
 
 
-    The first ‘section’ of each configuration (in the example above ‘relais’) represents an agency ID.  Typically the requestor calling the NCIP service will include an agency ID in the request (example below).  Having the first section of each configuration value tied to a requestors agency ID gives the module more flexibility.  If you have two requesters calling your NCIP services with unique agency IDs you can configure these values differently for each requestor.  Also, the agency ID is not always required so the ncip.properties file contains a default configuration value for each.  If the request does not contain an agency ID the module will use the values assigned to the default configurations.  More than likely your requestors will send an agency ID with the request.  This is just a precaution.
+The first ‘section’ of each configuration (in the example above ‘relais’) represents an agency ID.  Typically the requestor calling the NCIP service will include an agency ID in the request (example below).  Having the first section of each configuration value tied to a requestors agency ID gives the module more flexibility.  If you have two requesters calling your NCIP services with unique agency IDs you can configure these values differently for each requestor.  Also, the agency ID is not always required so the ncip.properties file contains a default configuration value for each.  If the request does not contain an agency ID the module will use the values assigned to the default configurations.  More than likely your requestors will send an agency ID with the request.  This is just a precaution.
 
 
     
