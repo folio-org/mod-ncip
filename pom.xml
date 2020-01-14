@@ -9,6 +9,12 @@
 	<name>NCIP</name>
 	<description>NCIP responder for FOLIO (internal module)</description>
 
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://spdx.org/licenses/Apache-2.0</url>
+		</license>
+	</licenses>
 
 	<properties>
 		<vertx.version>3.8.0</vertx.version>
