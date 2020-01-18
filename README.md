@@ -266,3 +266,11 @@ You can look at the existing services for examples.  The FolioCheckInItemService
 [https://www.carli.illinois.edu/frequently-asked-questions-about-xc](https://www.carli.illinois.edu/frequently-asked-questions-about-xc)
 
 [https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html](https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html) 
+
+## Additional information
+
+### Issue tracker
+
+See project [MODNCIP](https://issues.folio.org/browse/MODNCIP)
+at the [FOLIO issue tracker](https://dev.folio.org/guidelines/issue-tracker).
+
