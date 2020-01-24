@@ -1,6 +1,6 @@
 {
-  "id": "mod-ncip-1.0",
-  "name": "NCIP Module",
+  "id": "${artifactId}-${version}",
+  "name": "NCIP",
    "provides": [
     {
       "id": "mod-ncip",
