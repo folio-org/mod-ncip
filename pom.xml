@@ -119,7 +119,7 @@
 			<version>1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.extensiblecatalog.ncip.v2</groupId>
+			<groupId>org.folio</groupId>
 			<artifactId>domain-models-runtime</artifactId>
 			<version>21.1.0</version>
 		</dependency>
