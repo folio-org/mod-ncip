@@ -137,7 +137,7 @@ As you are setting up mod-nicp, the ncip.properties file and the settings values
 
 
 If you are using the edge-ncip module to access the ncip services send a GET request to: 
-http://okapiurl/circapi/ncipconfigcheck?apikey=yourapikey
+http://youredgemoduleURL/ncipconfigcheck?apikey=yourapikey
 
 
 You can access it directly through the NCIP module by sending a GET request to: 
@@ -157,9 +157,9 @@ If the service is able to retrieve a UUID for each of the settings in your confi
 ### About the NCIP services
 This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all of the services is the same:
 
-POST to .../ncip    (if you are calling the mod-ncip directly)
+POST to http://yourokapiendoint/ncip    (if you are calling the mod-ncip directly)
 
-POST to ..../circapi/ncip (if you are calling mod-ncip through edge-ncip)
+POST to http://youredgencipendpoint/ncip (if you are calling mod-ncip through edge-ncip)
 
 The module determines which service is being called based on the XML passed into the service.
 These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog (XC) NCIP toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
