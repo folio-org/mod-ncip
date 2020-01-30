@@ -50,8 +50,10 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		logger.info("ncip config check...");
 	    okapiHeaders = routingContext.request().headers(); 
 		String baseUrl = routingContext.request().headers().get(Constants.X_OKAPI_URL);
+		logger.info("BaseEndpoint: " + baseUrl);
 		JSONParser parser = new JSONParser();
-		InputStream inputStream =this.getClass().getResourceAsStream(Constants.INIT_PROP_FILE);
+		//InputStream inputStream =this.getClass().getResourceAsStream(Constants.INIT_PROP_FILE);
+		InputStream inputStream =this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 		JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 		JSONArray jsonArray = (JSONArray) obj.get("lookups");
 		
@@ -68,7 +70,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 	      while (innerProperties.hasMoreElements()) {
 	    	  String  innerKey = innerProperties.nextElement();
 	    	  String  innerValues = values.getProperty(innerKey);
-	    	  System.out.println(innerKey + " : "  + innerValues);
+	    	  logger.info(innerKey + " : "  + innerValues);
 	    	  JSONObject setting = returnSearch(jsonArray,innerKey);
 	    	  if (setting == null) continue;
 			  String lookup = (String) setting.get("lookup");

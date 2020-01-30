@@ -21,9 +21,6 @@ import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
