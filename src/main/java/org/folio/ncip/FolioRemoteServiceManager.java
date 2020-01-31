@@ -368,8 +368,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			// PLACE REQUEST (HOLD)
 			JsonObject request = new JsonObject();
 			request.put("requestType", "Page");
-			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
-			//SEE NOTES.TXT
+			// FOR EXPLANATION ABOUT HARDCODE FULFILLMENT
+			//SEE README (Pickup Preference)
 			request.put("fulfilmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
 			request.put("requesterId", uid);
