@@ -126,7 +126,7 @@ public class FolioNcipHelper {
 				InputStream input = new FileInputStream(toolKitPropertyFileName);
 				properties.load(input);
 				toolkitProperties.put(tenant, properties);
-				serviceContext.put(tenant, ServiceValidatorFactory.buildServiceValidator().getInitialServiceContext());
+				serviceContext.put(tenant,ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
 				translator.put(tenant,TranslatorFactory.buildTranslator(null,properties));
 			}
 			promise.complete();
