@@ -1,38 +1,16 @@
 package org.folio.ncip;
 
 import static io.restassured.RestAssured.given;
-import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.http.HttpClient.Version;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
-
-import org.apache.commons.io.IOUtils;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-
 import io.restassured.http.ContentType;
-import io.restassured.http.Header;
 import io.restassured.response.Response;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 
 /**
  * When not run from StorageTestSuite then this class invokes StorageTestSuite.before() and

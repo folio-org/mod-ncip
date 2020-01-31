@@ -107,49 +107,61 @@ public class FolioNcipHelper {
 		return responseMsgInputStream;
 	}
 
-	//XC NCIP TOOLKIT PROPERTIES FILE 
-	//INITIALIZED FOR EACH TENANT
+	/**
+	 * XC NCIP Toolkit properties file
+	 * initialized for each tenant
+	 *
+	*/
 	private Future<Void> initToolkit() {
 
 		Promise<Void> promise = Promise.promise();
 		try {
 			//get property folder for each tenant
+			logger.info("initializing toolkit.properties");
 			final String propertyFolder = System.getProperty("prop_files");
 			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
 			Iterator<String> i = tenantPropertyFolders.iterator();
 			while (i.hasNext()) {
 				Properties properties = new Properties();
 				String tenant = (String) i.next();
+				logger.info("initializing toolkit.properties for tenant: " + tenant);
 				String toolKitPropertyFileName = System.getProperty("prop_files") + "/tenants/" + tenant + "/toolkit.properties"; 
 				InputStream input = new FileInputStream(toolKitPropertyFileName);
 				properties.load(input);
 				toolkitProperties.put(tenant, properties);
-				serviceContext.put(tenant, ServiceValidatorFactory.buildServiceValidator().getInitialServiceContext());
+				serviceContext.put(tenant,ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
 				translator.put(tenant,TranslatorFactory.buildTranslator(null,properties));
 			}
 			promise.complete();
 		}
 		catch(Exception e) {
+			logger.fatal("Unable to initialize toolkit.properties file.");
+			logger.fatal(e.getLocalizedMessage());
 			promise.fail("Unable to initialize toolkit.properties file.");
-			System.out.println(e.toString());
 		}
 		return promise.future();
 	}
 
-	//IN THE FUTURE, PROPERTIES COULD BE CONFIGURED IN SETTINGS?
-	//THEY TYPICALLY DON'T CHANGE FREQUENTLY
-	//THESE ARE THINGS LIKE MATERIAL TYPE FOR INSTANCES 
-	//THE ACCEPT ITEM SERVICE CREATES
-	//INITIALIZED FOR EACH TENANT
+	/**
+	 * Initializing property values needed for several of the services.
+	 * e.g. materialTypes for instances created in AcceptItem
+	 * These values are initialized for each tenant
+	 * In the future, properties could be configured in settings?
+	 * They don't typically change frequently...so maybe the property 
+	 * file is fine.
+	 *
+	*/
 	private Future<Void> initNcipProperties() {
 		Promise<Void> promise = Promise.promise();
 		try {
 			String propertyFolder = System.getProperty("prop_files");
+			logger.info("initializing ncip.properties");
 			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
 			Iterator<String> i = tenantPropertyFolders.iterator();
 			while (i.hasNext()) {
 				Properties properties = new Properties();
 				String tenant = (String) i.next();
+				logger.info("initializing ncip.properties for tenant: " + tenant);
 				String filePath = System.getProperty("prop_files") + "/tenants/" + tenant + "/" + "ncip.properties";
 
 				InputStream input = new FileInputStream(filePath);
@@ -159,8 +171,9 @@ public class FolioNcipHelper {
 			promise.complete();
 		}
 		catch(Exception e) {
+			logger.fatal("unable to initialize ncip.properties file");
+			logger.fatal(e.getLocalizedMessage());
 			promise.fail("unable to initialize ncip.properties file");
-			System.out.println(e.toString());
 		}
 		return promise.future();
 	}
@@ -174,12 +187,14 @@ public class FolioNcipHelper {
 		try {
 
 			//get property folder
+			logger.info("initializing rules.drl");
 			final String propertyFolder = System.getProperty("prop_files");
 			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
 			Iterator<String> i = tenantPropertyFolders.iterator();
 			while (i.hasNext()) {
 
 				String tenant = (String) i.next();
+				logger.info("initializing rules for tenant: " + tenant);
 				KieServices kieServices = KieServices.Factory.get();
 				KieFileSystem kfs = kieServices.newKieFileSystem();
 				String rulesFilePath = System.getProperty("prop_files") + "/tenants/" + tenant + "/rules.drl"; 
@@ -195,8 +210,9 @@ public class FolioNcipHelper {
 			promise.complete();
 		}
 		catch(Exception e) {
+			logger.fatal("unable to initialize rules.drl");
+			logger.fatal(e.getLocalizedMessage());
 			promise.fail("unable to initialize rules.drl");
-			System.out.println(e.toString());
 		}
 		return promise.future();
 	}

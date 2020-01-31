@@ -368,8 +368,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			// PLACE REQUEST (HOLD)
 			JsonObject request = new JsonObject();
 			request.put("requestType", "Page");
-			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
-			//SEE NOTES.TXT
+			// FOR EXPLANATION ABOUT HARDCODE FULFILLMENT
+			//SEE README (Pickup Preference)
 			request.put("fulfilmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
 			request.put("requesterId", uid);
@@ -503,14 +503,19 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return user;
 	}
 
-	//ONE TIME (PER AGENT) PROPERTY INITIALIZATION
+
+	/**
+	 * This method is called one time (per agent in the ncip.properties file)
+	 * to initialize & store property values
+	 *
+	*/
 	private void initProperties(String requesterAgencyId, String baseUrl) throws Exception {
 
 		logger.info("=======> initializing properties");
 		JSONParser parser = new JSONParser();
 		try {
 
-			InputStream inputStream =this.getClass().getResourceAsStream(Constants.INIT_PROP_FILE);
+			InputStream inputStream =this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 			JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 			JSONArray jsonArray = (JSONArray) obj.get("lookups");
 			Iterator i = jsonArray.iterator();
@@ -560,8 +565,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	}
 	
-	//LOOKUP PATRON METHOD SHARED BY
-	//SEVERAL OF THE SERVICES
+	/**
+	   * Lookup patron method shared by several of the services
+	   *
+	*/
 	public JsonObject lookupPatronRecord(UserId userid) throws Exception {
 		String barcode = userid.getUserIdentifierValue();
 		// LOOKUP THE PATRON
@@ -579,8 +586,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return user;
 	}
 
-	//METHOD THE LOOKUP USER SERVICE CALLS
-	//GET USER AND USER DETAILS (E.G ACCOUNTS)
+	/**
+	 * Method the LookupUser service calls.
+	 * Pulls together user and user details (e.g. accounts)
+	 *
+	*/
 	public JsonObject lookupUser(UserId userid) throws Exception {
 		JsonObject user = lookupPatronRecord(userid);
 		if (user == null) return user;
