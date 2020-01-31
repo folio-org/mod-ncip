@@ -107,8 +107,11 @@ public class FolioNcipHelper {
 		return responseMsgInputStream;
 	}
 
-	//XC NCIP TOOLKIT PROPERTIES FILE 
-	//INITIALIZED FOR EACH TENANT
+	/**
+	 * XC NCIP Toolkit properties file
+	 * initialized for each tenant
+	 *
+	*/
 	private Future<Void> initToolkit() {
 
 		Promise<Void> promise = Promise.promise();
@@ -139,11 +142,15 @@ public class FolioNcipHelper {
 		return promise.future();
 	}
 
-	//IN THE FUTURE, PROPERTIES COULD BE CONFIGURED IN SETTINGS?
-	//THEY TYPICALLY DON'T CHANGE FREQUENTLY
-	//THESE ARE THINGS LIKE MATERIAL TYPE FOR INSTANCES 
-	//THE ACCEPT ITEM SERVICE CREATES
-	//INITIALIZED FOR EACH TENANT
+	/**
+	 * Initializing property values needed for several of the services.
+	 * e.g. materialTypes for instances created in AcceptItem
+	 * These values are initialized for each tenant
+	 * In the future, properties could be configured in settings?
+	 * They don't typically change frequently...so maybe the property 
+	 * file is fine.
+	 *
+	*/
 	private Future<Void> initNcipProperties() {
 		Promise<Void> promise = Promise.promise();
 		try {
