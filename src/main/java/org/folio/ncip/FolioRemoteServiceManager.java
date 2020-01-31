@@ -510,7 +510,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JSONParser parser = new JSONParser();
 		try {
 
-			InputStream inputStream =this.getClass().getResourceAsStream(Constants.INIT_PROP_FILE);
+			InputStream inputStream =this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 			JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 			JSONArray jsonArray = (JSONArray) obj.get("lookups");
 			Iterator i = jsonArray.iterator();
