@@ -21,7 +21,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     inventory-storage.material-types.collection.get   ->Settings (Inventory): Create, edit, delete material types
     inventory-storage.loan-types.collection.get       ->Settings (Inventory): Create, edit, delete loan types
 
-### You need to set up the values in FOLIO that will be set in the [ncip.properties](#ncip-prop)
+### You need to set up the values in FOLIO that will be set in the [ncip.properties](#ncip-prop) file
 
 
 
