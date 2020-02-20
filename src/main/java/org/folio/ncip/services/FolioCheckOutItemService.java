@@ -58,7 +58,9 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	logger.info("Could not determine agency id from initiation header.Using default");
         }
        
-		
+       //In case the element is there but empty
+        if (requesterAgencyId != null && requesterAgencyId.trim().equalsIgnoreCase("")) requesterAgencyId = Constants.DEFAULT_AGENCY;
+        
         GregorianCalendar calendar = new GregorianCalendar();		
 		
         try {
