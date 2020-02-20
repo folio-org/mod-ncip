@@ -20,6 +20,7 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
+import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -75,6 +76,8 @@ public class FolioNcipHelper {
 			logger.info(entry.getKey() + "-" + entry.getValue());
 		}
 		logger.info("==============================");
+		logger.info("==========BODY===============");
+		logger.info(context.getBodyAsString());
 		
 		
 		String tenant = context.request().headers().get(Constants.X_OKAPI_TENANT);
@@ -107,6 +110,7 @@ public class FolioNcipHelper {
 		return responseMsgInputStream;
 	}
 
+
 	/**
 	 * XC NCIP Toolkit properties file
 	 * initialized for each tenant
@@ -121,6 +125,7 @@ public class FolioNcipHelper {
 			final String propertyFolder = System.getProperty("prop_files");
 			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
 			Iterator<String> i = tenantPropertyFolders.iterator();
+			//ServiceContext sContext = ServiceValidatorFactory.buildServiceValidator().getInitialServiceContext();
 			while (i.hasNext()) {
 				Properties properties = new Properties();
 				String tenant = (String) i.next();

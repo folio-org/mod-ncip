@@ -6,12 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpClient.Version;
-import java.net.http.HttpRequest;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,6 +34,17 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.time.LocalDateTime;
 
@@ -86,89 +91,107 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return (System.nanoTime() - t0) / (1000L * 1000L);
 	}
 
-	public HttpResponse<String> callApiGet(String url, HttpClient client)
+	public String  callApiGet(String uriString)
 			throws Exception, IOException, InterruptedException {
-		HttpRequest r = HttpRequest.newBuilder().uri(URI.create(url)).timeout(Duration.ofMinutes(1))
-				.header(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.header(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).version(Version.HTTP_1_1)
-				.header(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.header(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-				.GET().build();
-
-		HttpResponse<String> response = client.send(r, BodyHandlers.ofString());
+		CloseableHttpClient client = HttpClients.custom().build();
+		HttpUriRequest request = RequestBuilder.get()
+				.setUri(uriString)
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+				.build();
+		
+		
+		 HttpResponse response = client.execute(request);
+		 HttpEntity entity = response.getEntity();
+		 String responseString = EntityUtils.toString(entity, "UTF-8");
+		 int responseCode = response.getStatusLine().getStatusCode();
 
 		logger.info("GET:");
-		logger.info(url);
-		logger.info(response.statusCode());
-		logger.info(response.body().toString());
-
-		if (response.statusCode() > 399) {
-			String responseBody = processErrorResponse(response);
-			throw new Exception(responseBody);
+		logger.info(uriString);
+		logger.info(responseCode);
+		logger.info(responseString);
+		
+		if (responseCode > 399) {
+			String responseBody = processErrorResponse(responseString);
+			throw new Exception(responseString);
 		}
 
-		return response;
+		return responseString;
 
 	}
 
-	public HttpResponse<String> callApiPost(String url, HttpClient client, JsonObject body)
-			throws Exception, IOException, InterruptedException {
-		HttpRequest r = HttpRequest.newBuilder().uri(URI.create(url)).timeout(Duration.ofMinutes(1))
-				.header(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.header(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).version(Version.HTTP_1_1)
-				.header(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
-				.header(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.header(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-				.POST(BodyPublishers.ofString(body.toString())).build();
-
-		HttpResponse<String> response = client.send(r, BodyHandlers.ofString());
+	public String callApiPost(String uriString, JsonObject body)
+			throws Exception, IOException, InterruptedException {		
+		CloseableHttpClient client = HttpClients.custom().build();
+		HttpUriRequest request = RequestBuilder.post()
+				.setUri(uriString)
+				.setEntity(new StringEntity(body.toString()))
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
+				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+				.build();
+		
+		 HttpResponse response = client.execute(request);
+		 HttpEntity entity = response.getEntity();
+		 String responseString = EntityUtils.toString(entity, "UTF-8");
+		 int responseCode = response.getStatusLine().getStatusCode();
 
 		logger.info("POST:");
 		logger.info(body.toString());
-		logger.info(url);
-		logger.info(response.statusCode());
-		logger.info(response.body().toString());
+		logger.info(uriString);
+		logger.info(responseCode);
+		logger.info(responseString);
 
-		if (response.statusCode() > 399) {
-			String responseBody = processErrorResponse(response);
+		if (responseCode > 399) {
+			String responseBody = processErrorResponse(responseString);
 			throw new Exception(responseBody);
 		}
 
-		return response;
+		return responseString;
 
 	}
 
-	public HttpResponse<String> callApiDelete(String url, HttpClient client)
+	public HttpResponse callApiDelete(String uriString)
 			throws Exception, IOException, InterruptedException {
-		HttpRequest r = HttpRequest.newBuilder().uri(URI.create(url)).timeout(Duration.ofMinutes(1))
-				.header(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.header(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).version(Version.HTTP_1_1)
-				.header(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
-				.header(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.header(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-				.DELETE().build();
 
-		HttpResponse<String> response = client.send(r, BodyHandlers.ofString());
+		CloseableHttpClient client = HttpClients.custom().build();
+		HttpUriRequest request = RequestBuilder.delete()  //set timeout?
+				.setUri(uriString)
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+				.build();
+		
+		 HttpResponse response = client.execute(request);
+		 int responseCode = response.getStatusLine().getStatusCode();
+
 		logger.info("DELETE:");
-		logger.info(url);
-		logger.info(response.statusCode());
-		logger.info(response.body().toString());
+		logger.info(uriString);
+		logger.info(responseCode);
 
-		if (response.statusCode() > 399) {
-			String responseBody = processErrorResponse(response);
-			throw new Exception(responseBody);
+		if (responseCode > 399) {
+			throw new Exception("Response code from delete: " + responseCode);
 		}
 
 		return response;
 
 	}
-
-	public String processErrorResponse(HttpResponse<String> response) {
+  /**
+   * The method deals with error messages that are returned
+   * by the API as plain strings and messages returned as JSON
+   *
+   */
+	public String processErrorResponse(String responseBody) {
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
-		String responseBody = response.body().toString();
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
 		try {
-			JsonObject jsonObject = new JsonObject(response.body());
+			JsonObject jsonObject = new JsonObject(responseBody);
 			JsonArray errors = jsonObject.getJsonArray("errors");
 			Iterator i = errors.iterator();
 			responseBody = "ERROR: ";
@@ -202,7 +225,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		String servicePoint = ncipProperties.getProperty(agencyId + ".checkin.service.point.id");
 
-		HttpClient client = HttpClient.newBuilder().build();
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.put("servicePointId", servicePoint);
 		jsonObject.put("checkInDate", returnDate);
@@ -210,16 +232,15 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		jsonObject.put("id", id.toString());
 
 		String url = baseUrl + Constants.CHECK_IN_BY_BARCODE;
-		HttpResponse<String> checkInResponse = callApiPost(url, client, jsonObject);
+		String checkInResponse = callApiPost(url,  jsonObject);
 
-		return new JsonObject(checkInResponse.body());
+		return new JsonObject(checkInResponse);
 	}
 
 	public JsonObject checkOut(CheckOutItemInitiationData initData, String agencyId) throws Exception {
 		
 		UUID id = UUID.randomUUID();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		HttpClient client = HttpClient.newBuilder().build();
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
 		LocalDateTime now = LocalDateTime.now();
 		String loanDate = dtf.format(now);
@@ -262,8 +283,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		String url = baseUrl + Constants.CHECK_OUT_BY_BARCODE;
 
-		HttpResponse<String> checkoutResponse = callApiPost(url, client, jsonObject);
-		JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse.body());
+		String checkoutResponse = callApiPost(url,  jsonObject);
+		JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
 		return checkoutResponseAsJson;
 	}
 
@@ -280,7 +301,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		JsonObject returnValues = new JsonObject();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		HttpClient client = HttpClient.newBuilder().build();
+		
 		
 		// LOOKUP THE USER
 		JsonObject user = lookupPatronRecord(userId);
@@ -293,8 +314,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
 		String pickuLocationUrl = baseUrl + "/service-points?query=(code==" + pickUpLocationCode
 				+ "+AND+pickupLocation==true)";
-		HttpResponse<String> servicePointResponse = callApiGet(pickuLocationUrl, client);
-		JsonObject servicePoints = new JsonObject(servicePointResponse.body());
+		String  servicePointResponse = callApiGet(pickuLocationUrl);
+		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
 			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
 
@@ -324,7 +345,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			// CALL INSTANCE API:
 			String url = baseUrl + Constants.INSTANCE_URL;
-			HttpResponse<String> instanceResponse = callApiPost(url, client, instance);
+			String instanceResponse = callApiPost(url, instance);
 
 			// CALL HOLDINGS API:
 			JsonObject holdings = new JsonObject();
@@ -335,7 +356,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			//REQUIRED, ELSE IT WILL NOT SHOW UP IN INVENTORY SEARCH BY LOCA.
 			holdings.put("permanentLocationId", holdingsPermLocation);    
 			url = baseUrl + Constants.HOLDINGS_URL;
-			HttpResponse<String> holdingsResponse = callApiPost(url, client, holdings);
+			String holdingsResponse = callApiPost(url, holdings);
 
 			// CALL ITEMS API
 			String itemStatusName = ncipProperties.getProperty(requesterAgencyId + ".item.status.name");
@@ -363,28 +384,32 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			item.put("permanentLocation", permLocation);
 
 			url = baseUrl + Constants.ITEM_URL;
-			HttpResponse<String> itemResponse = callApiPost(url, client, item);
+			String itemResponse = callApiPost(url, item);
 
 			// PLACE REQUEST (HOLD)
 			JsonObject request = new JsonObject();
 			request.put("requestType", "Page");
-			// FOR EXPLANATION ABOUT HARDCODE FULFILLMENT
+			// FOR EXPLANATION ABOUT HARDCODED FULFILLMENT
 			//SEE README (Pickup Preference)
 			request.put("fulfilmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
-			request.put("requesterId", uid);
+			request.put("requesterId", "289347298347");
 			request.put("itemId", itemUuid.toString());
 			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
 			LocalDateTime now = LocalDateTime.now();
 			request.put("requestDate", dtf.format(now));
-
+			
 			url = baseUrl + Constants.REQUEST_URL;
-			HttpResponse<String> requestRespone = callApiPost(url, client, request);
+			String requestRespone = callApiPost(url, request);
+			
 
-			returnValues.mergeIn(new JsonObject(requestRespone.body())).mergeIn(new JsonObject(itemResponse.body()))
-					.mergeIn(new JsonObject(holdingsResponse.body()));
+			
+			
+
+			returnValues.mergeIn(new JsonObject(requestRespone)).mergeIn(new JsonObject(itemResponse))
+					.mergeIn(new JsonObject(holdingsResponse));
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
@@ -394,21 +419,21 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 			// TRY TO DELETE THE ITEM (IT MAY OR MAYNOT HAVE BEEN CREATED
 			try {
-				callApiDelete(deleteItemUrl, client);
+				callApiDelete(deleteItemUrl);
 			} catch (Exception itemError) {
 				logger.error("unable to back out item: " + itemUuid.toString());
 				logger.error(itemError.getMessage());
 			}
 			// TRY TO DELETE HOLDINGS
 			try {
-				callApiDelete(deleteHoldingsUrl, client);
+				callApiDelete(deleteHoldingsUrl);
 			} catch (Exception holdingsError) {
 				logger.error("unable to back out holdings record: " + holdingsUuid);
 				logger.error(holdingsError.getMessage());
 			}
 			// TRY TO DELETE INSTANCE
 			try {
-				callApiDelete(deleteInstanceUrl, client);
+				callApiDelete(deleteInstanceUrl);
 			} catch (Exception instanceError) {
 				logger.error("unable to back out instance record: " + instanceUuid);
 				logger.error(instanceError.getMessage());
@@ -441,7 +466,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String groupId = user.getString("patronGroup");
-		HttpClient client = HttpClient.newBuilder().build();
+		//HttpClient client = HttpClient.newBuilder().build();
 		final long LONG_DELAY_MS = 5000;
 
 		List<String> apiCallsNeeded = Arrays.asList(baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)",
@@ -450,13 +475,13 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				baseUrl + "/service-points-users?query=(userId==" + userId + ")");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
-		CompletionService<HttpResponse> cs = new ExecutorCompletionService<>(executor);
-		List<Future<HttpResponse>> completableList = new ArrayList<>();
+		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
+		List<Future<String>> completableList = new ArrayList<>();
 
 		Iterator<String> iterator = apiCallsNeeded.iterator();
 		while (iterator.hasNext()) {
 			String url = iterator.next();
-			completableList.add(cs.submit(() -> callApiGet(url, client)));
+			completableList.add(cs.submit(() -> callApiGet(url)));
 		}
 
 		List<String> successes = new ArrayList<>();
@@ -464,13 +489,13 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		long startTime = System.nanoTime();
 		while (completableList.size() > 0) {
-			Future<HttpResponse> f = cs.poll();
+			Future<String> f = cs.poll();
 			if (f != null) {
 				completableList.remove(f);
 				try {
-					HttpResponse value = f.get();
-					successes.add(value.body().toString());
-					user.mergeIn(new JsonObject(value.body().toString()));
+					String value = f.get();
+					successes.add(value);
+					user.mergeIn(new JsonObject(value));
 				} catch (Exception e) {
 					failures.add(e.getMessage());
 					logger.error("an api call failed");
@@ -493,8 +518,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String defaultServicePointId = user.getJsonArray("servicePointsUsers").getJsonObject(0)
 					.getString("defaultServicePointId");
 			String url = baseUrl + "/service-points/" + defaultServicePointId;
-			HttpResponse<String> response = callApiGet(url, client);
-			JsonObject servicePoint = new JsonObject(response.body());
+			String response = callApiGet(url);
+			JsonObject servicePoint = new JsonObject(response);
 			user.mergeIn(servicePoint);
 		} catch (Exception e) {
 			// THIS IS FINE
@@ -520,11 +545,13 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			JSONArray jsonArray = (JSONArray) obj.get("lookups");
 			Iterator i = jsonArray.iterator();
 
-			HttpClient client = HttpClient.newBuilder().build();
-			HttpResponse<String> response = null;
+			
+			HttpResponse response = null;
 			requesterAgencyId = requesterAgencyId.toLowerCase();
 			int responseCode = 0;
 			JsonObject jsonObject = null;
+			
+			CloseableHttpClient client = HttpClients.custom().build();
 
 			while (i.hasNext()) {
 				JSONObject setting = (JSONObject) i.next();
@@ -542,9 +569,27 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				logger.info(lookupValue);
 
 				url = url.replace("{lookup}", URLEncoder.encode(lookupValue));
-				response = callApiGet(baseUrl + url.trim(), client);
-				responseCode = response.statusCode();
-				jsonObject = new JsonObject(response.body());
+				
+				HttpUriRequest request = RequestBuilder.get()
+						.setUri(baseUrl + url.trim())
+						.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+						.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+						.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+						.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+						.build();
+				
+				
+				 response = client.execute(request);
+				 HttpEntity entity = response.getEntity();
+				 String responseString = EntityUtils.toString(entity, "UTF-8");
+				 responseCode = response.getStatusLine().getStatusCode();
+				 
+				 if (responseCode > 400) {
+					 throw new Exception(responseString);
+				 }
+				
+
+				jsonObject = new JsonObject(responseString);
 				if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
 							"Your " + requesterAgencyId + ". " + lookup + " of " + lookupValue + " could not be found");
@@ -553,14 +598,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 						jsonObject.getJsonArray(returnArray).getJsonObject(0).getString(identifier));
 
 			}
-
+			client.close();
 			// IF WE MADE IT THIS FAR, ALL OF THE PROPERTIES HAVE BEEN INITIALIZED
 			ncipProperties.setProperty(requesterAgencyId + Constants.INITIALIZED_PROPERTY, "true");
 
 		} catch (Exception e) {
 			logger.error("Failed attempting to initialize the properties needed to make the API calls");
 			logger.error(e.getLocalizedMessage());
-			throw new Exception("Initializing NCIP properties failed.  " + e.getLocalizedMessage());
+			throw new Exception("Initializing NCIP properties failed.  " + e.getMessage());
 		}
 
 	}
@@ -573,12 +618,31 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String barcode = userid.getUserIdentifierValue();
 		// LOOKUP THE PATRON
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		HttpClient client = HttpClient.newBuilder().build();
 		String userApiUri = baseUrl + "/users?query=(barcode==" + barcode + ")&limit=1";
-		HttpResponse<String> response = callApiGet(userApiUri, client);
+		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
-		JsonObject users = new JsonObject(response.body());
+		JsonObject users = new JsonObject(response);
+		if (users.getJsonArray("users").size() == 0)
+			return null;
+		
+		JsonObject user = users.getJsonArray("users").getJsonObject(0);
+		return user;
+	}
+	
+	/**
+	   * Lookup patron method used by LookupUser service
+	   * when AuthenticationInput is used instead of UserId
+	   *
+	*/
+	public JsonObject lookupPatronRecordBy(String type,String value) throws Exception {
+		// LOOKUP THE PATRON
+		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+		String userApiUri = baseUrl + "/users?query=(" + type + "==" + value + ")&limit=1";
+		String response = callApiGet(userApiUri);
+
+		// WAS THE PATRON FOUND?
+		JsonObject users = new JsonObject(response);
 		if (users.getJsonArray("users").size() == 0)
 			return null;
 		
@@ -586,11 +650,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return user;
 	}
 
-	/**
-	 * Method the LookupUser service calls.
-	 * Pulls together user and user details (e.g. accounts)
-	 *
-	*/
+
+  /**
+   * Method the LookupUser service calls.
+   * Pulls together user and user details (e.g. accounts)
+   *
+   */
 	public JsonObject lookupUser(UserId userid) throws Exception {
 		JsonObject user = lookupPatronRecord(userid);
 		if (user == null) return user;

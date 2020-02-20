@@ -5,16 +5,28 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpClient.Version;
-import java.net.http.HttpResponse.BodyHandlers;
+//import java.net.http.HttpClient;
+//import java.net.http.HttpRequest;
+//import java.net.http.HttpResponse;
+//import java.net.http.HttpClient.Version;
+//import java.net.http.HttpResponse.BodyHandlers;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.time.Duration;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -29,9 +41,9 @@ import io.vertx.ext.web.RoutingContext;
 
 /*
  * 
- * 	VALIDATES THE VALUES
- * IN THE ncip.properties CONFIGURATION FILE
- *	JUST FOR TESTING SETTINGS DURING SETUP
+ * Validates the values 
+ * in the 'ncip.properties' configuration file
+ * This is used just for testing during setup of NCIP
  * 
  */
 public class NcipConfigCheck extends FolioNcipHelper {
@@ -57,10 +69,10 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 		JSONArray jsonArray = (JSONArray) obj.get("lookups");
 		
-		HttpClient client = HttpClient.newBuilder().build();
-		HttpResponse<String> response = null;
-		
+		 HttpResponse response = null;
+
 		Enumeration<String> properties = (Enumeration<String>) ncipProperties.propertyNames();
+		CloseableHttpClient client = HttpClients.createDefault();
 	    while (properties.hasMoreElements()) {
 	     String key = properties.nextElement();
 	     Properties values = (Properties) ncipProperties.get(key);
@@ -80,17 +92,46 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			  String identifier = (String) setting.get("identifier");
 				
 				
-				logger.info("Initializing ");
-				logger.info(lookup);
-				logger.info(" using lookup value ");
-				logger.info(lookup);
+			  logger.info("Initializing ");
+			  logger.info(lookup);
+			  logger.info(" using lookup value ");
+			  logger.info(lookup);
 
-				url = url.replace("{lookup}", URLEncoder.encode(innerValues));
-				System.out.println("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + innerValues);
-				response = callApiGet(baseUrl + url.trim(), client);
-				responseCode = response.statusCode();
-				jsonObject = new JsonObject(response.body());
-				if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
+			 url = url.replace("{lookup}", URLEncoder.encode(innerValues));
+			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + innerValues);
+			 
+
+			 
+			 
+			HttpUriRequest request = RequestBuilder.get()
+					.setUri(baseUrl + url.trim())
+					.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+					.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+					.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+					.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+					.build();
+					
+			 response = client.execute(request);
+			 HttpEntity entity = response.getEntity();
+			 String responseString = EntityUtils.toString(entity, "UTF-8");
+			 responseCode = response.getStatusLine().getStatusCode();
+			 
+			
+
+			logger.info("GET:");
+			logger.info(baseUrl + url.trim());
+			logger.info(response.getStatusLine().getStatusCode());
+			logger.info(responseString);
+
+
+			
+			if (responseCode> 399) {
+				String responseBody = processErrorResponse(responseString);
+				throw new Exception(responseBody);
+			}
+
+			 jsonObject = new JsonObject(responseString);
+			 if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
 							"The lookup of " + innerValues + " could not be found for " + innerKey);
 				
@@ -114,39 +155,12 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		  return null;
 	  }
 	  
-	  
-		public HttpResponse<String> callApiGet(String url, HttpClient client)
-				throws Exception, IOException, InterruptedException {
-			HttpRequest r = HttpRequest.newBuilder().uri(URI.create(url)).timeout(Duration.ofMinutes(1))
-					.header(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-					.header(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).version(Version.HTTP_1_1)
-					.header(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-					.header(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-					.GET().build();
-
-			HttpResponse<String> response = client.send(r, BodyHandlers.ofString());
-
-			logger.info("GET:");
-			logger.info(url);
-			logger.info(response.statusCode());
-			logger.info(response.body().toString());
-
-			if (response.statusCode() > 399) {
-				String responseBody = processErrorResponse(response);
-				throw new Exception(responseBody);
-			}
-
-			return response;
-
-		}
-		
-		
-		public String processErrorResponse(HttpResponse<String> response) {
+	  		
+		public String processErrorResponse(String responseBody) {
 			// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
-			String responseBody = response.body().toString();
 			// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
 			try {
-				JsonObject jsonObject = new JsonObject(response.body());
+				JsonObject jsonObject = new JsonObject(responseBody);
 				JsonArray errors = jsonObject.getJsonArray("errors");
 				Iterator i = errors.iterator();
 				responseBody = "ERROR: ";
