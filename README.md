@@ -9,22 +9,25 @@ Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 
 NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
-**README DRAFT** in progress...adding code and documentation to GIT
 
-## To Do
-- [ ] Need a home for XC NCIP Toolkit JAR files - working with Jakub
-- [x] Test module with Q4
-- [ ] Do I need to build in more tests?
+## Preparation
+### The NCIP module requires a FOLIO user with the following permissions:
+    users.collection.get                              ->can view user profile
+    circulation.requests.item.post                    ->Requests: View, create
+    inventory-storage.all                             ->Inventory: All permissions (note: only need inventory-storage.locations.collection.get)
+    inventory-storage.service-points.collection.get   ->Users: Can view service points assigned to users
+    inventory-storage.instance-types.collection.get   ->Settings (Inventory): Create, edit, delete locally defined resource types
+    inventory-storage.identifier-types.collection.get ->Settings (Inventory): Create, edit, delete resource identifier types
+    inventory-storage.material-types.collection.get   ->Settings (Inventory): Create, edit, delete material types
+    inventory-storage.loan-types.collection.get       ->Settings (Inventory): Create, edit, delete loan types
 
+### You need to set up the values in FOLIO that will be set in the [ncip.properties](#ncip-prop) file
 
 
 
 
 ## Installing the module
 
-
-
-The module requires Java 11
 
 This module does have a companion 'edge' module - edge-ncip - that can be used to expose this service to external applications.
 https://github.com/folio-org/edge-ncip
@@ -87,7 +90,7 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 
 2. toolkit.properties - This module was built using the Extensible Catalog (XC) NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) 
 
-3. ncip.properties - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
+3. <a id="ncip-prop">ncip.properties</a> - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
 
 You can find examples of these property files and folder structure in the /src/main/resources folder.
 
