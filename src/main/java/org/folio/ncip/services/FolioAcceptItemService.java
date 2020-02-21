@@ -71,6 +71,9 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 	        	
 	        }
 	        
+	        //In case the element is there but empty
+	        if (requesterAgencyId != null && requesterAgencyId.trim().equalsIgnoreCase("")) requesterAgencyId = Constants.DEFAULT_AGENCY;
+	        
 	        ItemIdentifierType itemIdentifierType = new ItemIdentifierType(Constants.SCHEME, Constants.ITEM_BARCODE);
 	        RequestIdentifierType requestIdentifierType = new RequestIdentifierType(Constants.SCHEME,Constants.REQUEST_ID);
 	        

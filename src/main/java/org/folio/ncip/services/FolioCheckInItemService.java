@@ -56,6 +56,9 @@ public class FolioCheckInItemService extends FolioNcipService implements CheckIn
 			// NOT A PROBLEM - USING DEFAULT
 			logger.info("Could not determine agency id from initiation header. Using default");
 		}
+		
+		//In case the element is there but empty
+        if (requesterAgencyId != null && requesterAgencyId.trim().equalsIgnoreCase("")) requesterAgencyId = Constants.DEFAULT_AGENCY;
 
 		try {
 			//THE SERVICE MANAGER CALLS THE OKAPI APIs

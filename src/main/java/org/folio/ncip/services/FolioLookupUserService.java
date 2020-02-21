@@ -23,6 +23,7 @@ import org.extensiblecatalog.ncip.v2.service.StructuredPersonalUserName;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.extensiblecatalog.ncip.v2.service.UserAddressRoleType;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatus;
@@ -68,7 +69,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			 this.ncipProperties = ((FolioRemoteServiceManager)serviceManager).getNcipProperties();
 			 this.kieContainer = ((FolioRemoteServiceManager)serviceManager).getKieContainer();
 
-			 UserId userId = retrieveUserId(initData);
+			 UserId userId = retrieveUserId(initData,serviceManager);
 		     
 		     
 		       try {
@@ -124,7 +125,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			 }
 			 
 			 if (initData.getUserIdDesired())
-				 responseData.setUserId(initData.getUserId());
+				 responseData.setUserId(this.retrieveBarcode(userDetails,agencyId));
 			 
 			  if (initData.getUserAddressInformationDesired())
 		        	responseData.getUserOptionalFields().setUserAddressInformations(this.retrieveAddress(userDetails));
@@ -141,6 +142,15 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		 }
 		 return responseData;
 	 }
+	 
+	   private UserId retrieveBarcode(JsonObject jsonObject,String agencyId) throws Exception {
+		   UserId userId = new UserId();
+		   String barcode = jsonObject.getString("barcode");
+		   userId.setUserIdentifierValue(barcode);
+		   userId.setAgencyId(new AgencyId(agencyId));
+		   userId.setUserIdentifierType(new UserIdentifierType("barcode"));
+		   return userId;
+	   }
 
 
 	    private UserPrivilege retrieveBorrowingPrvilege(JsonObject jsonObject,String agencyId) throws Exception{
@@ -315,32 +325,36 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	return uai;
 	    }
 	    
-		 private String retrieveAuthenticationInputTypeOf(String type,LookupUserInitiationData initData) {
+		 private String retrieveAuthenticationInputTypeOf(LookupUserInitiationData initData,RemoteServiceManager serviceManager) {
 		    	if (initData.getAuthenticationInputs() == null) return null;
-		    	String authenticationID = null;
+		    	String barcode = null;
 		    	for (AuthenticationInput authenticationInput : initData.getAuthenticationInputs()) {
-		    		if (authenticationInput.getAuthenticationInputType().getValue().equalsIgnoreCase(type)) {
-		    			authenticationID = authenticationInput.getAuthenticationInputData();
-		    			break;
-		    		}
+		    		
+		    		String authType = authenticationInput.getAuthenticationInputType().getValue();
+		    		String authValue = authenticationInput.getAuthenticationInputData();
+		    		
+		    		try {
+						JsonObject patronDetailsAsJson = ((FolioRemoteServiceManager)serviceManager).lookupPatronRecordBy(authType,authValue);
+						barcode = patronDetailsAsJson.getString("barcode");
+						if (barcode != null && !barcode.equalsIgnoreCase("")) return barcode;
+					} catch (Exception e) {
+						logger.error(e.toString());
+					}
+		    		
 		    	}
-		    	if (authenticationID != null && authenticationID.equalsIgnoreCase("")) authenticationID = null;
-		    	return authenticationID;
+		    	if (barcode != null && barcode.equalsIgnoreCase("")) barcode = null;
+		    	return barcode;
 		 }
 		 
-		private UserId retrieveUserId(LookupUserInitiationData initData) {
+		private UserId retrieveUserId(LookupUserInitiationData initData,RemoteServiceManager serviceManager) {
 		    	UserId uid = null;
 		    	String uidString = null;
 		    	if (initData.getUserId() != null) {
 		    		uid = initData.getUserId();
 		    	}
 		    	else {
-		    		//TRY Barcode Id
-		    		uidString = this.retrieveAuthenticationInputTypeOf(Constants.AUTH_BARCODE,initData);
-		    		//TRY User Id
-		    		if (uidString == null) {
-		    			uidString = this.retrieveAuthenticationInputTypeOf(Constants.AUTH_UID, initData);
-		    		}
+		    		//try AuthenticationInput:
+		    		uidString = this.retrieveAuthenticationInputTypeOf(initData, serviceManager);
 		    	}
 		    	if (uidString != null) {
 		    		uid = new UserId();
