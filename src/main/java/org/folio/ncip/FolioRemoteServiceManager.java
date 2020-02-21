@@ -393,7 +393,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			//SEE README (Pickup Preference)
 			request.put("fulfilmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
-			request.put("requesterId", "289347298347");
+			request.put("requesterId", uid);
 			request.put("itemId", itemUuid.toString());
 			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
