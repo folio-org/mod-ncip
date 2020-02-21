@@ -22,6 +22,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     inventory-storage.loan-types.collection.get       ->Settings (Inventory): Create, edit, delete loan types
 
 ### You need to set up the values in FOLIO that will be set in the [ncip.properties](#ncip-prop) file
+### If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
 
 
 
@@ -92,7 +93,7 @@ Moving forward this functionality can be removed if it is not necessary or as FO
 
 3. <a id="ncip-prop">ncip.properties</a> - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
 
-You can find examples of these property files and folder structure in the /src/main/resources folder.
+You can find examples of these property files and folder structure in the [/src/main/resources folder](https://github.com/folio-org/mod-ncip/tree/master/src/main/resources).
 
         #accept item
         relais.instance.type.name=PALCI
