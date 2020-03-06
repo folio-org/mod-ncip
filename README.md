@@ -117,32 +117,21 @@ You will need a set of these settings in mod-configuration for each individual A
 ![Illustrates NCIP message pointing out the agency ID](docs/images/ncipMessageIllustratesAgencyId.png?raw=true "Illustrates NCIP message pointing out the agency ID")
 
 
+When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are intiialized.  This means the first request may be a bit slow to respond.
+
+If you later add settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
+
+To reinitialize the NCIP properties --> send a GET request to ../ncip/initncipproperties
+To reinitialize the Toolkit properties --> send a GET request to ../ncip/inittoolkit
+To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
 
 
-
-
-
-
-
- The inventory module is evolving so this may become unnecessary.  For now it expects the configuration value to be there.  The AcceptItem service will not work without it.  Let me know if I should remove it.
-
-
-When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this, but it is a one time initialization.
-
-
-As you are setting up mod-nicp, the ncip.properties file and the settings values in FOLIO, you can use this utility service to validate the values you have set in the ncip.properties file (it attempts to look up each value you have configured):
-
-
-If you are using the edge-ncip module to access the ncip services send a GET request to: 
-http://youredgemoduleURL/ncipconfigcheck?apikey=yourapikey
-
+As you are setting up mod-nicp, the ncip.properties file and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
 You can access it directly through the NCIP module by sending a GET request to: 
-http://okapiurl/ncipconfigcheck
+.../ncipconfigcheck
 
-
-If the service is able to retrieve a UUID for each of the settings in your configuration file it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
-
+If the service is able to retrieve a UUID for each of the your settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 
     
     <Problem>
@@ -151,7 +140,7 @@ If the service is able to retrieve a UUID for each of the settings in your confi
     </Problem>
 
     
-### About the NCIP services
+## About the NCIP services
 This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all of the services is the same:
 
 POST to http://yourokapiendoint/ncip    (if you are calling the mod-ncip directly)
@@ -164,9 +153,9 @@ These particular four services were selected because they are required to intera
 #### Supported Services
 
 ##### Lookup User
-The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "ok" value to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
+The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "active" value to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
 
-This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
+This service can also use the Drools rules to help determine the 'blocked' or 'active' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The values used in the rules can be adjusted in mod-configuration.  If you don't want to use them skip setting any values for them in mod-configuration.
 
 Sample XML Request:
 
@@ -225,10 +214,11 @@ Note: Correct capitalization is important for this configuration.  CheckinItemSe
 
 ![Illustrates updating the toolkit.properties file by adding a configuration for the Request Item Service](docs/images/newServiceToolkit.png?raw=true "Illustrates updating the toolkit.properties file")
 
+These are the default values used for the NCIP Toolkit configuraiton.
 
 #### Step 2: Create the class you configured in step 1
 The new class should implement the Toolkit's interface for this service.  In this example your new class would implement the RequestItemService interface.  This means your class is required to have a 'performService' method as illustrated below.
-When an NCIP request is received, the toolkit looks at the XML in the body of the request to to decide which class will process it (based on the configuration in the toolkit.properties file).  For example, if a request comes in that contains the RequestItem Service XML, the toolkit will instantiate your implemenation of the RequestItem service and then the performService method will be called.  You can see this in the 'ncipProcess' method in the FolioNcipHelper class.
+When an NCIP request is received, the toolkit looks at the XML in the body of the request to to decide which class will process it (based on the toolkit configuraiton).  For example, if a request comes in that contains the RequestItem Service XML, the toolkit will instantiate your implemenation of the RequestItem service and then the performService method will be called.  You can see this in the 'ncipProcess' method in the FolioNcipHelper class.
 
 ![Illustrates the new FolioRequestItemService class](docs/images/requestItemService.png?raw=true "Illustrates the new FolioRequestItemService class")
 
@@ -263,6 +253,10 @@ You can look at the existing services for examples.  The FolioCheckInItemService
 [https://www.carli.illinois.edu/frequently-asked-questions-about-xc](https://www.carli.illinois.edu/frequently-asked-questions-about-xc)
 
 [https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html](https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html) 
+
+### More about the toolkit settings
+https://github.com/eXtensibleCatalog/NCIP2-Toolkit/wiki/GeneralConfiguration
+https://github.com/moravianlibrary/xcncip2toolkit/blob/master/connectors/aleph/22/trunk/web/src/main/resources/toolkit.properties
 
 ## Additional information
 
