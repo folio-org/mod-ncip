@@ -117,13 +117,13 @@ You will need a set of these settings in mod-configuration for each individual A
 ![Illustrates NCIP message pointing out the agency ID](docs/images/ncipMessageIllustratesAgencyId.png?raw=true "Illustrates NCIP message pointing out the agency ID")
 
 
-When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are intiialized.  This means the first request may be a bit slow to respond.
+When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are initialized.  This means the first request may be a bit slow to respond.
 
 If you later add settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
 
-To reinitialize the NCIP properties --> send a GET request to ../ncip/initncipproperties
-To reinitialize the Toolkit properties --> send a GET request to ../ncip/inittoolkit
-To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
+* To reinitialize the NCIP properties --> send a GET request to ../ncip/initncipproperties
+* To reinitialize the Toolkit properties --> send a GET request to ../ncip/inittoolkit
+* To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
 
 
 As you are setting up mod-nicp, the ncip.properties file and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
