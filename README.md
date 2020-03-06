@@ -126,10 +126,9 @@ If you later add settings to mod-configuration you can initialize them in mod-nc
 * To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
 
 
-As you are setting up mod-nicp, the ncip.properties file and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
+As you are setting up mod-nicp, the NCIP properties and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
-You can access it directly through the NCIP module by sending a GET request to: 
-.../ncipconfigcheck
+* To validate your configuration settings --> send a GET request to ../ncipconfigcheck
 
 If the service is able to retrieve a UUID for each of the your settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 
