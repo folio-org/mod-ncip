@@ -24,7 +24,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ```
 2. If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
 
-3. There are configuration values required that must exist in FOLIO for the NCIP services to work.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use.  These values have to be setup in mod-configuration (more about that below).  Here is a list of the configurations you will need to establish values for in FOLIO:
+3. There are configuration values that must exist in FOLIO for the NCIP services to work.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use.  These values have to be setup in mod-configuration (more about that below).  Here is a list of the configurations you will need to establish values for in FOLIO:
 
     * instance.type.name
     * instance.source
