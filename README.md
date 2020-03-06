@@ -130,7 +130,7 @@ As you are setting up mod-nicp, the NCIP properties and the settings values in F
 
 * To validate your configuration settings --> send a GET request to ../ncipconfigcheck
 
-If the service is able to retrieve a UUID for each of the your settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
+If the service is able to retrieve a UUID for each of the settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 
     
     <Problem>
