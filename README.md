@@ -62,15 +62,7 @@ https://github.com/folio-org/edge-ncip
    </td>
    <td>int
    </td>
-   <td>The port the module binds to.  The default is 8082
-   </td>
-  </tr>
-  <tr>
-   <td>prop_files
-   </td>
-   <td>string
-   </td>
-   <td>The location of the property files for the module.  More details about the property files below.
+   <td>The port the module binds to.  The default is 8081
    </td>
   </tr>
   <tr>
@@ -84,34 +76,21 @@ https://github.com/folio-org/edge-ncip
 </table>
 
 
-### Properties in mod-configuration
-
-#### Setup
 
 
+## mod-configuration setup
 
-#### More about each configuration type
+There are three types of settings that can exist in mod-configuration for the NCIP module:
 
-
-...changes in progress
-
-
-        #accept item
-        relais.instance.type.name=PALCI
-        relais.instance.source=PALCI
-        relais.item.material.type.name=PALCI
-        relais.item.perm.loan.type.name=PALCI
-        relais.item.status.name=Available
-        relais.item.perm.location.code=PALCI_LEHIGH
-        relais.holdings.perm.location.code=PALCI_LEHIGH
-        relais.instance.custom.identifier.name=PALCI Request ID
-        #check out
-        relais.checkout.service.point.code=FAIRCHILD
-        #check in
-        relais.checkin.service.point.code=FAIRCHILD
+### Required Configurations:
+1) NCIP properties: these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
+### Optional Configurations
+2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DONT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
+3) Rule properties: Use these setting if you want the Lookup user service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The lookup user service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
 
 
-The first ‘section’ of each configuration (in the example above ‘relais’) represents an agency ID.  Typically the requestor calling the NCIP service will include an agency ID in the request (example below).  Having the first section of each configuration value tied to a requestors agency ID gives the module more flexibility.  If you have two requesters calling your NCIP services with unique agency IDs you can configure these values differently for each requestor.  Also, the agency ID is not always required so the ncip.properties file contains a default configuration value for each.  If the request does not contain an agency ID the module will use the values assigned to the default configurations.  More than likely your requestors will send an agency ID with the request.  This is just a precaution.
+
+
 
 
     
