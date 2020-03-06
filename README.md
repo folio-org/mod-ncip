@@ -37,7 +37,15 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * checkout.service.point.code
     * checkin.service.point.code
 
-Note - you can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for differnt Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
+Notes 
+* You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for differnt Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
+
+
+* The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.  “instance.custom.identifier.name” was used so the item could be searched for in the inventory module.  It shows up like this and is searchable:
+
+![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
+
+
  
 ## Installing the module
 
@@ -85,15 +93,26 @@ There are three types of settings that can exist in mod-configuration for the NC
 ### Required Configurations:
 1) NCIP properties: these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
 ### Optional Configurations
-2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DONT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
+2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
 3) Rule properties: Use these setting if you want the Lookup user service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The lookup user service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
 
+#### NCIP Properties
 
+| MODULE        | configName    |   code   			 			| value  (examples) |   
+| ------------- |:-------------:| :-----------------------------|------------------:|		
+| NCIP          | Relais 		| instance.type.name 			| PALCI             |	
+| NCIP          | Relais     	| instance.source 				| PALCI             |	
+| NCIP          | Relais      	| item.material.type.name 		| PALCI             |	
+| NCIP          | Relais 		| item.perm.loan.type.name 		| PALCI             |	
+| NCIP          | Relais     	| item.status.name   			| Available         |
+| NCIP          | Relais      	| item.perm.location.code 		| PALCI_LEHIGH      |	
+| NCIP          | Relais 		| holdings.perm.location.code 	| PALCI_LEHIGH      |	
+| NCIP          | Relais     	| instance.custom.identifier.name| PALCI Request ID |		
+| NCIP          | Relais      	| checkout.service.point.code	| FAIRCHILD         |		
+| NCIP          | Relais      	| checkin.service.point.code 	| FAIRCHILD         |		
 
-
-
-
-    
+You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
+   
 
 ![Illustrates NCIP message pointing out the agency ID](docs/images/ncipMessageIllustratesAgencyId.png?raw=true "Illustrates NCIP message pointing out the agency ID")
 
@@ -101,12 +120,6 @@ There are three types of settings that can exist in mod-configuration for the NC
 
 
 
-The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.   I used the “instance.custom.identifier.name” so I could search for the item in the inventory module.  It shows up like this and is searchable:
-
-
-
-
-![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
 
 
 
