@@ -45,7 +45,7 @@ Notes
 
 ![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
 
-
+This can be removed if it is no longer needed becuase of the evolution of the inventory module.
  
 ## Installing the module
 
