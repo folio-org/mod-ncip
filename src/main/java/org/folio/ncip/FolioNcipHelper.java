@@ -142,14 +142,14 @@ public class FolioNcipHelper {
 				initNcipProperties(context);
 			} catch (Exception e) {
 				logger.info("Unable to initialize NCIP properties with mod-configuration.");
-				logger.info("Initialize them later by calling the initNcipProperties web service.");
+				logger.info("Initialize them later by calling the initncipproperties endpoint.");
 				logger.info(e.getLocalizedMessage());
 			}
 			try {
 				initRules(context);
 			} catch (Exception e) {
 				logger.info("Unable to initialize drools rules with mod-configuration.");
-				logger.info("Initialize them later by calling the initRules web service.");
+				logger.info("Initialize them later by calling the initrules endpoint.");
 				logger.info(e.getLocalizedMessage());
 			}
 
@@ -268,8 +268,6 @@ public class FolioNcipHelper {
 				// IF THE CONFIG EXISTS IN MOD-CONFIGURATION, ADD TO PROPERTIES VAR
 				// IF THE CONFIG DOES NOT EXIST IN MOD-CONFIGURATION,
 				// THROW AN EXCEPTION.
-				// THEY SHOULD HAVE BEEN SET WHEN THE TENANT DEPLOYED THIS MODULE
-				// OR SET BY THE TENANT USING MOD-CONFIGURATION MANUALLY
 				try {
 					String response = callApiGet(configEndpoint + line + "&limit=200", context.request().headers());
 					JsonObject jsonObject = new JsonObject(response);
@@ -316,36 +314,22 @@ public class FolioNcipHelper {
 	 */
 	public void initRules(RoutingContext context) {
 		logger.info("...initialize variables for drools rules....");
-
-		String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 		String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==";
 		Properties properties = new Properties();
 		try {
-			String maxAmountResponse = callApiGet(configEndpoint + Constants.MAX_FINE_AMOUNT + ")",
-					context.request().headers());
-			JsonObject jsonObject = new JsonObject(maxAmountResponse);
-			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
-			if (configs != null && configs.size() > 0)
-				properties.put(Constants.MAX_FINE_AMOUNT, configs.getJsonObject(0).getValue("value"));
-			else
-				// IF EITHER RULE VALUE IS NOT SET - RULES WON'T BE USED
+			String maxAmountResponse = getConfigValue(Constants.MAX_FINE_AMOUNT, context.request().headers());
+			if (maxAmountResponse == null)
 				throw new Exception(
 						"max-fine-amount not set in mod-configuration.  Rules will not be used for lookup user");
-
-			String maxLoanCountResponse = callApiGet(configEndpoint + Constants.MAX_LOAN_COUNT + ")",
-					context.request().headers());
-			jsonObject = new JsonObject(maxLoanCountResponse);
-			configs = jsonObject.getJsonArray(Constants.CONFIGS);
-			if (configs != null && configs.size() > 0)
-				properties.put(Constants.MAX_LOAN_COUNT, configs.getJsonObject(0).getValue("value"));
-			else
-				// IF EITHER RULE VALUE IS NOT SET - RULES WON'T BE USED
+			
+			String maxLoanCountResponse = getConfigValue(Constants.MAX_LOAN_COUNT, context.request().headers());
+			if (maxLoanCountResponse == null)
 				throw new Exception(
 						"max-loan-count not set in mod-configuration.  Rules will not be used for lookup user");
-
+			
+			properties.put(Constants.MAX_FINE_AMOUNT, maxLoanCountResponse);
+			properties.put(Constants.MAX_LOAN_COUNT, maxLoanCountResponse);
 			rulesProperties.put(tenant, properties);
-
 		} catch (Exception e) {
 			logger.info("****NO RULES WILL BE USED FOR LOOKUPUSER SERVICE****");
 			logger.info("****UNABLE TO RETRIEVE DROOLS CONFIGURATION VALUES****");
@@ -358,13 +342,8 @@ public class FolioNcipHelper {
 		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(Constants.RULES_FILE);
 		KieServices kieServices = KieServices.Factory.get();
 		KieFileSystem kfs = kieServices.newKieFileSystem();
-		//org.kie.api.io.Resource resource = kieServices.getResources().newInputStreamResource(resourceAsStream)
-		//		.setResourceType(ResourceType.DRL);
-		//kfs.write(resource);
-		
-		kfs.write( "src/main/resources/test.drl",
+		kfs.write( "src/main/resources/nciprules.drl",
 		           kieServices.getResources().newInputStreamResource( resourceAsStream ) );
-		
 		
 
 		KieBuilder Kiebuilder = kieServices.newKieBuilder(kfs);
@@ -376,8 +355,7 @@ public class FolioNcipHelper {
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
 		String returnValue = null;
 		String okapiBaseEndpoint = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String tenant = okapiHeaders.get(Constants.X_OKAPI_TENANT);
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=" + code;
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + code + ")";
 
 		try {
 			String response = callApiGet(configEndpoint, okapiHeaders);

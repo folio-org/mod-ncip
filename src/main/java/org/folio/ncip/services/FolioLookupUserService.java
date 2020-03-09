@@ -356,8 +356,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 						barcode = patronDetailsAsJson.getString("barcode");
 						if (barcode != null && !barcode.equalsIgnoreCase("")) return barcode;
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error("unable to get barcode value from input");
 					}
 		    		
 		    	}
