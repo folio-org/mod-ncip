@@ -1,17 +1,21 @@
 package org.folio.ncip;
 
-
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.common.MappedMessageHandler;
 import org.extensiblecatalog.ncip.v2.common.MessageHandlerFactory;
@@ -20,56 +24,87 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
-import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import io.vertx.core.Future;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-
-
 
 public class FolioNcipHelper {
 
 	private static final Logger logger = Logger.getLogger(FolioNcipHelper.class);
-
-	//INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext serviceContext PER TENANT
-	protected Properties serviceContext = new Properties();  
-	//INSTANCES OF org.extensiblecatalog.ncip.v2.common.Translator PER TENANT
+	// INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext
+	// serviceContext PER TENANT
+	protected Properties serviceContext = new Properties();
+	// INSTANCES OF org.extensiblecatalog.ncip.v2.common.Translator PER TENANT
 	protected Properties translator = new Properties();
-	//INSTANCES OF java.util.Properties.Properties PER TENANT
+	// INSTANCES OF java.util.Properties.Properties PER TENANT
 	protected Properties toolkitProperties = new Properties();
-	//INSTANCES OF org.kie.api.runtime.KieContainer PER TENANT
+	// INSTANCES OF org.kie.api.runtime.KieContainer PER TENANT
 	protected Properties kieContainer = new Properties();
-	//INSTANCE OF java.util.Properties.Properties PER TENANT
+	// INSTANCE OF java.util.Properties.Properties PER TENANT
 	protected Properties ncipProperties = new Properties();
-	
+	// INSTANCE OF java.util.Properties.Properties PER TENANT
+	protected Properties rulesProperties = new Properties();
 
+	// USE THESE TOOLKIT PROPERTIES AS DEFAULTS:
+	protected Properties defaultToolkitObjects = new Properties();
 
 	public FolioNcipHelper(Promise<Void> promise) {
-		//INITIALIZE THE PROPERTIES
-		//FOR EACH TENANT
-		//initNcipProperties();  //E.G. INSTANCE TYPE
-		//initToolkit();             //XC NCIP TOOLKIT PROPERTIES FILES
-		//initRules();               //INIT DROOLS RULES FOR PATRON CHECK
-		
-		 Future<Void> steps = initToolkit().compose(v -> initRules().compose(x ->initNcipProperties()));
-	     steps.setHandler(ar -> {
-	    	if (ar.succeeded()) {
-	    		promise.complete();
-	    	}
-	    	else {
-	    		promise.fail(ar.cause());
-	    	}
-	    });
+		Future<Void> steps = initToolkitDefaults();
+		steps.setHandler(ar -> {
+			if (ar.succeeded()) {
+				promise.complete();
+			} else {
+				promise.fail(ar.cause());
+			}
+		});
 	}
 
+	/*
+	 * 
+	 * When the module starts, default config. values for the NCIP toolkit are loaded. When
+	 * the first request (per tenant) is made, the module will check for updated
+	 * configurations using mod-configuration.
+	 * 
+	 */
+	private Future<Void> initToolkitDefaults() {
+		Promise<Void> promise = Promise.promise();
+
+		try {
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			Properties properties = new Properties();
+			logger.info("initializing the XC NCIP Toolkit default properties...");
+			properties.load(inputStream);
+
+			if (properties.isEmpty()) {
+				promise.fail("Unable to initialize the default toolkit properties.");
+			}
+
+			defaultToolkitObjects.put("toolkit", properties);
+			defaultToolkitObjects.put("servicecontext",
+					ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
+			defaultToolkitObjects.put("translator", TranslatorFactory.buildTranslator(null, properties));
+			return promise.future();
+		} catch (Exception e) {
+			logger.fatal("Unable to initialize the default toolkit properties.");
+			logger.fatal(e.getLocalizedMessage());
+			promise.fail("Unable to initialize the default toolkit properties.");
+		}
+		return promise.future();
+
+	}
+	
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
-		
-		
+
 		logger.info("ncip process called...");
 		logger.info("=====okapi headers================");
 		for (Map.Entry<String, String> entry : context.request().headers().entries()) {
@@ -78,171 +113,339 @@ public class FolioNcipHelper {
 		logger.info("==============================");
 		logger.info("==========BODY===============");
 		logger.info(context.getBodyAsString());
-		
-		
+
 		String tenant = context.request().headers().get(Constants.X_OKAPI_TENANT);
+
+		//The first time a tenant makes a request, it will attempt
+		//to initialize configuration values using mod-configuration.
+		//Tenants can later manually initialize configuration values using
+		//the endpoints:
+		//inittoolkit
+		//initrules
+		//initncipproperties
+		
+		if (toolkitProperties.get(tenant) == null) {
+			// INITIALIZE THIS TENANTS TOOLKIT PROPERTIES WITH THE DEFAULT VALUES:
+			toolkitProperties.put(tenant, defaultToolkitObjects.get("toolkit"));
+			serviceContext.put(tenant, defaultToolkitObjects.get("servicecontext"));
+			translator.put(tenant, defaultToolkitObjects.get("translator"));
+			// HAVE THEY OVERWRITTEN ANY OF THESE VALUES IN MOD-CONFIGURATION?
+			try {
+				initToolkit(context);
+			} catch (Exception e) {
+				logger.info(e.getLocalizedMessage());
+				logger.info("Unable to initialize custom toolkit properties.  Using default");
+				logger.info(e.getLocalizedMessage());
+			}
+
+			try {
+				initNcipProperties(context);
+			} catch (Exception e) {
+				logger.info("Unable to initialize NCIP properties with mod-configuration.");
+				logger.info("Initialize them later by calling the initNcipProperties web service.");
+				logger.info(e.getLocalizedMessage());
+			}
+			try {
+				initRules(context);
+			} catch (Exception e) {
+				logger.info("Unable to initialize drools rules with mod-configuration.");
+				logger.info("Initialize them later by calling the initRules web service.");
+				logger.info(e.getLocalizedMessage());
+			}
+
+		}
+
 		InputStream stream = new ByteArrayInputStream(context.getBodyAsString().getBytes(StandardCharsets.UTF_8));
 		NCIPInitiationData initiationData = null;
 		InputStream responseMsgInputStream = null;
 		FolioRemoteServiceManager folioRemoteServiceManager = null;
 		MappedMessageHandler messageHandler = null;
 		try {
-			//USE THIS TENANT'S TRANSLATOR TO CREATE THE OBJECTS WITH THE XML INPUT:
-			initiationData = ((Translator)translator.get(tenant)).createInitiationData((org.extensiblecatalog.ncip.v2.service.ServiceContext )serviceContext.get(tenant), stream);
-			
+			// USE THIS TENANT'S TRANSLATOR TO CREATE THE OBJECTS WITH THE XML INPUT:
+			initiationData = ((Translator) translator.get(tenant)).createInitiationData(
+					(org.extensiblecatalog.ncip.v2.service.ServiceContext) serviceContext.get(tenant), stream);
+
 			folioRemoteServiceManager = new FolioRemoteServiceManager();
-			folioRemoteServiceManager.setKieContainer((KieContainer)kieContainer.get(tenant));
+			folioRemoteServiceManager.setKieContainer((KieContainer) kieContainer.get(tenant));
 			folioRemoteServiceManager.setOkapiHeaders(context.request().headers());
-			folioRemoteServiceManager.setNcipProperties((Properties)ncipProperties.get(tenant));
-			
-			//MESSAGEHANDLER IS A DYNAMIC TYPE BASED ON INCOMING XML
-			//E.G. INCOMING XML = LookupUserRequest, then messageHandler WILL BE FolioLookupUserService
-			//THIS IS CONFIGURABLE IN THE toolkit.properties file
-			messageHandler = (MappedMessageHandler) MessageHandlerFactory.buildMessageHandler(toolkitProperties.getProperty(tenant));
+			folioRemoteServiceManager.setNcipProperties((Properties) ncipProperties.get(tenant));
+			folioRemoteServiceManager.setRulesProperties((Properties) rulesProperties.get(tenant));
+
+			// MESSAGEHANDLER IS A DYNAMIC TYPE BASED ON INCOMING XML
+			// E.G. INCOMING XML = LookupUserRequest, then messageHandler WILL BE
+			// FolioLookupUserService
+			// THIS IS CONFIGURABLE IN THE toolkit.properties file
+			messageHandler = (MappedMessageHandler) MessageHandlerFactory
+					.buildMessageHandler(toolkitProperties.getProperty(tenant));
 			messageHandler.setRemoteServiceManager(folioRemoteServiceManager);
-			NCIPResponseData responseData = messageHandler.performService(initiationData, (org.extensiblecatalog.ncip.v2.service.ServiceContext)serviceContext.get(tenant));
-			responseMsgInputStream =  ((Translator)translator.get(tenant)).createResponseMessageStream((org.extensiblecatalog.ncip.v2.service.ServiceContext)serviceContext.get(tenant), responseData);
-		}
-		catch(Exception e) {
+			NCIPResponseData responseData = messageHandler.performService(initiationData,
+					(org.extensiblecatalog.ncip.v2.service.ServiceContext) serviceContext.get(tenant));
+			responseMsgInputStream = ((Translator) translator.get(tenant)).createResponseMessageStream(
+					(org.extensiblecatalog.ncip.v2.service.ServiceContext) serviceContext.get(tenant), responseData);
+		} catch (Exception e) {
 			logger.error(e.toString());
 			throw e;
 		}
 		return responseMsgInputStream;
 	}
 
-
 	/**
-	 * XC NCIP Toolkit properties file
-	 * initialized for each tenant
+	 * XC NCIP Toolkit properties initialized for each tenant using
+	 * mod-configuration
+	 * 
+	 * @throws Exception
 	 *
-	*/
-	private Future<Void> initToolkit() {
+	 */
+	public void initToolkit(RoutingContext context) throws Exception {
 
-		Promise<Void> promise = Promise.promise();
 		try {
-			//get property folder for each tenant
-			logger.info("initializing toolkit.properties");
-			final String propertyFolder = System.getProperty("prop_files");
-			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
-			Iterator<String> i = tenantPropertyFolders.iterator();
-			//ServiceContext sContext = ServiceValidatorFactory.buildServiceValidator().getInitialServiceContext();
-			while (i.hasNext()) {
-				Properties properties = new Properties();
-				String tenant = (String) i.next();
-				logger.info("initializing toolkit.properties for tenant: " + tenant);
-				String toolKitPropertyFileName = System.getProperty("prop_files") + "/tenants/" + tenant + "/toolkit.properties"; 
-				InputStream input = new FileInputStream(toolKitPropertyFileName);
-				properties.load(input);
-				toolkitProperties.put(tenant, properties);
-				serviceContext.put(tenant,ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
-				translator.put(tenant,TranslatorFactory.buildTranslator(null,properties));
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
+			// DO THE TOOLKIT PROPERTIES EXIST IN MOD-CONFIGURATION?
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
+			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=configName=toolkit&limit=200";
+			// GET THE EXISTING PROPERTIES FOR THE TOOLKIT
+			// AND JUST OVERWRITE ANY THAT HAVE BEEN SET IN MOD-CONFIGURATION
+			Properties properties = (Properties) toolkitProperties.get(tenant);
+
+			String response = callApiGet(configEndpoint, context.request().headers());
+			JsonObject jsonObject = new JsonObject(response);
+			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
+			if (configs.size() < 1) {
+				logger.info("No toolkit configurations found.  Using defaults.  QUERY:" + configEndpoint);
+				return;
 			}
-			promise.complete();
-		}
-		catch(Exception e) {
+			
+			Iterator configsIterator = configs.iterator();
+			while (configsIterator.hasNext()) {
+				JsonObject config = (JsonObject) configsIterator.next();
+				String code = config.getString("code");
+				String value = config.getString("value");
+				properties.setProperty(code, value);
+			}
+			toolkitProperties.put(tenant, properties);
+			serviceContext.put(tenant,
+					ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
+			translator.put(tenant, TranslatorFactory.buildTranslator(null, properties));
+		} catch (Exception e) {
 			logger.fatal("Unable to initialize toolkit.properties file.");
 			logger.fatal(e.getLocalizedMessage());
-			promise.fail("Unable to initialize toolkit.properties file.");
+			throw new Exception("Unable to initialize toolkit properties using mod-configuration.  EXCEPTION: "
+					+ e.getLocalizedMessage());
 		}
-		return promise.future();
+
 	}
 
 	/**
-	 * Initializing property values needed for several of the services.
-	 * e.g. materialTypes for instances created in AcceptItem
-	 * These values are initialized for each tenant
-	 * In the future, properties could be configured in settings?
-	 * They don't typically change frequently...so maybe the property 
+	 * Initializing property values needed for several of the services. e.g.
+	 * materialTypes for instances created in AcceptItem These values are
+	 * initialized for each tenant In the future, properties could be configured in
+	 * settings? They don't typically change frequently...so maybe mod-configuration
 	 * file is fine.
+	 * 
+	 * @throws Exception
 	 *
-	*/
-	private Future<Void> initNcipProperties() {
-		Promise<Void> promise = Promise.promise();
+	 */
+	public void initNcipProperties(RoutingContext context) throws Exception {
+
 		try {
-			String propertyFolder = System.getProperty("prop_files");
-			logger.info("initializing ncip.properties");
-			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
-			Iterator<String> i = tenantPropertyFolders.iterator();
-			while (i.hasNext()) {
-				Properties properties = new Properties();
-				String tenant = (String) i.next();
-				logger.info("initializing ncip.properties for tenant: " + tenant);
-				String filePath = System.getProperty("prop_files") + "/tenants/" + tenant + "/" + "ncip.properties";
+			// THE NCIP PROPERTY FILE CONTAINS A LIST OF PROPERTIES
+			// THAT NEED TO BE INITIALIZED
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
+			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=";
+			Properties properties = new Properties();
+			// LOOK FOR EACH PROPERTY:
+			while (reader.ready()) {
+				String line = reader.readLine();
+				logger.info(line);
+				if (line.contains("#"))
+					continue; // ignore comments in the file
 
-				InputStream input = new FileInputStream(filePath);
-				properties.load(input);
-				ncipProperties.put(tenant, properties);
+				// IF THE CONFIG EXISTS IN MOD-CONFIGURATION, ADD TO PROPERTIES VAR
+				// IF THE CONFIG DOES NOT EXIST IN MOD-CONFIGURATION,
+				// THROW AN EXCEPTION.
+				// THEY SHOULD HAVE BEEN SET WHEN THE TENANT DEPLOYED THIS MODULE
+				// OR SET BY THE TENANT USING MOD-CONFIGURATION MANUALLY
+				try {
+					String response = callApiGet(configEndpoint + line + "&limit=200", context.request().headers());
+					JsonObject jsonObject = new JsonObject(response);
+					JsonArray configs = jsonObject.getJsonArray("configs");
+					if (configs.size() < 1) {
+						throw new Exception("No ncip properties found in mod-configuration for property: " + line);
+					}
+					// SAVE EACH PROPERTY found
+					// THERE COULD BE MULTIPLE - A DIFFERENT PROPERTY FOR
+					// EACH AGENCY ID
+					Iterator configsIterator = configs.iterator();
+					while (configsIterator.hasNext()) {
+						JsonObject config = (JsonObject) configsIterator.next();
+						String code = config.getString("code");
+						String configName = config.getString("configName");
+						String value = config.getString("value");
+						// CONFIG NAME CONTAINS THE AGENCY ID FOR THIS VALUE
+						// THERE COULD BE MULTIPLE VALUES FOR DIFFERENT AGENCY IDS
+						properties.setProperty((configName + "." + code).toLowerCase(), value);
+					}
+				} catch (Exception e) {
+					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION, TRY TO SET VALUE
+					throw new Exception(
+							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
+				}
 			}
-			promise.complete();
-		}
-		catch(Exception e) {
-			logger.fatal("unable to initialize ncip.properties file");
+			ncipProperties.put(tenant, properties);
+		} catch (Exception e) {
+			logger.fatal("Unable to initialize ncip properties using mod-configuration.");
 			logger.fatal(e.getLocalizedMessage());
-			promise.fail("unable to initialize ncip.properties file");
+			throw new Exception(
+					"Unable to initialize toolkit.properties using mod-configuration." + e.getLocalizedMessage());
 		}
-		return promise.future();
 	}
 
-	//THESE RULES ARE USED TO DETERMINE IF A *PATRON* CAN BORROW
-	//THESE DON'T HAVE TO BE USED
-	//CODE ALSO CHECKS ACTIVE INDICATOR ON USER RECORD
-	//INITIALIZED FOR EACH TENANT
-	private Future<Void> initRules() {
-		Promise<Void> promise = Promise.promise();
+	/**
+	 * This method attempts to load from mod-configuration values that have been set
+	 * up for the two drools rules used by the LookupUser service (to determine
+	 * borrowing privileges. These rules are optional. If no configuration values
+	 * are found LookupUser will function without checking the rules.
+	 * 
+	 * MAX-LOAN-COUNT MAX-FINE-AMOUNT
+	 *
+	 */
+	public void initRules(RoutingContext context) {
+		logger.info("...initialize variables for drools rules....");
+
+		String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
+		String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==";
+		Properties properties = new Properties();
 		try {
+			String maxAmountResponse = callApiGet(configEndpoint + Constants.MAX_FINE_AMOUNT + ")",
+					context.request().headers());
+			JsonObject jsonObject = new JsonObject(maxAmountResponse);
+			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
+			if (configs != null && configs.size() > 0)
+				properties.put(Constants.MAX_FINE_AMOUNT, configs.getJsonObject(0).getValue("value"));
+			else
+				// IF EITHER RULE VALUE IS NOT SET - RULES WON'T BE USED
+				throw new Exception(
+						"max-fine-amount not set in mod-configuration.  Rules will not be used for lookup user");
 
-			//get property folder
-			logger.info("initializing rules.drl");
-			final String propertyFolder = System.getProperty("prop_files");
-			List<String> tenantPropertyFolders = findFoldersInDirectory(propertyFolder + "/tenants");
-			Iterator<String> i = tenantPropertyFolders.iterator();
+			String maxLoanCountResponse = callApiGet(configEndpoint + Constants.MAX_LOAN_COUNT + ")",
+					context.request().headers());
+			jsonObject = new JsonObject(maxLoanCountResponse);
+			configs = jsonObject.getJsonArray(Constants.CONFIGS);
+			if (configs != null && configs.size() > 0)
+				properties.put(Constants.MAX_LOAN_COUNT, configs.getJsonObject(0).getValue("value"));
+			else
+				// IF EITHER RULE VALUE IS NOT SET - RULES WON'T BE USED
+				throw new Exception(
+						"max-loan-count not set in mod-configuration.  Rules will not be used for lookup user");
+
+			rulesProperties.put(tenant, properties);
+
+		} catch (Exception e) {
+			logger.info("****NO RULES WILL BE USED FOR LOOKUPUSER SERVICE****");
+			logger.info("****UNABLE TO RETRIEVE DROOLS CONFIGURATION VALUES****");
+			logger.error(e.getLocalizedMessage());
+			return;
+
+		}
+
+		// LOAD IN RULES FILES
+		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(Constants.RULES_FILE);
+		KieServices kieServices = KieServices.Factory.get();
+		KieFileSystem kfs = kieServices.newKieFileSystem();
+		//org.kie.api.io.Resource resource = kieServices.getResources().newInputStreamResource(resourceAsStream)
+		//		.setResourceType(ResourceType.DRL);
+		//kfs.write(resource);
+		
+		kfs.write( "src/main/resources/test.drl",
+		           kieServices.getResources().newInputStreamResource( resourceAsStream ) );
+		
+		
+
+		KieBuilder Kiebuilder = kieServices.newKieBuilder(kfs);
+		Kiebuilder.buildAll();
+		kieContainer.put(tenant, kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId()));
+
+	}
+
+	public String getConfigValue(String code, MultiMap okapiHeaders) {
+		String returnValue = null;
+		String okapiBaseEndpoint = okapiHeaders.get(Constants.X_OKAPI_URL);
+		String tenant = okapiHeaders.get(Constants.X_OKAPI_TENANT);
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=" + code;
+
+		try {
+			String response = callApiGet(configEndpoint, okapiHeaders);
+			JsonObject jsonObject = new JsonObject(response);
+			JsonArray configs = jsonObject.getJsonArray("configs");
+			if (configs.size() < 1) {
+				return null;
+			}
+			returnValue = configs.getJsonObject(0).getString("value");
+		} catch (Exception e) {
+			logger.error("unable to get config value for code: " + code);
+			logger.error(e.getMessage());
+			return null;
+		}
+
+		return returnValue;
+	}
+
+	public String callApiGet(String uriString, MultiMap okapiHeaders)
+			throws Exception, IOException, InterruptedException {
+		CloseableHttpClient client = HttpClients.custom().build();
+		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+
+		HttpResponse response = client.execute(request);
+		HttpEntity entity = response.getEntity();
+		String responseString = EntityUtils.toString(entity, "UTF-8");
+		int responseCode = response.getStatusLine().getStatusCode();
+
+		logger.info("GET:");
+		logger.info(uriString);
+		logger.info(responseCode);
+		logger.info(responseString);
+
+		if (responseCode > 399) {
+			String responseBody = processErrorResponse(responseString);
+			throw new Exception(responseString);
+		}
+
+		return responseString;
+
+	}
+
+	/**
+	 * The method deals with error messages that are returned by the API as plain
+	 * strings and messages returned as JSON
+	 *
+	 */
+	public String processErrorResponse(String responseBody) {
+		// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
+		// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
+		try {
+			JsonObject jsonObject = new JsonObject(responseBody);
+			JsonArray errors = jsonObject.getJsonArray("errors");
+			Iterator i = errors.iterator();
+			responseBody = "ERROR: ";
 			while (i.hasNext()) {
-
-				String tenant = (String) i.next();
-				logger.info("initializing rules for tenant: " + tenant);
-				KieServices kieServices = KieServices.Factory.get();
-				KieFileSystem kfs = kieServices.newKieFileSystem();
-				String rulesFilePath = System.getProperty("prop_files") + "/tenants/" + tenant + "/rules.drl"; 
-
-				File file = new File(rulesFilePath);
-				org.kie.api.io.Resource resource = kieServices.getResources().newFileSystemResource(file).setResourceType(ResourceType.DRL);
-				kfs.write(resource);
-
-				KieBuilder Kiebuilder = kieServices.newKieBuilder(kfs);
-				Kiebuilder.buildAll();
-				kieContainer.put(tenant, kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId())) ;
+				JsonObject errorMessage = (JsonObject) i.next();
+				responseBody += errorMessage.getString("message");
 			}
-			promise.complete();
+		} catch (Exception exception) {
+			// NOT A PROBLEM, ERROR WAS A STRING. UNABLE TO PARSE
+			// AS JSON
 		}
-		catch(Exception e) {
-			logger.fatal("unable to initialize rules.drl");
-			logger.fatal(e.getLocalizedMessage());
-			promise.fail("unable to initialize rules.drl");
-		}
-		return promise.future();
+		return responseBody;
 	}
-
-
-	public List<String> findFoldersInDirectory(String directoryPath) {
-		File directory = new File(directoryPath);
-
-		FileFilter directoryFileFilter = new FileFilter() {
-			public boolean accept(File file) {
-				return file.isDirectory();
-			}
-		};
-
-		File[] directoryListAsFile = directory.listFiles(directoryFileFilter);
-		List<String> foldersInDirectory = new ArrayList<String>(directoryListAsFile.length);
-		for (File directoryAsFile : directoryListAsFile) {
-			foldersInDirectory.add(directoryAsFile.getName());
-		}
-
-		return foldersInDirectory;
-	}
-	
-	
-	
-
 
 }

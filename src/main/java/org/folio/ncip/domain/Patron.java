@@ -8,9 +8,24 @@ public class Patron {
 	private List<Loan> loans = new ArrayList<Loan>();
 	private List<Account> accounts = new ArrayList<Account>();
 	private boolean canBorrow = true;
+	private Integer maxLoanCount;
+	private Integer maxFineAmount;
 	private String name="test";
 
 	
+	
+	public Integer getMaxLoanCount() {
+		return maxLoanCount;
+	}
+	public void setMaxLoanCount(Integer maxLoanCount) {
+		this.maxLoanCount = maxLoanCount;
+	}
+	public Integer getMaxFineAmount() {
+		return maxFineAmount;
+	}
+	public void setMaxFineAmount(Integer maxFineAmount) {
+		this.maxFineAmount = maxFineAmount;
+	}
 	public String getName() {
 		return name;
 	}
@@ -53,9 +68,16 @@ public class Patron {
 		return getLoans().size();
 		
 	}
+
 	
-	public Double getOverdueFineAmount() {
-		return 400.10;
+	public boolean loanCountExceeded() {
+		if (getLoanCount() > getMaxLoanCount()) return true;
+		return false;
+	}
+	
+	public boolean fineAmountExceeded() {
+		if (getAllCharges() > maxFineAmount) return true;
+		return false;
 	}
 	
 	

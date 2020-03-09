@@ -134,9 +134,6 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
 							"The lookup of " + innerValues + " could not be found for " + innerKey);
-				
-				
-				
 	      }
 	    }
 	}
@@ -174,5 +171,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			}
 			return responseBody;
 		}
+		
+
 
 }

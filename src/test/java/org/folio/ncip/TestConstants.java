@@ -6,6 +6,7 @@ public class TestConstants {
 	static final String PROBLEM = "Problem";
 	static final String GOOD_PATRON_BARCODE = "8377630";
 	static final String GOOD_PATRON_ID = "99999999-9999-1999-8999-999999999901";
+	static final String ACTIVE = "ACTIVE";
 	
 	static final String BLOCKED_PATRON_BARCODE = "5551213";
 	static final String BLOCKED_PATRON_ID = "99999999-9999-1999-8999-999999999902";
