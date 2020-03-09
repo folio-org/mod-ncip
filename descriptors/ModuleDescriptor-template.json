@@ -22,6 +22,10 @@
         "id":"instance-types",
         "version" : "2.0"
       },
+	  {
+		"id": "configuration",
+		"version": "2.0"
+	  },
       {
         "id":"identifier-types",
         "version" : "1.2"
