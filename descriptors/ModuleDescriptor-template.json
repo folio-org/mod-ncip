@@ -52,11 +52,11 @@
       },
       {
         "id":"inventory",
-        "version":"9.6"
+        "version":"10.2"
       },
       {
         "id":"circulation",
-        "version":"8.3"
+        "version":"9.2"
       }
   ],
   "permissionSets": [],
