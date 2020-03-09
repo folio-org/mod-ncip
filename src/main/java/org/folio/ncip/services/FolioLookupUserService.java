@@ -56,6 +56,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	 public JsonObject obj;
 	 private KieContainer kieContainer;
 	 private Properties ncipProperties;
+	 private Properties rulesProperties;
 	 
 
 	 
@@ -68,7 +69,8 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			 LookupUserResponseData responseData = new LookupUserResponseData();
 			 this.ncipProperties = ((FolioRemoteServiceManager)serviceManager).getNcipProperties();
 			 this.kieContainer = ((FolioRemoteServiceManager)serviceManager).getKieContainer();
-
+			 this.rulesProperties = ((FolioRemoteServiceManager)serviceManager).getRulesProperties();
+					 
 			 UserId userId = retrieveUserId(initData,serviceManager);
 		     
 		     
@@ -157,33 +159,22 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	UserPrivilege up = new UserPrivilege();
 	    	up.setUserPrivilegeDescription("User Status");
 	    	up.setAgencyId( new AgencyId(agencyId));
-	    	up.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType(null,"STATUS"));
+	    	up.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("","STATUS"));
 	    	UserPrivilegeStatus ups = new UserPrivilegeStatus();
 	    	String patronBorrowingStatus = checkRules(jsonObject);
-	    	ups.setUserPrivilegeStatusType(new UserPrivilegeStatusType(null,patronBorrowingStatus));
+	    	ups.setUserPrivilegeStatusType(new UserPrivilegeStatusType("",patronBorrowingStatus));
 	    	up.setUserPrivilegeStatus(ups);
 	    	return up;
 	    }
 	    
 	    
 	    private String checkRules(JsonObject jsonObject) throws Exception {
+	    	
+	    	//IF KIESESSION IS NULL - JUST RETURN 'OK' - THEY DON'T WANT TO USE RULES
+	    	
+	    	
 	    	try {
 
-		    	Patron patron = new Patron();
-		    	JsonArray loans = jsonObject.getJsonArray("loans");
-		    	for (int i = 0 ; i < loans.size(); i++) {
-		    	        JsonObject obj = loans.getJsonObject(i);
-		    	        Loan loan = new Loan();
-		    	        loan.setId(obj.getString("id"));
-		    	        patron.getLoans().add(loan);
-		    	}
-		    	JsonArray fines = jsonObject.getJsonArray("accounts");
-		    	for (int i = 0 ; i < fines.size(); i++) {
-		    	        JsonObject obj = fines.getJsonObject(i);
-		    	        Account account = new Account();
-		    	        account.setRemaining(obj.getDouble("remaining"));
-		    	        patron.getAccounts().add(account);
-		    	}
 		    	
 		    	//do any manual blocks exist?
 		    	JsonArray blocks = jsonObject.getJsonArray("manualblocks");
@@ -196,25 +187,51 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		    	}
 		    	
 		    	//IS THE PATRON ACTIVE
-		    	if (!jsonObject.getBoolean(Constants.ACTIVE)) return Constants.BLOCKED;
-
-		    	//CHECK NCIP CIRC RULES
-		    	KieSession ksession = kieContainer.newKieSession();
-		    	ksession.insert(patron);
-		    	DroolsResponse droolsResponse = new DroolsResponse();
-		    	ksession.insert(droolsResponse);
-		    	int firedRules = ksession.fireAllRules();
-		    	logger.info("RULES FIRED: " + firedRules);
-		    	logger.info("PATRON CAN BORROW" + patron.canBorrow());
-		    	KieBase kieBase = ksession.getKieBase();
-		    	Collection<KiePackage> kiePackages = kieBase.getKiePackages();
-		    	for( KiePackage kiePackage: kiePackages ){
-		    	    for( Rule rule: kiePackage.getRules() ){ 
-		    	        logger.info( rule.getName() );
-		    	    }
+		    	if (!jsonObject.getBoolean("active")) return Constants.BLOCKED;
+		    	
+		    	if (kieContainer != null) {
+		    		
+		    		String maxFineAmount = rulesProperties.getProperty(Constants.MAX_FINE_AMOUNT);
+		    		String maxLoanCounts = rulesProperties.getProperty(Constants.MAX_LOAN_COUNT);
+			    	Patron patron = new Patron();
+			    	patron.setMaxFineAmount(new Integer(maxFineAmount));
+			    	patron.setMaxLoanCount(new Integer(maxLoanCounts));
+			    	JsonArray loans = jsonObject.getJsonArray("loans");
+			    	for (int x = 0 ; x < loans.size(); x++) {
+			    	        JsonObject obj = loans.getJsonObject(x);
+			    	        Loan loan = new Loan();
+			    	        loan.setId(obj.getString("id"));
+			    	        patron.getLoans().add(loan);
+			    	}
+			    	JsonArray fines = jsonObject.getJsonArray("accounts");
+			    	for (int x = 0 ; x < fines.size(); x++) {
+			    	        JsonObject obj = fines.getJsonObject(x);
+			    	        Account account = new Account();
+			    	        account.setRemaining(obj.getDouble("remaining"));
+			    	        patron.getAccounts().add(account);
+			    	}
+			    	
+			    	
+			    	//CHECK NCIP CIRC RULES - RULE VALUES WERE SET IN MOD-CONFIGURATION
+			    	KieSession ksession = kieContainer.newKieSession();
+			    	ksession.insert(patron);
+			    	DroolsResponse droolsResponse = new DroolsResponse();
+			    	ksession.insert(droolsResponse);
+			    	int firedRules = ksession.fireAllRules();
+			    	logger.info("RULES FIRED: " + firedRules);
+			    	logger.info("PATRON CAN BORROW" + patron.canBorrow());
+			    	KieBase kieBase = ksession.getKieBase();
+			    	Collection<KiePackage> kiePackages = kieBase.getKiePackages();
+			    	for( KiePackage kiePackage: kiePackages ){
+			    	    for( Rule rule: kiePackage.getRules() ){ 
+			    	        logger.info( rule.getName() );
+			    	    }
+			    	}
+			    	return patron.canBorrow() ? Constants.ACTIVE : Constants.BLOCKED;
 		    	}
-
-		     return patron.canBorrow() ? Constants.OK : Constants.BLOCKED;
+		    	
+		    	return Constants.ACTIVE;
+			     
 	    	}
 	    	catch(Exception e) {
 	    		logger.error("error during checkRules");
@@ -241,9 +258,10 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	UserPrivilege up = new UserPrivilege();
 	    	up.setUserPrivilegeDescription(descriptionString);
 	    	up.setAgencyId( new AgencyId(agencyId));
-	    	up.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType(null,agencyUserPrivilegeTypeString));
+	    	new AgencyUserPrivilegeType(agencyId, agencyId);
+	    	up.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("",agencyUserPrivilegeTypeString));
 	    	UserPrivilegeStatus ups = new UserPrivilegeStatus();
-	    	ups.setUserPrivilegeStatusType(new UserPrivilegeStatusType(null,userPrivilegeStatusTypeString));
+	    	ups.setUserPrivilegeStatusType(new UserPrivilegeStatusType("",userPrivilegeStatusTypeString));
 	    	up.setUserPrivilegeStatus(ups);
 	    	return up;
 	    }
@@ -338,7 +356,8 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 						barcode = patronDetailsAsJson.getString("barcode");
 						if (barcode != null && !barcode.equalsIgnoreCase("")) return barcode;
 					} catch (Exception e) {
-						logger.error(e.toString());
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 		    		
 		    	}

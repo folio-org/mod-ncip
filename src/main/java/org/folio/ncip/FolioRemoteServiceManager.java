@@ -54,7 +54,18 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	private MultiMap okapiHeaders;
 	private Properties ncipProperties;
 	private KieContainer kieContainer;
+	private Properties rulesProperties;
 	
+	
+	
+	public Properties getRulesProperties() {
+		return rulesProperties;
+	}
+
+	public void setRulesProperties(Properties rulesProperties) {
+		this.rulesProperties = rulesProperties;
+	}
+
 	public FolioRemoteServiceManager() throws Exception {
 
 	}
@@ -208,6 +219,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	
 
 	public JsonObject checkIn(CheckInItemInitiationData initData, String agencyId) throws Exception {
+		
+		//BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
+		//BEEN SET IN MOD-CONFIGURATION
+		//CAN'T DO ANYTHING WITHOUT THEM
+		if (ncipProperties == null) {
+			logger.fatal("NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set so the Checkin Item service can be called");
+			throw new Exception("NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called");
+		}
 
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
 		LocalDateTime now = LocalDateTime.now();
@@ -238,6 +257,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	}
 
 	public JsonObject checkOut(CheckOutItemInitiationData initData, String agencyId) throws Exception {
+		
+		//BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
+		//BEEN SET IN MOD-CONFIGURATION
+		//CAN'T DO ANYTHING WITHOUT THEM
+		if (ncipProperties == null) {
+			logger.fatal("NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set so the Checkout item service can be called");
+			throw new Exception("NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set  in mod-configuration so the Checkout item service can be called");
+		}
 		
 		UUID id = UUID.randomUUID();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
@@ -301,6 +328,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		JsonObject returnValues = new JsonObject();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+		
+		//BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
+		//BEEN SET IN MOD-CONFIGURATION
+		//CAN'T DO ANYTHING WITHOUT THEM
+		if (ncipProperties == null) {
+			logger.fatal("NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set so the AcceptItem service can be called");
+			throw new Exception("NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set  in mod-configuration so the AcceptItem service can be called");
+		}
 		
 		
 		// LOOKUP THE USER
@@ -389,8 +424,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			// PLACE REQUEST (HOLD)
 			JsonObject request = new JsonObject();
 			request.put("requestType", "Page");
-			// FOR EXPLANATION ABOUT HARDCODED FULFILLMENT
-			//SEE README (Pickup Preference)
+			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
+			//SEE NOTES.TXT
 			request.put("fulfilmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
 			request.put("requesterId", uid);
@@ -528,7 +563,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return user;
 	}
 
-
 	/**
 	 * This method is called one time (per agent in the ncip.properties file)
 	 * to initialize & store property values
@@ -539,7 +573,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		logger.info("=======> initializing properties");
 		JSONParser parser = new JSONParser();
 		try {
-
 			InputStream inputStream =this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 			JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 			JSONArray jsonArray = (JSONArray) obj.get("lookups");
@@ -605,7 +638,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		} catch (Exception e) {
 			logger.error("Failed attempting to initialize the properties needed to make the API calls");
 			logger.error(e.getLocalizedMessage());
-			throw new Exception("Initializing NCIP properties failed.  " + e.getMessage());
+			throw new Exception("Initializing NCIP properties failed.  Are you sure you have NCIP properties set for this AgencyId: "  + requesterAgencyId );
 		}
 
 	}

@@ -6,14 +6,13 @@ import org.folio.ncip.domain.ErrorMessage;
 import org.folio.ncip.domain.DroolsResponse;
 
 
-//IF YOU DO NOT WANT TO USE THESE RULES YOU CAN DELETE
-//THEM OR COMMENT THEM OUT
+
 
 rule "Check All Charges For NCIP"
 
 
 when
-p: Patron(getLoanCount() > 100 )
+p: Patron(loanCountExceeded() == true)
 then
 p.canBorrow(false);
 end
@@ -22,7 +21,7 @@ end
 rule "Check All Fines For NCIP"
 
 when
-p: Patron(getAllCharges() > 500)
+p: Patron(fineAmountExceeded() == true)
 then
 p.canBorrow(false);
 end

@@ -5,7 +5,7 @@ public class Constants {
 	public static final String OK = "OK";
 	public static final String AUTH_UID = "Username";
 	public static final String AUTH_BARCODE = "Barcode Id";
-	public static final String ACTIVE = "active";
+	public static final String ACTIVE = "ACTIVE";
 	public static final String BORROWING_BLOCK = "borrowing";
 	public static final String REQUEST_BLOCK = "requesting";
 	public static final String ACCEPT_ITEM_PROBLEM = "Problem performing AcceptItem";
@@ -32,11 +32,13 @@ public class Constants {
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
-	public static final String RULES_FILE =  "rules_file";
 	public static final String APP_XML = "application/xml";
 	public static final String SYS_PORT = "port";
-	public static final String DEFAULT_PORT = "8082";
+	public static final String DEFAULT_PORT = "8081";
 	public static final String INIT_PROP_FILE = "init-values.properties";
+	public static final String TOOLKIT_PROP_FILE = "toolkit.properties";
+	public static final String NCIP_PROP_FILE = "ncip.properties";
+	public static final String RULES_FILE = "rules.drl";
 	public static final String X_OKAPI_TENANT = "x-okapi-tenant";
 	public static final String X_OKAPI_TOKEN = "X-Okapi-Token";
 	public static final String X_OKAPI_URL = "X-Okapi-Url";
@@ -51,6 +53,9 @@ public class Constants {
 	public static final String ITEM_BARCODE = "Item Barcode";
 	public static final String USER_BARCODE = "User Barcode";
 	public static final String REQUEST_ID = "Request Id";
+	public static final String MAX_FINE_AMOUNT = "max-fine-amount";
+	public static final String MAX_LOAN_COUNT = "max-loan-count";
+	public static final String CONFIGS = "configs";
 	
 	
 	//URLS

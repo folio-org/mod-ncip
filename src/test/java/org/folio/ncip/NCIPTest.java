@@ -4,8 +4,9 @@ import org.junit.Before;
 import org.mockito.MockitoAnnotations;
 
 public class NCIPTest {
-		@Before
-		public void init() {
-			MockitoAnnotations.initMocks(this);
-		}
+	 @Before
+	    public void init() {
+	        MockitoAnnotations.initMocks(this);
+	    }
+
 }

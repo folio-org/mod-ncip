@@ -11,7 +11,8 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 
 ## Preparation
-### The NCIP module requires a FOLIO user with the following permissions:
+1. The NCIP module requires a FOLIO user with the following permissions:
+```
     users.collection.get                              ->can view user profile
     circulation.requests.item.post                    ->Requests: View, create
     inventory-storage.all                             ->Inventory: All permissions (note: only need inventory-storage.locations.collection.get)
@@ -20,13 +21,32 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     inventory-storage.identifier-types.collection.get ->Settings (Inventory): Create, edit, delete resource identifier types
     inventory-storage.material-types.collection.get   ->Settings (Inventory): Create, edit, delete material types
     inventory-storage.loan-types.collection.get       ->Settings (Inventory): Create, edit, delete loan types
+```
+2. If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
 
-### You need to set up the values in FOLIO that will be set in the [ncip.properties](#ncip-prop) file
-### If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
+3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:
+
+    * instance.type.name
+    * instance.source
+    * item.material.type.name
+    * item.perm.loan.type.name
+    * item.status.name
+    * item.perm.location.code
+    * holdings.perm.location.code
+    * instance.custom.identifier.name
+    * checkout.service.point.code
+    * checkin.service.point.code
+
+Notes 
+* You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for differnt Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
 
 
+* The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.  “instance.custom.identifier.name” was used so the item could be searched for in the inventory module.  It shows up like this and is searchable:
 
+![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
 
+This can be removed if it is no longer needed becuase of the evolution of the inventory module.
+ 
 ## Installing the module
 
 
@@ -50,15 +70,7 @@ https://github.com/folio-org/edge-ncip
    </td>
    <td>int
    </td>
-   <td>The port the module binds to.  The default is 8082
-   </td>
-  </tr>
-  <tr>
-   <td>prop_files
-   </td>
-   <td>string
-   </td>
-   <td>The location of the property files for the module.  More details about the property files below.
+   <td>The port the module binds to.  The default is 8081
    </td>
   </tr>
   <tr>
@@ -72,84 +84,53 @@ https://github.com/folio-org/edge-ncip
 </table>
 
 
-### Property Files
-
-#### Setup
-
-There should be a set of three property files for each tenant.  The folder structure for the files should be:
-
-/the property file location you specify/**tenants**/your tenant id/the 3 property files
-
-When the module is started, properties are initialized for each tenant.  It determines tenants by looking in the **tenants** folder.
-
-#### More about each property file
 
 
+## mod-configuration setup
 
-1. rules.drl - this file contains Drools rules used by the “LookupUser” NCIP service.  It allows you to block users by the amount of fines they owe or the number of checked out items.  If you do not want to use these rules, comment them out or delete. (Leave the file in place) \
-Moving forward this functionality can be removed if it is not necessary or as FOLIO evolves. 
+There are three types of settings that can exist in mod-configuration for the NCIP module:
 
-2. toolkit.properties - This module was built using the Extensible Catalog (XC) NCIP toolkit.  The toolkit.properties file is a part of that toolkit.  To install and use this module you can probably leave this file as it is in the example in the resources folder.  There is a setting for logging in this file.  There are also settings you might have to change if the XML that is passed into the module fails somehow.   If you add support for additional NCIP services to this module you will have to update this file.  (more about that below) 
+### Required Configurations:
+1) NCIP properties: these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
+### Optional Configurations
+2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
+3) Rule properties: Use these setting if you want the LookupUser service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The LookupUser service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
 
-3. <a id="ncip-prop">ncip.properties</a> - this file contains the settings required by FOLIO to execute three of the four services currently supported in this module (the LookupUser service does not use these settings).  **You will have to set up this configuration file to contain the values your library is using:**
+#### NCIP Properties
 
-You can find examples of these property files and folder structure in the [/src/main/resources folder](https://github.com/folio-org/mod-ncip/tree/master/src/main/resources).
+| MODULE        | configName (the AgencyID)   |   code          | value  (examples) |   
+| ------------- |:-------------:| :-----------------------------|------------------:|		
+| NCIP          | Relais 		| instance.type.name 			| PALCI             |	
+| NCIP          | Relais     	| instance.source 				| PALCI             |	
+| NCIP          | Relais      	| item.material.type.name 		| PALCI             |	
+| NCIP          | Relais 		| item.perm.loan.type.name 		| PALCI             |	
+| NCIP          | Relais     	| item.status.name   			| Available         |
+| NCIP          | Relais      	| item.perm.location.code 		| PALCI_LEHIGH      |	
+| NCIP          | Relais 		| holdings.perm.location.code 	| PALCI_LEHIGH      |	
+| NCIP          | Relais     	| instance.custom.identifier.name| PALCI Request ID |		
+| NCIP          | Relais      	| checkout.service.point.code	| FAIRCHILD         |		
+| NCIP          | Relais      	| checkin.service.point.code 	| FAIRCHILD         |		
 
-        #accept item
-        relais.instance.type.name=PALCI
-        relais.instance.source=PALCI
-        relais.item.material.type.name=PALCI
-        relais.item.perm.loan.type.name=PALCI
-        relais.item.status.name=Available
-        relais.item.perm.location.code=PALCI_LEHIGH
-        relais.holdings.perm.location.code=PALCI_LEHIGH
-        relais.instance.custom.identifier.name=PALCI Request ID
-        #check out
-        relais.checkout.service.point.code=FAIRCHILD
-        #check in
-        relais.checkin.service.point.code=FAIRCHILD
-
-
-The first ‘section’ of each configuration (in the example above ‘relais’) represents an agency ID.  Typically the requestor calling the NCIP service will include an agency ID in the request (example below).  Having the first section of each configuration value tied to a requestors agency ID gives the module more flexibility.  If you have two requesters calling your NCIP services with unique agency IDs you can configure these values differently for each requestor.  Also, the agency ID is not always required so the ncip.properties file contains a default configuration value for each.  If the request does not contain an agency ID the module will use the values assigned to the default configurations.  More than likely your requestors will send an agency ID with the request.  This is just a precaution.
-
-
-    
+You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
+   
 
 ![Illustrates NCIP message pointing out the agency ID](docs/images/ncipMessageIllustratesAgencyId.png?raw=true "Illustrates NCIP message pointing out the agency ID")
 
 
+When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are initialized.  This means the first request may be a bit slow to respond.
+
+If you later add settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
+
+* To reinitialize the NCIP properties --> send a GET request to ../ncip/initncipproperties
+* To reinitialize the Toolkit properties --> send a GET request to ../ncip/inittoolkit
+* To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
 
 
+As you are setting up mod-nicp, the NCIP properties and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
-The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.   I used the “instance.custom.identifier.name” so I could search for the item in the inventory module.  It shows up like this and is searchable:
+* To validate your configuration settings --> send a GET request to ../ncipconfigcheck
 
-
-
-
-![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
-
-
-
-
- The inventory module is evolving so this may become unnecessary.  For now it expects the configuration value to be there.  The AcceptItem service will not work without it.  Let me know if I should remove it.
-
-
-When the first service is called (of the three services that use these configuration settings) the module retrieves all of the UUIDs for these settings and saves them to memory.  The first call to the NCIP services may be slower because of this, but it is a one time initialization.
-
-
-As you are setting up mod-nicp, the ncip.properties file and the settings values in FOLIO, you can use this utility service to validate the values you have set in the ncip.properties file (it attempts to look up each value you have configured):
-
-
-If you are using the edge-ncip module to access the ncip services send a GET request to: 
-http://youredgemoduleURL/ncipconfigcheck?apikey=yourapikey
-
-
-You can access it directly through the NCIP module by sending a GET request to: 
-http://okapiurl/ncipconfigcheck
-
-
-If the service is able to retrieve a UUID for each of the settings in your configuration file it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
-
+If the service is able to retrieve a UUID for each of the settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 
     
     <Problem>
@@ -158,7 +139,7 @@ If the service is able to retrieve a UUID for each of the settings in your confi
     </Problem>
 
     
-### About the NCIP services
+## About the NCIP services
 This initial version of the NCIP module supports four of the existing 50ish services in the NCIP protocol.  The endpoint for all of the services is the same:
 
 POST to http://yourokapiendoint/ncip    (if you are calling the mod-ncip directly)
@@ -171,9 +152,9 @@ These particular four services were selected because they are required to intera
 #### Supported Services
 
 ##### Lookup User
-The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "ok" value to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
+The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "active" value to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
 
-This service also uses the Drools rules to help determine the 'blocked' or 'ok' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The rules can be adjusted in the rules.drl file.  If you don't want to use them, delete or comment out the rules, but leave the rest of the file as is.
+This service can also use the Drools rules to help determine the 'blocked' or 'active' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The values used in the rules can be adjusted in mod-configuration.  If you don't want to use them skip setting any values for them in mod-configuration.
 
 Sample XML Request:
 
@@ -232,10 +213,11 @@ Note: Correct capitalization is important for this configuration.  CheckinItemSe
 
 ![Illustrates updating the toolkit.properties file by adding a configuration for the Request Item Service](docs/images/newServiceToolkit.png?raw=true "Illustrates updating the toolkit.properties file")
 
+These are the default values used for the NCIP Toolkit configuraiton.
 
 #### Step 2: Create the class you configured in step 1
 The new class should implement the Toolkit's interface for this service.  In this example your new class would implement the RequestItemService interface.  This means your class is required to have a 'performService' method as illustrated below.
-When an NCIP request is received, the toolkit looks at the XML in the body of the request to to decide which class will process it (based on the configuration in the toolkit.properties file).  For example, if a request comes in that contains the RequestItem Service XML, the toolkit will instantiate your implemenation of the RequestItem service and then the performService method will be called.  You can see this in the 'ncipProcess' method in the FolioNcipHelper class.
+When an NCIP request is received, the toolkit looks at the XML in the body of the request to to decide which class will process it (based on the toolkit configuraiton).  For example, if a request comes in that contains the RequestItem Service XML, the toolkit will instantiate your implemenation of the RequestItem service and then the performService method will be called.  You can see this in the 'ncipProcess' method in the FolioNcipHelper class.
 
 ![Illustrates the new FolioRequestItemService class](docs/images/requestItemService.png?raw=true "Illustrates the new FolioRequestItemService class")
 
@@ -270,6 +252,10 @@ You can look at the existing services for examples.  The FolioCheckInItemService
 [https://www.carli.illinois.edu/frequently-asked-questions-about-xc](https://www.carli.illinois.edu/frequently-asked-questions-about-xc)
 
 [https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html](https://www.oclc.org/developer/news/2010/developer-collaboration-leads-to-implementation-of-ncip-20.en.html) 
+
+### More about the toolkit settings
+https://github.com/eXtensibleCatalog/NCIP2-Toolkit/wiki/GeneralConfiguration
+https://github.com/moravianlibrary/xcncip2toolkit/blob/master/connectors/aleph/22/trunk/web/src/main/resources/toolkit.properties
 
 ## Additional information
 

@@ -1,12 +1,23 @@
 package org.folio.ncip;
 
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+
+
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.core.Promise;
 import java.io.InputStream;
@@ -33,12 +44,73 @@ public class MainVerticle extends AbstractVerticle {
 		router.route().handler(BodyHandler.create());
 		router.route(HttpMethod.POST, "/ncip").handler(this::handleNcip);
 		router.route(HttpMethod.GET, "/ncipconfigcheck").handler(this::ncipConfigCheck);
+		router.route(HttpMethod.GET,"/inittoolkit").handler(this::initToolkit);
+		router.route(HttpMethod.GET,"/initrules").handler(this::initRules);
+		router.route(HttpMethod.GET,"/initncipproperties").handler(this::initNcipProperties);
 		vertx.createHttpServer().requestHandler(router).listen(port);
+	}
+
+	
+	protected void initNcipProperties(RoutingContext ctx) {
+		try {
+			folioNcipHelper.initNcipProperties(ctx);
+		} 
+		catch(Exception e) {
+			logger.error("***************");
+			logger.error(e.toString());
+			ctx.response()
+			.setStatusCode(500)
+			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
+			.end("<Problem><message>problem processing inittoolkit request</message><exception>" + e.toString()+ "</exception></Problem>");
+		}
+		ctx.response()
+		.setStatusCode(200)
+		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
+		.end("\"OK\"");
+	}
+	
+	
+	
+	protected void initRules(RoutingContext ctx) {
+		try {
+			folioNcipHelper.initRules(ctx);
+		} 
+		catch(Exception e) {
+			logger.error("***************");
+			logger.error(e.toString());
+			ctx.response()
+			.setStatusCode(500)
+			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
+			.end("<Problem><message>problem processing inittoolkit request</message><exception>" + e.toString()+ "</exception></Problem>");
+		}
+		ctx.response()
+		.setStatusCode(200)
+		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
+		.end("\"OK\"");
+	}
+	
+	
+	protected void initToolkit(RoutingContext ctx) {
+		try {
+			folioNcipHelper.initToolkit(ctx);
+		} 
+		catch(Exception e) {
+			logger.error("***************");
+			logger.error(e.toString());
+			ctx.response()
+			.setStatusCode(500)
+			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
+			.end("<Problem><message>problem processing inittoolkit request</message><exception>" + e.toString()+ "</exception></Problem>");
+		}
+		ctx.response()
+		.setStatusCode(200)
+		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
+		.end("\"OK\"");
 	}
 
 
 	protected void ncipConfigCheck(RoutingContext ctx) {
-		logger.info("ncip mod - healthcheck method called");
+		///logger.info("ncip mod - healthcheck method called");
 		final Promise<Void> promise = Promise.promise();
 		try {
 			NcipConfigCheck ncipConfigCheck = new NcipConfigCheck(promise);
@@ -50,9 +122,6 @@ public class MainVerticle extends AbstractVerticle {
 			ctx.response()
 			.setStatusCode(500)
 			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
-			//THIS REALLY SHOULD BE AN NCIP RESONSE THAT MIRRORS THE NCIP REQUEST TYPE (WITH PROBLEM ELEMENT) HOWEVER...
-			//THAT IS NOT POSSIBLE IF WE'VE REACHED HERE BECAUSE ONLY THE MESSAGE HANDLER CAN CONSTRUCT A RESPONSE OBJECT
-			//WE SHOULDN'T EVER GET HERE - FAMOUS LAST WORDS
 			.end("<Problem><message>problem processing NCIP request</message><exception>" + e.toString()+ "</exception></Problem>");
 		}
 		ctx.response()
@@ -61,7 +130,7 @@ public class MainVerticle extends AbstractVerticle {
 		.end("\"OK\"");
 	}
 
-
+	
 
 	protected void handleNcip(RoutingContext ctx) {
 

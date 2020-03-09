@@ -1,6 +1,7 @@
 package org.folio.ncip;
 
 import io.restassured.http.Header;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
@@ -83,7 +84,8 @@ public class MockServer {
 	  void start() throws InterruptedException, ExecutionException, TimeoutException {
 		    // Setup Mock Server...
 		  final Promise<Void> promise = Promise.promise();
-		   folioNcipHelper  = new FolioNcipHelper(promise);
+		   folioNcipHelper  = new FolioNcipHelper(promise);  //TODO????
+		  //WebContext context = new WebContext(routingContext);
 		   HttpServer server = vertx.createHttpServer();
 		   params.put("port", this.port);
 		    CompletableFuture<HttpServer> deploymentComplete = new CompletableFuture<>();
@@ -120,7 +122,67 @@ public class MockServer {
 			    router.get("/accounts").handler(this::accounts);
 			    router.get("/service-points-users").handler(this::servicePointUsers);
 			    router.get("/manualblocks").handler(this::manualBlocks);
+			    router.get("/configurations/entries/maxloancount").handler(this::getMaxLoanCount);
+			    router.get("/configurations/entries/maxfineamount").handler(this::getMaxFineAmount);
+			    router.get("/configurations/entries/toolkit").handler(this::getToolkitCofigs);
+			    router.get("/configurations/entries").handler(this::getNcipConfigs);
+			    
+			   
 			    return router;
+		  }
+		  
+		  private void getMaxLoanCount(RoutingContext ctx) {
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "max-loan-count.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+		  
+		  private void getMaxFineAmount(RoutingContext ctx) {
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "max-fine-amount.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+		  
+		  private void getNcipConfigs(RoutingContext ctx) {
+			  logger.fatal("___________" + ctx.request().path());
+			  if (ctx.request().path().contains("max-loan-count")) {
+				  String path = ctx.request().path();
+				  path = path.replace("(", "");
+				  path = path.replace(")", "");
+				  //LOG.info("Path changed to {}", path);
+				  ctx.reroute(path);
+			  }
+			  
+
+			  MultiMap params =  ctx.request().params();
+			  List<String> param = params.getAll("query");
+			  String toolkit = "configName=toolkit";
+			  String maxFine = "(code==max-fine-amount)";
+			  String maxCount = "(code==max-loan-count)";
+			  					  
+			  param.contains(toolkit);
+			  if (param.contains(toolkit)) {
+				  ctx.reroute("/configurations/entries/toolkit");
+			  }
+			  if (param.contains(maxFine)) {
+				  ctx.reroute("/configurations/entries/maxfineamount");
+			  }
+			  if (param.contains(maxCount)) {
+				  ctx.reroute("/configurations/entries/maxloancount");
+			  }
+			  
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "ncip-configs.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+		  
+		  private void getToolkitCofigs(RoutingContext ctx) {
+	
+			  
+			  
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "toolkit-configs.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
 		  }
 		  
 		  private void groupLookup(RoutingContext ctx) {
