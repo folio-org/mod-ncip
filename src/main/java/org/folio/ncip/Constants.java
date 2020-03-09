@@ -48,6 +48,7 @@ public class Constants {
 	public static final String ACCEPT_TEXT = "Accept";
 	public static final String CONTENT_TYPE_TEXT = "Content-Type";
 	public static final String CONTENT_JSON_AND_PLAIN = "application/json,text/plain";
+	public static final String TEXT_PLAIN_STRING = "text/plain";
 	public static final String CONTENT_JSON = "application/json";
 	public static final String DATE_FORMAT_FOR_CIRC = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String INITIALIZED_PROPERTY = ".ncip.initialized";

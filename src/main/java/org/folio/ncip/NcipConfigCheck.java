@@ -1,27 +1,12 @@
 package org.folio.ncip;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URLEncoder;
-//import java.net.http.HttpClient;
-//import java.net.http.HttpRequest;
-//import java.net.http.HttpResponse;
-//import java.net.http.HttpClient.Version;
-//import java.net.http.HttpResponse.BodyHandlers;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.time.Duration;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Properties;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -31,10 +16,8 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
@@ -152,26 +135,4 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		  return null;
 	  }
 	  
-	  		
-		public String processErrorResponse(String responseBody) {
-			// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
-			// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
-			try {
-				JsonObject jsonObject = new JsonObject(responseBody);
-				JsonArray errors = jsonObject.getJsonArray("errors");
-				Iterator i = errors.iterator();
-				responseBody = "ERROR: ";
-				while (i.hasNext()) {
-					JsonObject errorMessage = (JsonObject) i.next();
-					responseBody += errorMessage.getString("message");
-				}
-			} catch (Exception exception) {
-				// NOT A PROBLEM, ERROR WAS A STRING. UNABLE TO PARSE
-				// AS JSON
-			}
-			return responseBody;
-		}
-		
-
-
 }
