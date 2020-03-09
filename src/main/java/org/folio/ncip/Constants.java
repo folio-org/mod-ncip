@@ -6,6 +6,9 @@ public class Constants {
 	public static final String AUTH_UID = "Username";
 	public static final String AUTH_BARCODE = "Barcode Id";
 	public static final String ACTIVE = "ACTIVE";
+	public static final String VALUE_KEY = "value";
+	public static final String CODE_KEY = "code";
+	public static final String UNABLE_TO_INIT_TOOLKIT = "Unable to initialize the default toolkit properties.";
 	public static final String BORROWING_BLOCK = "borrowing";
 	public static final String REQUEST_BLOCK = "requesting";
 	public static final String ACCEPT_ITEM_PROBLEM = "Problem performing AcceptItem";

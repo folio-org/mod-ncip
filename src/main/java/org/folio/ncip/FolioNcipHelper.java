@@ -27,12 +27,10 @@ import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
-import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -80,7 +78,6 @@ public class FolioNcipHelper {
 
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			Properties properties = new Properties();
 			logger.info("initializing the XC NCIP Toolkit default properties...");
 			properties.load(inputStream);
@@ -95,9 +92,9 @@ public class FolioNcipHelper {
 			defaultToolkitObjects.put("translator", TranslatorFactory.buildTranslator(null, properties));
 			return promise.future();
 		} catch (Exception e) {
-			logger.fatal("Unable to initialize the default toolkit properties.");
+			logger.fatal(Constants.UNABLE_TO_INIT_TOOLKIT);
 			logger.fatal(e.getLocalizedMessage());
-			promise.fail("Unable to initialize the default toolkit properties.");
+			promise.fail(Constants.UNABLE_TO_INIT_TOOLKIT);
 		}
 		return promise.future();
 
@@ -201,7 +198,6 @@ public class FolioNcipHelper {
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
 			// DO THE TOOLKIT PROPERTIES EXIST IN MOD-CONFIGURATION?
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
 			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=configName=toolkit&limit=200";
@@ -220,8 +216,8 @@ public class FolioNcipHelper {
 			Iterator configsIterator = configs.iterator();
 			while (configsIterator.hasNext()) {
 				JsonObject config = (JsonObject) configsIterator.next();
-				String code = config.getString("code");
-				String value = config.getString("value");
+				String code = config.getString(Constants.CODE_KEY);
+				String value = config.getString(Constants.VALUE_KEY);
 				properties.setProperty(code, value);
 			}
 			toolkitProperties.put(tenant, properties);
@@ -271,7 +267,7 @@ public class FolioNcipHelper {
 				try {
 					String response = callApiGet(configEndpoint + line + "&limit=200", context.request().headers());
 					JsonObject jsonObject = new JsonObject(response);
-					JsonArray configs = jsonObject.getJsonArray("configs");
+					JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 					if (configs.size() < 1) {
 						throw new Exception("No ncip properties found in mod-configuration for property: " + line);
 					}
@@ -281,15 +277,15 @@ public class FolioNcipHelper {
 					Iterator configsIterator = configs.iterator();
 					while (configsIterator.hasNext()) {
 						JsonObject config = (JsonObject) configsIterator.next();
-						String code = config.getString("code");
+						String code = config.getString(Constants.CODE_KEY);
 						String configName = config.getString("configName");
-						String value = config.getString("value");
+						String value = config.getString(Constants.VALUE_KEY);
 						// CONFIG NAME CONTAINS THE AGENCY ID FOR THIS VALUE
 						// THERE COULD BE MULTIPLE VALUES FOR DIFFERENT AGENCY IDS
 						properties.setProperty((configName + "." + code).toLowerCase(), value);
 					}
 				} catch (Exception e) {
-					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION, TRY TO SET VALUE
+					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION
 					throw new Exception(
 							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
 				}
@@ -344,8 +340,6 @@ public class FolioNcipHelper {
 		KieFileSystem kfs = kieServices.newKieFileSystem();
 		kfs.write( "src/main/resources/nciprules.drl",
 		           kieServices.getResources().newInputStreamResource( resourceAsStream ) );
-		
-
 		KieBuilder Kiebuilder = kieServices.newKieBuilder(kfs);
 		Kiebuilder.buildAll();
 		kieContainer.put(tenant, kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId()));
@@ -360,11 +354,11 @@ public class FolioNcipHelper {
 		try {
 			String response = callApiGet(configEndpoint, okapiHeaders);
 			JsonObject jsonObject = new JsonObject(response);
-			JsonArray configs = jsonObject.getJsonArray("configs");
+			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 			if (configs.size() < 1) {
 				return null;
 			}
-			returnValue = configs.getJsonObject(0).getString("value");
+			returnValue = configs.getJsonObject(0).getString(Constants.VALUE_KEY);
 		} catch (Exception e) {
 			logger.error("unable to get config value for code: " + code);
 			logger.error(e.getMessage());
@@ -375,7 +369,7 @@ public class FolioNcipHelper {
 	}
 
 	public String callApiGet(String uriString, MultiMap okapiHeaders)
-			throws Exception, IOException, InterruptedException {
+			throws Exception  {
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
@@ -395,7 +389,7 @@ public class FolioNcipHelper {
 
 		if (responseCode > 399) {
 			String responseBody = processErrorResponse(responseString);
-			throw new Exception(responseString);
+			throw new Exception(responseBody);
 		}
 
 		return responseString;
@@ -410,20 +404,21 @@ public class FolioNcipHelper {
 	public String processErrorResponse(String responseBody) {
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
+		StringBuffer responseBuffer = new StringBuffer();
 		try {
 			JsonObject jsonObject = new JsonObject(responseBody);
 			JsonArray errors = jsonObject.getJsonArray("errors");
 			Iterator i = errors.iterator();
-			responseBody = "ERROR: ";
+			responseBuffer.append("ERROR: " );
 			while (i.hasNext()) {
 				JsonObject errorMessage = (JsonObject) i.next();
-				responseBody += errorMessage.getString("message");
+				responseBuffer.append(errorMessage.getString("message"));
 			}
 		} catch (Exception exception) {
 			// NOT A PROBLEM, ERROR WAS A STRING. UNABLE TO PARSE
 			// AS JSON
 		}
-		return responseBody;
+		return responseBuffer.toString();
 	}
 
 }
