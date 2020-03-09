@@ -198,16 +198,16 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			    	patron.setMaxLoanCount(new Integer(maxLoanCounts));
 			    	JsonArray loans = jsonObject.getJsonArray("loans");
 			    	for (int x = 0 ; x < loans.size(); x++) {
-			    	        JsonObject obj = loans.getJsonObject(x);
+			    	        JsonObject loanObject = loans.getJsonObject(x);
 			    	        Loan loan = new Loan();
-			    	        loan.setId(obj.getString("id"));
+			    	        loan.setId(loanObject.getString("id"));
 			    	        patron.getLoans().add(loan);
 			    	}
 			    	JsonArray fines = jsonObject.getJsonArray("accounts");
 			    	for (int x = 0 ; x < fines.size(); x++) {
-			    	        JsonObject obj = fines.getJsonObject(x);
+			    	        JsonObject fineObject = fines.getJsonObject(x);
 			    	        Account account = new Account();
-			    	        account.setRemaining(obj.getDouble("remaining"));
+			    	        account.setRemaining(fineObject.getDouble("remaining"));
 			    	        patron.getAccounts().add(account);
 			    	}
 			    	
