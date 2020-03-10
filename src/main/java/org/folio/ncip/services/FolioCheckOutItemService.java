@@ -60,7 +60,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	//cannot get requester agency id from init header - try request id element
         	try {
         		requesterAgencyId = initData.getRequestId().getAgencyId().getValue();
-        		if (requesterAgencyId != null || requesterAgencyId.trim().equalsIgnoreCase(""))
+        		if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
         			throw new Exception("From Agency ID Missing");
         	}
         	catch(Exception except) {
