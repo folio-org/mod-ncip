@@ -15,12 +15,19 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ```
     users.collection.get                              ->can view user profile
     circulation.requests.item.post                    ->Requests: View, create
-    inventory-storage.all                             ->Inventory: All permissions (note: only need inventory-storage.locations.collection.get)
+    inventory-storage.all                             ->note: only need inventory-storage.locations.collection.get
     inventory-storage.service-points.collection.get   ->Users: Can view service points assigned to users
     inventory-storage.instance-types.collection.get   ->Settings (Inventory): Create, edit, delete locally defined resource types
     inventory-storage.identifier-types.collection.get ->Settings (Inventory): Create, edit, delete resource identifier types
     inventory-storage.material-types.collection.get   ->Settings (Inventory): Create, edit, delete material types
     inventory-storage.loan-types.collection.get       ->Settings (Inventory): Create, edit, delete loan types
+	usergroups.item.get
+	manualblocks.collection.get
+	accounts.collection.get
+	circulation.check-out-by-barcode.post
+	circulation.check-in-by-barcode.post
+	configuration.entries.collection.get
+	configuration.entries.item.get
 ```
 2. If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
 
