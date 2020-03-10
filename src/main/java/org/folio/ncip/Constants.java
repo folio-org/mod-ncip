@@ -52,7 +52,6 @@ public class Constants {
 	public static final String CONTENT_JSON = "application/json";
 	public static final String DATE_FORMAT_FOR_CIRC = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String INITIALIZED_PROPERTY = ".ncip.initialized";
-	public static final String DEFAULT_AGENCY = "default";
 	public static final String SCHEME = "Scheme";
 	public static final String ITEM_BARCODE = "Item Barcode";
 	public static final String USER_BARCODE = "User Barcode";
@@ -60,6 +59,7 @@ public class Constants {
 	public static final String MAX_FINE_AMOUNT = "max-fine-amount";
 	public static final String MAX_LOAN_COUNT = "max-loan-count";
 	public static final String CONFIGS = "configs";
+	public static final String AGENCY_ID = "Agency ID";
 	
 	
 	//URLS
