@@ -24,6 +24,9 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -245,13 +248,13 @@ public class FolioNcipHelper {
 	 */
 	public void initNcipProperties(RoutingContext context) throws Exception {
 
-		try {
+			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+	
 			// THE NCIP PROPERTY FILE CONTAINS A LIST OF PROPERTIES
 			// THAT NEED TO BE INITIALIZED
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
-			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
 			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=";
 			Properties properties = new Properties();
 			// LOOK FOR EACH PROPERTY:
@@ -286,17 +289,15 @@ public class FolioNcipHelper {
 					}
 				} catch (Exception e) {
 					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION
+					logger.fatal("Unable to initialize ncip properties using mod-configuration.");
+					logger.fatal(e.getLocalizedMessage());
+					ncipProperties.remove(tenant);
 					throw new Exception(
 							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
 				}
 			}
 			ncipProperties.put(tenant, properties);
-		} catch (Exception e) {
-			logger.fatal("Unable to initialize ncip properties using mod-configuration.");
-			logger.fatal(e.getLocalizedMessage());
-			throw new Exception(
-					"Unable to initialize toolkit.properties using mod-configuration." + e.getLocalizedMessage());
-		}
+		
 	}
 
 	/**
@@ -330,6 +331,9 @@ public class FolioNcipHelper {
 			logger.info("****NO RULES WILL BE USED FOR LOOKUPUSER SERVICE****");
 			logger.info("****UNABLE TO RETRIEVE DROOLS CONFIGURATION VALUES****");
 			logger.error(e.getLocalizedMessage());
+			//REMOVING ANY PREVIOUSLY EXISTING RULES IN PROPERTIES
+			rulesProperties.remove(tenant);
+			kieContainer.remove(tenant);
 			return;
 
 		}
