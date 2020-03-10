@@ -55,7 +55,7 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 
 	        //ATTEMPT TO DETERMINE AGENCY ID
 	        //INITIATION HEADER IS NOT REQUIRED
-	        String requesterAgencyId = Constants.DEFAULT_AGENCY;
+	        String requesterAgencyId = null;
 	        try {
 	        	requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
 	        }
@@ -63,16 +63,19 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 	        	//cannot get requester agency id from init header - try request id element
 	        	try {
 	        		requesterAgencyId = initData.getRequestId().getAgencyId().getValue();
+	        		if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
+	        			throw new Exception("From Agency ID Missing");
 	        	}
 	        	catch(Exception except) {
-	        		logger.info("Could not determine agency id from initiation header or request id element.  Using default");
-	        		//thats okay -- will use default
+	        		logger.error("Could not determine agency id from initiation header or request id element.  Using default");
+	        		if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
+	            	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.UNKNOWN_DATA_ELEMENT,Constants.CHECK_OUT_PROBLEM ,e.getMessage());
+	            	responseData.getProblems().add(p);
+	            	return responseData;
 	        	}
 	        	
 	        }
-	        
-	        //In case the element is there but empty
-	        if (requesterAgencyId != null && requesterAgencyId.trim().equalsIgnoreCase("")) requesterAgencyId = Constants.DEFAULT_AGENCY;
+
 	        
 	        ItemIdentifierType itemIdentifierType = new ItemIdentifierType(Constants.SCHEME, Constants.ITEM_BARCODE);
 	        RequestIdentifierType requestIdentifierType = new RequestIdentifierType(Constants.SCHEME,Constants.REQUEST_ID);

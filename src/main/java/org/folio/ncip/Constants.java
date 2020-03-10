@@ -6,6 +6,9 @@ public class Constants {
 	public static final String AUTH_UID = "Username";
 	public static final String AUTH_BARCODE = "Barcode Id";
 	public static final String ACTIVE = "ACTIVE";
+	public static final String VALUE_KEY = "value";
+	public static final String CODE_KEY = "code";
+	public static final String UNABLE_TO_INIT_TOOLKIT = "Unable to initialize the default toolkit properties.";
 	public static final String BORROWING_BLOCK = "borrowing";
 	public static final String REQUEST_BLOCK = "requesting";
 	public static final String ACCEPT_ITEM_PROBLEM = "Problem performing AcceptItem";
@@ -45,10 +48,10 @@ public class Constants {
 	public static final String ACCEPT_TEXT = "Accept";
 	public static final String CONTENT_TYPE_TEXT = "Content-Type";
 	public static final String CONTENT_JSON_AND_PLAIN = "application/json,text/plain";
+	public static final String TEXT_PLAIN_STRING = "text/plain";
 	public static final String CONTENT_JSON = "application/json";
 	public static final String DATE_FORMAT_FOR_CIRC = "yyyy-MM-dd'T'HH:mm:ss";
 	public static final String INITIALIZED_PROPERTY = ".ncip.initialized";
-	public static final String DEFAULT_AGENCY = "default";
 	public static final String SCHEME = "Scheme";
 	public static final String ITEM_BARCODE = "Item Barcode";
 	public static final String USER_BARCODE = "User Barcode";
@@ -56,6 +59,7 @@ public class Constants {
 	public static final String MAX_FINE_AMOUNT = "max-fine-amount";
 	public static final String MAX_LOAN_COUNT = "max-loan-count";
 	public static final String CONFIGS = "configs";
+	public static final String AGENCY_ID = "Agency ID";
 	
 	
 	//URLS

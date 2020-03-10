@@ -24,15 +24,16 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
-import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -80,7 +81,6 @@ public class FolioNcipHelper {
 
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			Properties properties = new Properties();
 			logger.info("initializing the XC NCIP Toolkit default properties...");
 			properties.load(inputStream);
@@ -95,9 +95,9 @@ public class FolioNcipHelper {
 			defaultToolkitObjects.put("translator", TranslatorFactory.buildTranslator(null, properties));
 			return promise.future();
 		} catch (Exception e) {
-			logger.fatal("Unable to initialize the default toolkit properties.");
+			logger.fatal(Constants.UNABLE_TO_INIT_TOOLKIT);
 			logger.fatal(e.getLocalizedMessage());
-			promise.fail("Unable to initialize the default toolkit properties.");
+			promise.fail(Constants.UNABLE_TO_INIT_TOOLKIT);
 		}
 		return promise.future();
 
@@ -142,14 +142,14 @@ public class FolioNcipHelper {
 				initNcipProperties(context);
 			} catch (Exception e) {
 				logger.info("Unable to initialize NCIP properties with mod-configuration.");
-				logger.info("Initialize them later by calling the initNcipProperties web service.");
+				logger.info("Initialize them later by calling the initncipproperties endpoint.");
 				logger.info(e.getLocalizedMessage());
 			}
 			try {
 				initRules(context);
 			} catch (Exception e) {
 				logger.info("Unable to initialize drools rules with mod-configuration.");
-				logger.info("Initialize them later by calling the initRules web service.");
+				logger.info("Initialize them later by calling the initrules endpoint.");
 				logger.info(e.getLocalizedMessage());
 			}
 
@@ -201,7 +201,6 @@ public class FolioNcipHelper {
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
 			// DO THE TOOLKIT PROPERTIES EXIST IN MOD-CONFIGURATION?
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
 			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=configName=toolkit&limit=200";
@@ -220,8 +219,8 @@ public class FolioNcipHelper {
 			Iterator configsIterator = configs.iterator();
 			while (configsIterator.hasNext()) {
 				JsonObject config = (JsonObject) configsIterator.next();
-				String code = config.getString("code");
-				String value = config.getString("value");
+				String code = config.getString(Constants.CODE_KEY);
+				String value = config.getString(Constants.VALUE_KEY);
 				properties.setProperty(code, value);
 			}
 			toolkitProperties.put(tenant, properties);
@@ -249,13 +248,13 @@ public class FolioNcipHelper {
 	 */
 	public void initNcipProperties(RoutingContext context) throws Exception {
 
-		try {
+			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+	
 			// THE NCIP PROPERTY FILE CONTAINS A LIST OF PROPERTIES
 			// THAT NEED TO BE INITIALIZED
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
-			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
 			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=";
 			Properties properties = new Properties();
 			// LOOK FOR EACH PROPERTY:
@@ -268,12 +267,10 @@ public class FolioNcipHelper {
 				// IF THE CONFIG EXISTS IN MOD-CONFIGURATION, ADD TO PROPERTIES VAR
 				// IF THE CONFIG DOES NOT EXIST IN MOD-CONFIGURATION,
 				// THROW AN EXCEPTION.
-				// THEY SHOULD HAVE BEEN SET WHEN THE TENANT DEPLOYED THIS MODULE
-				// OR SET BY THE TENANT USING MOD-CONFIGURATION MANUALLY
 				try {
 					String response = callApiGet(configEndpoint + line + "&limit=200", context.request().headers());
 					JsonObject jsonObject = new JsonObject(response);
-					JsonArray configs = jsonObject.getJsonArray("configs");
+					JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 					if (configs.size() < 1) {
 						throw new Exception("No ncip properties found in mod-configuration for property: " + line);
 					}
@@ -283,26 +280,24 @@ public class FolioNcipHelper {
 					Iterator configsIterator = configs.iterator();
 					while (configsIterator.hasNext()) {
 						JsonObject config = (JsonObject) configsIterator.next();
-						String code = config.getString("code");
+						String code = config.getString(Constants.CODE_KEY);
 						String configName = config.getString("configName");
-						String value = config.getString("value");
+						String value = config.getString(Constants.VALUE_KEY);
 						// CONFIG NAME CONTAINS THE AGENCY ID FOR THIS VALUE
 						// THERE COULD BE MULTIPLE VALUES FOR DIFFERENT AGENCY IDS
 						properties.setProperty((configName + "." + code).toLowerCase(), value);
 					}
 				} catch (Exception e) {
-					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION, TRY TO SET VALUE
+					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION
+					logger.fatal("Unable to initialize ncip properties using mod-configuration.");
+					logger.fatal(e.getLocalizedMessage());
+					ncipProperties.remove(tenant);
 					throw new Exception(
 							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
 				}
 			}
 			ncipProperties.put(tenant, properties);
-		} catch (Exception e) {
-			logger.fatal("Unable to initialize ncip properties using mod-configuration.");
-			logger.fatal(e.getLocalizedMessage());
-			throw new Exception(
-					"Unable to initialize toolkit.properties using mod-configuration." + e.getLocalizedMessage());
-		}
+		
 	}
 
 	/**
@@ -316,40 +311,29 @@ public class FolioNcipHelper {
 	 */
 	public void initRules(RoutingContext context) {
 		logger.info("...initialize variables for drools rules....");
-
-		String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 		String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==";
 		Properties properties = new Properties();
 		try {
-			String maxAmountResponse = callApiGet(configEndpoint + Constants.MAX_FINE_AMOUNT + ")",
-					context.request().headers());
-			JsonObject jsonObject = new JsonObject(maxAmountResponse);
-			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
-			if (configs != null && configs.size() > 0)
-				properties.put(Constants.MAX_FINE_AMOUNT, configs.getJsonObject(0).getValue("value"));
-			else
-				// IF EITHER RULE VALUE IS NOT SET - RULES WON'T BE USED
+			String maxAmountResponse = getConfigValue(Constants.MAX_FINE_AMOUNT, context.request().headers());
+			if (maxAmountResponse == null)
 				throw new Exception(
 						"max-fine-amount not set in mod-configuration.  Rules will not be used for lookup user");
-
-			String maxLoanCountResponse = callApiGet(configEndpoint + Constants.MAX_LOAN_COUNT + ")",
-					context.request().headers());
-			jsonObject = new JsonObject(maxLoanCountResponse);
-			configs = jsonObject.getJsonArray(Constants.CONFIGS);
-			if (configs != null && configs.size() > 0)
-				properties.put(Constants.MAX_LOAN_COUNT, configs.getJsonObject(0).getValue("value"));
-			else
-				// IF EITHER RULE VALUE IS NOT SET - RULES WON'T BE USED
+			
+			String maxLoanCountResponse = getConfigValue(Constants.MAX_LOAN_COUNT, context.request().headers());
+			if (maxLoanCountResponse == null)
 				throw new Exception(
 						"max-loan-count not set in mod-configuration.  Rules will not be used for lookup user");
-
+			
+			properties.put(Constants.MAX_FINE_AMOUNT, maxLoanCountResponse);
+			properties.put(Constants.MAX_LOAN_COUNT, maxLoanCountResponse);
 			rulesProperties.put(tenant, properties);
-
 		} catch (Exception e) {
 			logger.info("****NO RULES WILL BE USED FOR LOOKUPUSER SERVICE****");
 			logger.info("****UNABLE TO RETRIEVE DROOLS CONFIGURATION VALUES****");
 			logger.error(e.getLocalizedMessage());
+			//REMOVING ANY PREVIOUSLY EXISTING RULES IN PROPERTIES
+			rulesProperties.remove(tenant);
+			kieContainer.remove(tenant);
 			return;
 
 		}
@@ -358,15 +342,8 @@ public class FolioNcipHelper {
 		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(Constants.RULES_FILE);
 		KieServices kieServices = KieServices.Factory.get();
 		KieFileSystem kfs = kieServices.newKieFileSystem();
-		//org.kie.api.io.Resource resource = kieServices.getResources().newInputStreamResource(resourceAsStream)
-		//		.setResourceType(ResourceType.DRL);
-		//kfs.write(resource);
-		
-		kfs.write( "src/main/resources/test.drl",
+		kfs.write( "src/main/resources/nciprules.drl",
 		           kieServices.getResources().newInputStreamResource( resourceAsStream ) );
-		
-		
-
 		KieBuilder Kiebuilder = kieServices.newKieBuilder(kfs);
 		Kiebuilder.buildAll();
 		kieContainer.put(tenant, kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId()));
@@ -376,17 +353,16 @@ public class FolioNcipHelper {
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
 		String returnValue = null;
 		String okapiBaseEndpoint = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String tenant = okapiHeaders.get(Constants.X_OKAPI_TENANT);
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=" + code;
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + code + ")";
 
 		try {
 			String response = callApiGet(configEndpoint, okapiHeaders);
 			JsonObject jsonObject = new JsonObject(response);
-			JsonArray configs = jsonObject.getJsonArray("configs");
+			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 			if (configs.size() < 1) {
 				return null;
 			}
-			returnValue = configs.getJsonObject(0).getString("value");
+			returnValue = configs.getJsonObject(0).getString(Constants.VALUE_KEY);
 		} catch (Exception e) {
 			logger.error("unable to get config value for code: " + code);
 			logger.error(e.getMessage());
@@ -397,7 +373,7 @@ public class FolioNcipHelper {
 	}
 
 	public String callApiGet(String uriString, MultiMap okapiHeaders)
-			throws Exception, IOException, InterruptedException {
+			throws Exception  {
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
@@ -417,7 +393,7 @@ public class FolioNcipHelper {
 
 		if (responseCode > 399) {
 			String responseBody = processErrorResponse(responseString);
-			throw new Exception(responseString);
+			throw new Exception(responseBody);
 		}
 
 		return responseString;
@@ -432,20 +408,21 @@ public class FolioNcipHelper {
 	public String processErrorResponse(String responseBody) {
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
+		StringBuffer responseBuffer = new StringBuffer();
 		try {
 			JsonObject jsonObject = new JsonObject(responseBody);
 			JsonArray errors = jsonObject.getJsonArray("errors");
 			Iterator i = errors.iterator();
-			responseBody = "ERROR: ";
+			responseBuffer.append("ERROR: " );
 			while (i.hasNext()) {
 				JsonObject errorMessage = (JsonObject) i.next();
-				responseBody += errorMessage.getString("message");
+				responseBuffer.append(errorMessage.getString("message"));
 			}
 		} catch (Exception exception) {
 			// NOT A PROBLEM, ERROR WAS A STRING. UNABLE TO PARSE
 			// AS JSON
 		}
-		return responseBody;
+		return responseBuffer.toString();
 	}
 
 }

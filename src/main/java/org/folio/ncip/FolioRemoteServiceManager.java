@@ -224,8 +224,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		//BEEN SET IN MOD-CONFIGURATION
 		//CAN'T DO ANYTHING WITHOUT THEM
 		if (ncipProperties == null) {
-			logger.fatal("NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set so the Checkin Item service can be called");
-			throw new Exception("NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called");
+			logger.fatal(
+					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set so the Checkin Item service can be called");
+			throw new Exception(
+					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
 		}
 
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
@@ -262,8 +264,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		//BEEN SET IN MOD-CONFIGURATION
 		//CAN'T DO ANYTHING WITHOUT THEM
 		if (ncipProperties == null) {
-			logger.fatal("NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set so the Checkout item service can be called");
-			throw new Exception("NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set  in mod-configuration so the Checkout item service can be called");
+			logger.fatal(
+					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set so the Checkout item service can be called");
+			throw new Exception(
+					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set  in mod-configuration so the Checkout item service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
 		}
 		
 		UUID id = UUID.randomUUID();
@@ -292,7 +296,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
     		if (block.getBoolean(Constants.REQUEST_BLOCK)) throw new FolioNcipException(Constants.BLOCKED); 
     	}
     	//IS THE PATRON ACTIVE?
-    	if (!user.getBoolean(Constants.ACTIVE)) throw new FolioNcipException(Constants.BLOCKED); 
+    	if (!user.getBoolean("active"))
+			throw new FolioNcipException(Constants.BLOCKED);
 		///END CHECKING FOR BLOCK
 				
 				
@@ -333,8 +338,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		//BEEN SET IN MOD-CONFIGURATION
 		//CAN'T DO ANYTHING WITHOUT THEM
 		if (ncipProperties == null) {
-			logger.fatal("NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set so the AcceptItem service can be called");
-			throw new Exception("NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set  in mod-configuration so the AcceptItem service can be called");
+			logger.fatal(
+					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set so the AcceptItem service can be called");
+			throw new Exception(
+					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set in mod-configuration so the AcceptItem service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
 		}
 		
 		

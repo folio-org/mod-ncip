@@ -50,16 +50,28 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         
         //ATTEMPT TO DETERMINE AGENCY ID
         //INITIATION HEADER IS NOT REQUIRED
-        String requesterAgencyId = Constants.DEFAULT_AGENCY;
+        String requesterAgencyId = null;
         try {
         	requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+    		if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
+    			throw new Exception("From Agency ID Missing");
         }
         catch(Exception e) {
-        	logger.info("Could not determine agency id from initiation header.Using default");
+        	//cannot get requester agency id from init header - try request id element
+        	try {
+        		requesterAgencyId = initData.getRequestId().getAgencyId().getValue();
+        		if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
+        			throw new Exception("From Agency ID Missing");
+        	}
+        	catch(Exception except) {
+        		logger.error("Could not determine agency id from initiation header or request id element.  Using default");
+        		if (checkOutItemResponseData.getProblems() == null) checkOutItemResponseData.setProblems(new ArrayList<Problem>());
+            	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.AGENCY_ID,Constants.CHECK_OUT_PROBLEM ,e.getMessage());
+            	checkOutItemResponseData.getProblems().add(p);
+            	return checkOutItemResponseData;
+        	}
+        	
         }
-       
-       //In case the element is there but empty
-        if (requesterAgencyId != null && requesterAgencyId.trim().equalsIgnoreCase("")) requesterAgencyId = Constants.DEFAULT_AGENCY;
         
         GregorianCalendar calendar = new GregorianCalendar();		
 		

@@ -7,12 +7,59 @@
       "version": "1.0",
        "handlers": [
         {
-          "methods": [ "POST","GET" ],
-          "pathPattern": "/ncip"
+          "methods": [ "POST" ],
+          "pathPattern": "/ncip",
+		  "permissionsRequired": [
+            "users.collection.get",
+			"circulation.requests.item.post",
+            "inventory-storage.all",
+			"inventory-storage.service-points.collection.get",
+			"inventory-storage.instance-types.collection.get",
+			"inventory-storage.identifier-types.collection.get",
+			"inventory-storage.material-types.collection.get",
+			"inventory-storage.loan-types.collection.get",
+     			"usergroups.item.get",
+      			"manualblocks.collection.get",
+      			"accounts.collection.get",
+			"circulation.check-out-by-barcode.post",
+			"circulation.check-in-by-barcode.post"
+          ]
         },
         {
           "methods": [ "GET" ],
-          "pathPattern": "/ncipconfigcheck"
+          "pathPattern": "/ncipconfigcheck",
+		  "permissionsRequired": [
+            "inventory-storage.all",
+			"inventory-storage.service-points.collection.get",
+			"inventory-storage.instance-types.collection.get",
+			"inventory-storage.identifier-types.collection.get",
+			"inventory-storage.material-types.collection.get",
+			"inventory-storage.loan-types.collection.get"
+          ]
+        },
+		{
+          "methods": [ "GET" ],
+          "pathPattern": "/inittoolkit",
+		  "permissionsRequired": [
+            "configuration.entries.collection.get",
+			"configuration.entries.item.get"
+          ]
+        },
+		{
+          "methods": [ "GET" ],
+          "pathPattern": "/initrules",
+		    "permissionsRequired": [
+            "configuration.entries.collection.get",
+			"configuration.entries.item.get"
+          ]
+        },
+		{
+          "methods": [ "GET" ],
+          "pathPattern": "/initncipproperties",
+		    "permissionsRequired": [
+            "configuration.entries.collection.get",
+			"configuration.entries.item.get"
+          ]
         }
       ]
     }

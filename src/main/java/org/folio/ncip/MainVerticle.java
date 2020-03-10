@@ -1,23 +1,12 @@
 package org.folio.ncip;
 
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-
-
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.core.Promise;
 import java.io.InputStream;
@@ -61,12 +50,12 @@ public class MainVerticle extends AbstractVerticle {
 			ctx.response()
 			.setStatusCode(500)
 			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
-			.end("<Problem><message>problem processing inittoolkit request</message><exception>" + e.toString()+ "</exception></Problem>");
+			.end("<Problem><message>problem processing initNcipProperties request</message><exception>" + e.toString()+ "</exception></Problem>");
 		}
 		ctx.response()
 		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
-		.end("\"OK\"");
+		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING) //TODO CONSTANT
+		.end(Constants.OK);
 	}
 	
 	
@@ -81,12 +70,12 @@ public class MainVerticle extends AbstractVerticle {
 			ctx.response()
 			.setStatusCode(500)
 			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
-			.end("<Problem><message>problem processing inittoolkit request</message><exception>" + e.toString()+ "</exception></Problem>");
+			.end("<Problem><message>problem processing initRules request</message><exception>" + e.toString()+ "</exception></Problem>");
 		}
 		ctx.response()
 		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
-		.end("\"OK\"");
+		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING) 
+		.end(Constants.OK);
 	}
 	
 	
@@ -104,13 +93,12 @@ public class MainVerticle extends AbstractVerticle {
 		}
 		ctx.response()
 		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
-		.end("\"OK\"");
+		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING) 
+		.end(Constants.OK);
 	}
 
 
 	protected void ncipConfigCheck(RoutingContext ctx) {
-		///logger.info("ncip mod - healthcheck method called");
 		final Promise<Void> promise = Promise.promise();
 		try {
 			NcipConfigCheck ncipConfigCheck = new NcipConfigCheck(promise);
@@ -126,8 +114,8 @@ public class MainVerticle extends AbstractVerticle {
 		}
 		ctx.response()
 		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, "text/plain") //TODO CONSTANT
-		.end("\"OK\"");
+		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING)
+		.end(Constants.OK);
 	}
 
 	

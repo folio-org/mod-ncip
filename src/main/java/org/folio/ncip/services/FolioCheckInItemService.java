@@ -49,16 +49,19 @@ public class FolioCheckInItemService extends FolioNcipService implements CheckIn
 
 		//ATTEMPT TO DETERMINE AGENCY ID
 		// INITIATION HEADER IS NOT REQUIRED
-		String requesterAgencyId = Constants.DEFAULT_AGENCY;
+		String requesterAgencyId = null;
 		try {
 			requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+			if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
+				throw new Exception("Agency ID could nto be determined");
 		} catch (Exception e) {
-			// NOT A PROBLEM - USING DEFAULT
-			logger.info("Could not determine agency id from initiation header. Using default");
+			logger.error("Could not determine agency id from initiation header or request id element.  Using default");
+			if (checkInItemResponseData.getProblems() == null) checkInItemResponseData.setProblems(new ArrayList<Problem>());
+        	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.AGENCY_ID,Constants.CHECK_OUT_PROBLEM ,e.getMessage());
+        	checkInItemResponseData.getProblems().add(p);
+        	return checkInItemResponseData;
 		}
 		
-		//In case the element is there but empty
-        if (requesterAgencyId != null && requesterAgencyId.trim().equalsIgnoreCase("")) requesterAgencyId = Constants.DEFAULT_AGENCY;
 
 		try {
 			//THE SERVICE MANAGER CALLS THE OKAPI APIs

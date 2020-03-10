@@ -1,27 +1,13 @@
 package org.folio.ncip;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URLEncoder;
-//import java.net.http.HttpClient;
-//import java.net.http.HttpRequest;
-//import java.net.http.HttpResponse;
-//import java.net.http.HttpClient.Version;
-//import java.net.http.HttpResponse.BodyHandlers;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.time.Duration;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -31,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
@@ -69,36 +54,48 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 		JSONArray jsonArray = (JSONArray) obj.get("lookups");
 		
-		 HttpResponse response = null;
-
-		Enumeration<String> properties = (Enumeration<String>) ncipProperties.propertyNames();
-		CloseableHttpClient client = HttpClients.createDefault();
-	    while (properties.hasMoreElements()) {
-	     String key = properties.nextElement();
-	     Properties values = (Properties) ncipProperties.get(key);
-	     Enumeration<String> innerProperties = (Enumeration<String>) values.propertyNames();
-	     int responseCode = 0;
-		 JsonObject jsonObject = null;
-	      while (innerProperties.hasMoreElements()) {
-	    	  String  innerKey = innerProperties.nextElement();
-	    	  String  innerValues = values.getProperty(innerKey);
-	    	  logger.info(innerKey + " : "  + innerValues);
-	    	  JSONObject setting = returnSearch(jsonArray,innerKey);
-	    	  if (setting == null) continue;
-			  String lookup = (String) setting.get("lookup");
-			  String id = (String) setting.get("id");
-			  String url = (String) setting.get("url");
-			  String returnArray = (String) setting.get("returnArray");
-			  String identifier = (String) setting.get("identifier");
-				
+		
+		String okapiBaseEndpoint = routingContext.request().getHeader(Constants.X_OKAPI_URL);
+		String tenant = routingContext.request().getHeader(Constants.X_OKAPI_TENANT);
+		String conifgQuery = URLEncoder.encode("(module==NCIP and configName<>rules and configName<>toolkit)");
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=query=" + conifgQuery + "&limit=200";
+		//String encodedUrl = URLEncoder.encode(configEndpoint, "UTF-8");
+		String response = callApiGet(configEndpoint, routingContext.request().headers());
+		JsonObject jsonObject = new JsonObject(response);
+		JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
+		if (configs.size() < 1) {
+			logger.info("No toolkit configurations found.  Using defaults.  QUERY:" + configEndpoint);
+			throw new Exception(
+					"No NCP configurations found in mod-configuration");
+		}
+		
+		Iterator configsIterator = configs.iterator();
+		
+		while (configsIterator.hasNext()) {
+			JsonObject config = (JsonObject) configsIterator.next();
+			String code = config.getString(Constants.CODE_KEY);
+			String value = config.getString(Constants.VALUE_KEY);
+			JSONObject setting = returnSearch(jsonArray,code);
+			if (setting == null) continue;
+			String lookup = (String) setting.get("lookup");
+			String id = (String) setting.get("id");
+			String url = (String) setting.get("url");
+			String returnArray = (String) setting.get("returnArray");
+			String identifier = (String) setting.get("identifier");
+			Enumeration<String> properties = (Enumeration<String>) ncipProperties.propertyNames();
+			CloseableHttpClient client = HttpClients.createDefault();
+			HttpResponse lookupResponse = null;
+			
+			
+		
 				
 			  logger.info("Initializing ");
 			  logger.info(lookup);
 			  logger.info(" using lookup value ");
 			  logger.info(lookup);
 
-			 url = url.replace("{lookup}", URLEncoder.encode(innerValues));
-			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + innerValues);
+			 url = url.replace("{lookup}", URLEncoder.encode(value));
+			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + value);
 			 
 
 			 
@@ -111,16 +108,16 @@ public class NcipConfigCheck extends FolioNcipHelper {
 					.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
 					.build();
 					
-			 response = client.execute(request);
-			 HttpEntity entity = response.getEntity();
+			lookupResponse = client.execute(request);
+			 HttpEntity entity = lookupResponse.getEntity();
 			 String responseString = EntityUtils.toString(entity, "UTF-8");
-			 responseCode = response.getStatusLine().getStatusCode();
+			 int responseCode = lookupResponse.getStatusLine().getStatusCode();
 			 
 			
 
 			logger.info("GET:");
 			logger.info(baseUrl + url.trim());
-			logger.info(response.getStatusLine().getStatusCode());
+			logger.info(lookupResponse.getStatusLine().getStatusCode());
 			logger.info(responseString);
 
 
@@ -133,8 +130,8 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 jsonObject = new JsonObject(responseString);
 			 if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
-							"The lookup of " + innerValues + " could not be found for " + innerKey);
-	      }
+							"The lookup of " + value + " could not be found for " + code);
+	      
 	    }
 	}
 	
@@ -144,34 +141,12 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		  for(Object o: a){
 			    if ( o instanceof JSONObject ) {
 			        String config =(String) ((JSONObject) o).get("lookup");
-			        String actualValue = searchValue.substring(searchValue.indexOf('.')+1);
-			        //System.out.println("=====>" + config + " vs " + actualValue);
-			        if (config.equalsIgnoreCase(actualValue)) return (JSONObject) o;
+			       // String actualValue = searchValue.substring(searchValue.indexOf('.')+1);
+			        System.out.println("=====>" + config + " vs " + searchValue);
+			        if (config.equalsIgnoreCase(searchValue)) return (JSONObject) o;
 			    }
 			}
 		  return null;
 	  }
 	  
-	  		
-		public String processErrorResponse(String responseBody) {
-			// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
-			// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
-			try {
-				JsonObject jsonObject = new JsonObject(responseBody);
-				JsonArray errors = jsonObject.getJsonArray("errors");
-				Iterator i = errors.iterator();
-				responseBody = "ERROR: ";
-				while (i.hasNext()) {
-					JsonObject errorMessage = (JsonObject) i.next();
-					responseBody += errorMessage.getString("message");
-				}
-			} catch (Exception exception) {
-				// NOT A PROBLEM, ERROR WAS A STRING. UNABLE TO PARSE
-				// AS JSON
-			}
-			return responseBody;
-		}
-		
-
-
 }
