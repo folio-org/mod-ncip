@@ -9,7 +9,7 @@
         {
           "methods": [ "POST" ],
           "pathPattern": "/ncip",
-		  "modulePermissions": [
+          "modulePermissions": [
 			  "users.collection.get",
 			  "circulation.requests.item.post",
 			  "inventory-storage.all",
@@ -29,7 +29,7 @@
         {
           "methods": [ "GET" ],
           "pathPattern": "/ncipconfigcheck",
-		   "modulePermissions": [
+          "modulePermissions": [
 			   "inventory-storage.all",
 			   "inventory-storage.service-points.collection.get",
 			   "inventory-storage.instance-types.collection.get",
@@ -42,7 +42,7 @@
 		{
           "methods": [ "GET" ],
           "pathPattern": "/inittoolkit",
-		       "modulePermissions": [
+          "modulePermissions": [
 				"configuration.entries.collection.get",
 				"configuration.entries.item.get"
           ],
@@ -51,7 +51,7 @@
 		    {
           "methods": [ "GET" ],
           "pathPattern": "/initrules",
-		  "modulePermissions": [
+          "modulePermissions": [
 			  "configuration.entries.collection.get",
 			  "configuration.entries.item.get"
           ],
@@ -60,7 +60,7 @@
 		  {
           "methods": [ "GET" ],
           "pathPattern": "/initncipproperties",
-		  "modulePermissions": [
+          "modulePermissions": [
 			   "configuration.entries.collection.get",
 			   "configuration.entries.item.get"
           ],
