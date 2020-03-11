@@ -10,19 +10,19 @@
           "methods": [ "POST" ],
           "pathPattern": "/ncip",
 		      "modulePermissions": [
-             "users.collection.get",
-			       "circulation.requests.item.post",
-             "inventory-storage.all",
-			       "inventory-storage.service-points.collection.get",
-			       "inventory-storage.instance-types.collection.get",
-			       "inventory-storage.identifier-types.collection.get",
-			       "inventory-storage.material-types.collection.get",
-			       "inventory-storage.loan-types.collection.get",
-     			   "usergroups.item.get",
-      			 "manualblocks.collection.get",
-      			 "accounts.collection.get",
-			       "circulation.check-out-by-barcode.post",
-			       "circulation.check-in-by-barcode.post"
+				  "users.collection.get",
+				  "circulation.requests.item.post",
+				  "inventory-storage.all",
+				  "inventory-storage.service-points.collection.get",
+				  "inventory-storage.instance-types.collection.get",
+				  "inventory-storage.identifier-types.collection.get",
+				  "inventory-storage.material-types.collection.get",
+				  "inventory-storage.loan-types.collection.get",
+				  "usergroups.item.get",
+				  "manualblocks.collection.get",
+				  "accounts.collection.get",
+				  "circulation.check-out-by-barcode.post",
+				  "circulation.check-in-by-barcode.post"
           ],
           "permissionsRequired": ["ncip.post"]
         },
@@ -30,7 +30,7 @@
           "methods": [ "GET" ],
           "pathPattern": "/ncipconfigcheck",
 		      "modulePermissions": [
-            "inventory-storage.all",
+				   "inventory-storage.all",
 			       "inventory-storage.service-points.collection.get",
 			       "inventory-storage.instance-types.collection.get",
 			       "inventory-storage.identifier-types.collection.get",
@@ -43,7 +43,7 @@
           "methods": [ "GET" ],
           "pathPattern": "/inittoolkit",
 		       "modulePermissions": [
-              "configuration.entries.collection.get",
+					"configuration.entries.collection.get",
 			        "configuration.entries.item.get"
           ],
           "permissionsRequired": ["ncip.inittoolkit.get"]
@@ -52,7 +52,7 @@
           "methods": [ "GET" ],
           "pathPattern": "/initrules",
 		      "modulePermissions": [
-            "configuration.entries.collection.get",
+				  "configuration.entries.collection.get",
 			      "configuration.entries.item.get"
           ],
            "permissionsRequired": ["ncip.initrules.get"]
@@ -61,7 +61,7 @@
           "methods": [ "GET" ],
           "pathPattern": "/initncipproperties",
 		      "modulePermissions": [
-             "configuration.entries.collection.get",
+				   "configuration.entries.collection.get",
 			       "configuration.entries.item.get"
           ],
           "permissionsRequired": ["ncip.initncipproperties.get"]
