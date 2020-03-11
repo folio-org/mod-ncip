@@ -26,10 +26,16 @@
         "accounts.collection.get",
         "circulation.check-out-by-barcode.post",
         "circulation.check-in-by-barcode.post",
+        "circulation.loans.collection.get",
         "inventory.instances.item.post",
         "inventory-storage.holdings.item.delete",
         "inventory.items.item.delete",
-        "inventory.instances.item.delete"
+        "inventory.instances.item.delete",
+        "inventory-storage.holdings.item.post",
+        "inventory-storage.service-points-users.collection.get",
+        "inventory.items.item.post",
+        "inventory-storage.items.collection.get"
+
       ],
            "permissionsRequired": ["ncip.post"]
         },
