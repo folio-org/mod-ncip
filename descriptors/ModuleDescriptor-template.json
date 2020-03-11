@@ -24,7 +24,7 @@
 			  "circulation.check-out-by-barcode.post",
 			  "circulation.check-in-by-barcode.post"
 			],
-			"permissionsRequired": ["ncip.post"]
+           "permissionsRequired": ["ncip.post"]
         },
         {
           "methods": [ "GET" ],
@@ -37,7 +37,7 @@
 			   "inventory-storage.material-types.collection.get",
 			   "inventory-storage.loan-types.collection.get"
           ],
-			  "permissionsRequired": ["ncip.ncipconfigcheck.get"]
+         "permissionsRequired": ["ncip.ncipconfigcheck.get"]
         },
 		{
           "methods": [ "GET" ],
@@ -46,7 +46,7 @@
 				"configuration.entries.collection.get",
 				"configuration.entries.item.get"
           ],
-			   "permissionsRequired": ["ncip.inittoolkit.get"]
+          "permissionsRequired": ["ncip.inittoolkit.get"]
         },
 		    {
           "methods": [ "GET" ],
@@ -55,7 +55,7 @@
 			  "configuration.entries.collection.get",
 			  "configuration.entries.item.get"
           ],
-			   "permissionsRequired": ["ncip.initrules.get"]
+          "permissionsRequired": ["ncip.initrules.get"]
         },
 		  {
           "methods": [ "GET" ],
@@ -64,7 +64,7 @@
 			   "configuration.entries.collection.get",
 			   "configuration.entries.item.get"
           ],
-		  "permissionsRequired": ["ncip.initncipproperties.get"]
+          "permissionsRequired": ["ncip.initncipproperties.get"]
         }
       ]
     }
