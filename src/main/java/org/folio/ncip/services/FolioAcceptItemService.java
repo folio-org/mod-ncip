@@ -58,6 +58,7 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 	        String requesterAgencyId = null;
 	        try {
 	        	requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+	        	if (requesterAgencyId == null || requesterAgencyId.equalsIgnoreCase("")) throw new Exception("Requester agency ID is missing");
 	        }
 	        catch(Exception e) {
 	        	//cannot get requester agency id from init header - try request id element

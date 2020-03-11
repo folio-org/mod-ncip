@@ -9,57 +9,77 @@
         {
           "methods": [ "POST" ],
           "pathPattern": "/ncip",
-		  "permissionsRequired": [
-            "users.collection.get",
-			"circulation.requests.item.post",
-            "inventory-storage.all",
-			"inventory-storage.service-points.collection.get",
-			"inventory-storage.instance-types.collection.get",
-			"inventory-storage.identifier-types.collection.get",
-			"inventory-storage.material-types.collection.get",
-			"inventory-storage.loan-types.collection.get",
-     			"usergroups.item.get",
-      			"manualblocks.collection.get",
-      			"accounts.collection.get",
-			"circulation.check-out-by-barcode.post",
-			"circulation.check-in-by-barcode.post"
-          ]
+          "modulePermissions": [
+        "users.collection.get",
+        "circulation.requests.item.post",
+        "inventory-storage.all",
+        "inventory-storage.service-points.collection.get",
+        "inventory-storage.instance-types.collection.get",
+        "inventory-storage.identifier-types.collection.get",
+        "inventory-storage.material-types.collection.get",
+        "inventory-storage.loan-types.collection.get",
+        "inventory-storage.locations.collection.get",
+        "configuration.entries.collection.get",
+        "configuration.entries.item.get",
+        "usergroups.item.get",
+        "manualblocks.collection.get",
+        "accounts.collection.get",
+        "circulation.check-out-by-barcode.post",
+        "circulation.check-in-by-barcode.post",
+        "circulation.loans.collection.get",
+        "inventory.instances.item.post",
+        "inventory-storage.holdings.item.delete",
+        "inventory.items.item.delete",
+        "inventory.instances.item.delete",
+        "inventory-storage.holdings.item.post",
+        "inventory-storage.service-points-users.collection.get",
+        "inventory.items.item.post",
+        "inventory-storage.items.collection.get"
+
+      ],
+           "permissionsRequired": ["ncip.post"]
         },
         {
           "methods": [ "GET" ],
           "pathPattern": "/ncipconfigcheck",
-		  "permissionsRequired": [
-            "inventory-storage.all",
-			"inventory-storage.service-points.collection.get",
-			"inventory-storage.instance-types.collection.get",
-			"inventory-storage.identifier-types.collection.get",
-			"inventory-storage.material-types.collection.get",
-			"inventory-storage.loan-types.collection.get"
-          ]
+          "modulePermissions": [
+         "inventory-storage.all",
+         "inventory-storage.service-points.collection.get",
+         "inventory-storage.instance-types.collection.get",
+         "inventory-storage.identifier-types.collection.get",
+         "inventory-storage.material-types.collection.get",
+         "configuration.entries.collection.get",
+         "configuration.entries.item.get",
+         "inventory-storage.loan-types.collection.get"
+          ],
+         "permissionsRequired": ["ncip.ncipconfigcheck.get"]
         },
-		{
+    {
           "methods": [ "GET" ],
           "pathPattern": "/inittoolkit",
-		  "permissionsRequired": [
-            "configuration.entries.collection.get",
-			"configuration.entries.item.get"
-          ]
+          "modulePermissions": [
+        "configuration.entries.collection.get",
+        "configuration.entries.item.get"
+          ],
+          "permissionsRequired": ["ncip.inittoolkit.get"]
         },
-		{
+        {
           "methods": [ "GET" ],
           "pathPattern": "/initrules",
-		    "permissionsRequired": [
-            "configuration.entries.collection.get",
-			"configuration.entries.item.get"
-          ]
+          "modulePermissions": [
+        "configuration.entries.collection.get",
+        "configuration.entries.item.get"
+          ],
+          "permissionsRequired": ["ncip.initrules.get"]
         },
-		{
+      {
           "methods": [ "GET" ],
           "pathPattern": "/initncipproperties",
-		    "permissionsRequired": [
-            "configuration.entries.collection.get",
-			"configuration.entries.item.get"
-          ]
+          "modulePermissions": [
+         "configuration.entries.collection.get",
+         "configuration.entries.item.get"
+          ],
+          "permissionsRequired": ["ncip.initncipproperties.get"]
         }
       ]
     }
@@ -69,10 +89,10 @@
         "id":"instance-types",
         "version" : "2.0"
       },
-	  {
-		"id": "configuration",
-		"version": "2.0"
-	  },
+      {
+      "id": "configuration",
+      "version": "2.0"
+      },
       {
         "id":"identifier-types",
         "version" : "1.2"
@@ -106,7 +126,45 @@
         "version":"9.2"
       }
   ],
-  "permissionSets": [],
+  "permissionSets": [
+    {
+      "permissionName": "ncip.post",
+      "displayName": "NCIP Request",
+      "description": "Post NCIP request"
+    },
+    {
+      "permissionName": "ncip.ncipconfigcheck.get",
+      "displayName": "NCIP - configuration check",
+      "description": "Check NCIP configuraitons"
+    },
+    {
+      "permissionName": "ncip.inittoolkit.get",
+      "displayName": "NCIP - initialize toolkit properties",
+      "description": "Initialize NCIP toolkit properties"
+    },
+    {
+      "permissionName": "ncip.initrules.get",
+      "displayName": "NCIP - initialize rules",
+      "description": "Initialize NCIP Drools rules"
+    },
+     {
+      "permissionName": "ncip.initncipproperties.get",
+      "displayName": "NCIP - initialize properties",
+      "description": "Initialize NCIP properties"
+    },
+    {
+      "permissionName": "ncip.all",
+      "displayName": "NCIP - all permissions",
+      "description": "Entire set of permissions needed to use NCIP",
+      "subPermissions": [
+        "ncip.post",
+        "ncip.ncipconfigcheck.get",
+        "ncip.inittoolkit.get",
+        "ncip.initrules.get",
+        "ncip.initncipproperties.get"
+      ]
+    }
+  ],
   "launchDescriptor": {
     "dockerImage": "${artifactId}:${version}",
     "dockerPull": false,

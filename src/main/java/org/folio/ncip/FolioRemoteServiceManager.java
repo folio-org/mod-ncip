@@ -1,6 +1,5 @@
 package org.folio.ncip;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,9 +54,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	private Properties ncipProperties;
 	private KieContainer kieContainer;
 	private Properties rulesProperties;
-	
-	
-	
+
 	public Properties getRulesProperties() {
 		return rulesProperties;
 	}
@@ -71,7 +68,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	}
 
 	public FolioRemoteServiceManager(Properties properties) {
-		
+
 	}
 
 	public Properties getNcipProperties() {
@@ -81,7 +78,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public void setNcipProperties(Properties ncipProperties) {
 		this.ncipProperties = ncipProperties;
 	}
-	
+
 	public KieContainer getKieContainer() {
 		return kieContainer;
 	}
@@ -102,28 +99,24 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return (System.nanoTime() - t0) / (1000L * 1000L);
 	}
 
-	public String  callApiGet(String uriString)
-			throws Exception, IOException, InterruptedException {
+	public String callApiGet(String uriString) throws Exception, IOException, InterruptedException {
 		CloseableHttpClient client = HttpClients.custom().build();
-		HttpUriRequest request = RequestBuilder.get()
-				.setUri(uriString)
+		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
 				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-				.build();
-		
-		
-		 HttpResponse response = client.execute(request);
-		 HttpEntity entity = response.getEntity();
-		 String responseString = EntityUtils.toString(entity, "UTF-8");
-		 int responseCode = response.getStatusLine().getStatusCode();
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+
+		HttpResponse response = client.execute(request);
+		HttpEntity entity = response.getEntity();
+		String responseString = EntityUtils.toString(entity, "UTF-8");
+		int responseCode = response.getStatusLine().getStatusCode();
 
 		logger.info("GET:");
 		logger.info(uriString);
 		logger.info(responseCode);
 		logger.info(responseString);
-		
+
 		if (responseCode > 399) {
 			String responseBody = processErrorResponse(responseString);
 			throw new Exception(responseString);
@@ -133,8 +126,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	}
 
-	public String callApiPost(String uriString, JsonObject body)
-			throws Exception, IOException, InterruptedException {		
+	public String callApiPost(String uriString, JsonObject body) 
+		throws Exception, IOException, InterruptedException {
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.post()
 				.setUri(uriString)
@@ -145,11 +138,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
 				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
 				.build();
-		
-		 HttpResponse response = client.execute(request);
-		 HttpEntity entity = response.getEntity();
-		 String responseString = EntityUtils.toString(entity, "UTF-8");
-		 int responseCode = response.getStatusLine().getStatusCode();
+
+		HttpResponse response = client.execute(request);
+		HttpEntity entity = response.getEntity();
+		String responseString = EntityUtils.toString(entity, "UTF-8");
+		int responseCode = response.getStatusLine().getStatusCode();
 
 		logger.info("POST:");
 		logger.info(body.toString());
@@ -166,21 +159,20 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	}
 
-	public HttpResponse callApiDelete(String uriString)
-			throws Exception, IOException, InterruptedException {
+	public HttpResponse callApiDelete(String uriString) throws Exception, IOException, InterruptedException {
 
 		CloseableHttpClient client = HttpClients.custom().build();
-		HttpUriRequest request = RequestBuilder.delete()  //set timeout?
+		HttpUriRequest request = RequestBuilder.delete() // set timeout?
 				.setUri(uriString)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
 				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
 				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
 				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
 				.build();
-		
-		 HttpResponse response = client.execute(request);
-		 int responseCode = response.getStatusLine().getStatusCode();
+
+		HttpResponse response = client.execute(request);
+		int responseCode = response.getStatusLine().getStatusCode();
 
 		logger.info("DELETE:");
 		logger.info(uriString);
@@ -193,11 +185,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return response;
 
 	}
-  /**
-   * The method deals with error messages that are returned
-   * by the API as plain strings and messages returned as JSON
-   *
-   */
+
+	/**
+	 * The method deals with error messages that are returned by the API as plain
+	 * strings and messages returned as JSON
+	 *
+	 */
 	public String processErrorResponse(String responseBody) {
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
 		// SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
@@ -216,13 +209,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 		return responseBody;
 	}
-	
 
 	public JsonObject checkIn(CheckInItemInitiationData initData, String agencyId) throws Exception {
-		
-		//BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
-		//BEEN SET IN MOD-CONFIGURATION
-		//CAN'T DO ANYTHING WITHOUT THEM
+
+		// BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
+		// BEEN SET IN MOD-CONFIGURATION
+		// CAN'T DO ANYTHING WITHOUT THEM
 		if (ncipProperties == null) {
 			logger.fatal(
 					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set so the Checkin Item service can be called");
@@ -238,9 +230,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		UUID id = UUID.randomUUID();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 
-		//IF REQUIRED CONFIG VALUES HAVE NOT BEEN INITIALIZED, THEN INIT THEM
-		//THIS HAS TO HAPPEN HERE (AND NOT DURING VERT.X START) BECAUSE IT NEEDS
-		//AN AUTHENTICATED USER TO MAKE THE API CAllS
+		// IF REQUIRED CONFIG VALUES HAVE NOT BEEN INITIALIZED, THEN INIT THEM
+		// THIS HAS TO HAPPEN HERE (AND NOT DURING VERT.X START) BECAUSE IT NEEDS
+		// AN AUTHENTICATED USER TO MAKE THE API CAllS
 		if (ncipProperties.get(agencyId + Constants.INITIALIZED_PROPERTY) == null)
 			initProperties(agencyId, baseUrl);
 
@@ -253,23 +245,23 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		jsonObject.put("id", id.toString());
 
 		String url = baseUrl + Constants.CHECK_IN_BY_BARCODE;
-		String checkInResponse = callApiPost(url,  jsonObject);
+		String checkInResponse = callApiPost(url, jsonObject);
 
 		return new JsonObject(checkInResponse);
 	}
 
 	public JsonObject checkOut(CheckOutItemInitiationData initData, String agencyId) throws Exception {
-		
-		//BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
-		//BEEN SET IN MOD-CONFIGURATION
-		//CAN'T DO ANYTHING WITHOUT THEM
+
+		// BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
+		// BEEN SET IN MOD-CONFIGURATION
+		// CAN'T DO ANYTHING WITHOUT THEM
 		if (ncipProperties == null) {
 			logger.fatal(
 					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set so the Checkout item service can be called");
 			throw new Exception(
 					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set  in mod-configuration so the Checkout item service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
 		}
-		
+
 		UUID id = UUID.randomUUID();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
@@ -277,30 +269,31 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String loanDate = dtf.format(now);
 		String itemBarcode = initData.getItemId().getItemIdentifierValue();
 		String userBarcode = initData.getUserId().getUserIdentifierValue();
-				
-		//LOOKUP USER & CHECK FOR BLOCKS
-		//ADDED BECAUSE THE CHECKOUT API DOES NOT LOOK FOR 'BLOCKS'
-		//**THIS CAN BE REMOVED WHEN UXPROD-1683 IS COMPLETED**
+
+		// LOOKUP USER & CHECK FOR BLOCKS
+		// ADDED BECAUSE THE CHECKOUT API DOES NOT LOOK FOR 'BLOCKS'
+		// **THIS CAN BE REMOVED WHEN UXPROD-1683 IS COMPLETED**
 		JsonObject user = lookupPatronRecord(initData.getUserId());
 		if (user == null)
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
-		
-		user = gatherPatronData(user,user.getString("id"));
-		
-    	//DO MANUAL BLOCKS EXIST?
-    	JsonArray blocks = user.getJsonArray("manualblocks");
-    	Iterator  i = blocks.iterator();
-    	while (i.hasNext()) {
-    		JsonObject block = (JsonObject) i.next();
-    		if (block.getBoolean(Constants.BORROWING_BLOCK)) throw new FolioNcipException(Constants.BLOCKED); 
-    		if (block.getBoolean(Constants.REQUEST_BLOCK)) throw new FolioNcipException(Constants.BLOCKED); 
-    	}
-    	//IS THE PATRON ACTIVE?
-    	if (!user.getBoolean("active"))
+
+		user = gatherPatronData(user, user.getString("id"));
+
+		// DO MANUAL BLOCKS EXIST?
+		JsonArray blocks = user.getJsonArray("manualblocks");
+		Iterator i = blocks.iterator();
+		while (i.hasNext()) {
+			JsonObject block = (JsonObject) i.next();
+			if (block.getBoolean(Constants.BORROWING_BLOCK))
+				throw new FolioNcipException(Constants.BLOCKED);
+			if (block.getBoolean(Constants.REQUEST_BLOCK))
+				throw new FolioNcipException(Constants.BLOCKED);
+		}
+		// IS THE PATRON ACTIVE?
+		if (!user.getBoolean("active"))
 			throw new FolioNcipException(Constants.BLOCKED);
-		///END CHECKING FOR BLOCK
-				
-				
+		/// END CHECKING FOR BLOCK
+
 		// IF REQUIRED CONFIG VALUES HAVE NOT BEEN INITIALIZED, THEN INIT THEM
 		if (ncipProperties.get(agencyId + Constants.INITIALIZED_PROPERTY) == null)
 			initProperties(agencyId, baseUrl);
@@ -315,7 +308,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		String url = baseUrl + Constants.CHECK_OUT_BY_BARCODE;
 
-		String checkoutResponse = callApiPost(url,  jsonObject);
+		String checkoutResponse = callApiPost(url, jsonObject);
 		JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
 		return checkoutResponseAsJson;
 	}
@@ -333,18 +326,17 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		JsonObject returnValues = new JsonObject();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		
-		//BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
-		//BEEN SET IN MOD-CONFIGURATION
-		//CAN'T DO ANYTHING WITHOUT THEM
+
+		// BEFORE ANYTHING ELSE - MAKE SURE THE NCIP PROPERTIES HAVE
+		// BEEN SET IN MOD-CONFIGURATION
+		// CAN'T DO ANYTHING WITHOUT THEM
 		if (ncipProperties == null) {
 			logger.fatal(
 					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set so the AcceptItem service can be called");
 			throw new Exception(
 					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set in mod-configuration so the AcceptItem service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
 		}
-		
-		
+
 		// LOOKUP THE USER
 		JsonObject user = lookupPatronRecord(userId);
 
@@ -356,7 +348,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
 		String pickuLocationUrl = baseUrl + "/service-points?query=(code==" + pickUpLocationCode
 				+ "+AND+pickupLocation==true)";
-		String  servicePointResponse = callApiGet(pickuLocationUrl);
+		String servicePointResponse = callApiGet(pickuLocationUrl);
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
 			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
@@ -395,8 +387,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			holdings.put("id", holdingsUuid.toString());
 			holdings.put("instanceId", instanceUuid.toString());
 			holdings.put("discoverySuppress", true);
-			//REQUIRED, ELSE IT WILL NOT SHOW UP IN INVENTORY SEARCH BY LOCA.
-			holdings.put("permanentLocationId", holdingsPermLocation);    
+			// REQUIRED, ELSE IT WILL NOT SHOW UP IN INVENTORY SEARCH BY LOCA.
+			holdings.put("permanentLocationId", holdingsPermLocation);
 			url = baseUrl + Constants.HOLDINGS_URL;
 			String holdingsResponse = callApiPost(url, holdings);
 
@@ -432,7 +424,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			JsonObject request = new JsonObject();
 			request.put("requestType", "Page");
 			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
-			//SEE NOTES.TXT
+			// SEE NOTES.TXT
 			request.put("fulfilmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
 			request.put("requesterId", uid);
@@ -442,13 +434,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
 			LocalDateTime now = LocalDateTime.now();
 			request.put("requestDate", dtf.format(now));
-			
+
 			url = baseUrl + Constants.REQUEST_URL;
 			String requestRespone = callApiPost(url, request);
-			
-
-			
-			
 
 			returnValues.mergeIn(new JsonObject(requestRespone)).mergeIn(new JsonObject(itemResponse))
 					.mergeIn(new JsonObject(holdingsResponse));
@@ -501,17 +489,19 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	/**
 	 * This method, used by the lookup user service, makes the 5 API calls in an
 	 * asynchronous way
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 * 
 	 **/
 	public JsonObject gatherPatronData(JsonObject user, String userId) throws Exception {
 
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String groupId = user.getString("patronGroup");
-		//HttpClient client = HttpClient.newBuilder().build();
+		// HttpClient client = HttpClient.newBuilder().build();
 		final long LONG_DELAY_MS = 5000;
 
-		List<String> apiCallsNeeded = Arrays.asList(baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)",
+		List<String> apiCallsNeeded = Arrays.asList(
+				baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)",
 				baseUrl + "/accounts?query=(userId==" + userId + ")", baseUrl + "/groups/" + groupId,
 				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
 				baseUrl + "/service-points-users?query=(userId==" + userId + ")");
@@ -542,7 +532,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					failures.add(e.getMessage());
 					logger.error("an api call failed");
 					logger.error(e.toString());
-		    		throw new Exception(" An API call failed.   Error when looking up patron details.  API calls to circ, accounts, manual blocks and service points.  " , e);
+					throw new Exception(
+							" An API call failed.   Error when looking up patron details.  API calls to circ, accounts, manual blocks and service points.  ",
+							e);
 				}
 			}
 			if (millisElapsedSince(startTime) > LONG_DELAY_MS) {
@@ -571,26 +563,25 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	}
 
 	/**
-	 * This method is called one time (per agent in the ncip.properties file)
-	 * to initialize & store property values
+	 * This method is called one time (per agent in the ncip.properties file) to
+	 * initialize & store property values
 	 *
-	*/
+	 */
 	private void initProperties(String requesterAgencyId, String baseUrl) throws Exception {
 
 		logger.info("=======> initializing properties");
 		JSONParser parser = new JSONParser();
 		try {
-			InputStream inputStream =this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 			JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 			JSONArray jsonArray = (JSONArray) obj.get("lookups");
 			Iterator i = jsonArray.iterator();
 
-			
 			HttpResponse response = null;
 			requesterAgencyId = requesterAgencyId.toLowerCase();
 			int responseCode = 0;
 			JsonObject jsonObject = null;
-			
+
 			CloseableHttpClient client = HttpClients.custom().build();
 
 			while (i.hasNext()) {
@@ -609,31 +600,27 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				logger.info(lookupValue);
 
 				url = url.replace("{lookup}", URLEncoder.encode(lookupValue));
-				
-				HttpUriRequest request = RequestBuilder.get()
-						.setUri(baseUrl + url.trim())
+
+				HttpUriRequest request = RequestBuilder.get().setUri(baseUrl + url.trim())
 						.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-						.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+						.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
 						.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-						.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-						.build();
-				
-				
-				 response = client.execute(request);
-				 HttpEntity entity = response.getEntity();
-				 String responseString = EntityUtils.toString(entity, "UTF-8");
-				 responseCode = response.getStatusLine().getStatusCode();
-				 
-				 if (responseCode > 400) {
-					 throw new Exception(responseString);
-				 }
-				
+						.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+
+				response = client.execute(request);
+				HttpEntity entity = response.getEntity();
+				String responseString = EntityUtils.toString(entity, "UTF-8");
+				responseCode = response.getStatusLine().getStatusCode();
+
+				if (responseCode > 400) {
+					throw new Exception(responseString);
+				}
 
 				jsonObject = new JsonObject(responseString);
 				if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
 							"Your " + requesterAgencyId + ". " + lookup + " of " + lookupValue + " could not be found");
-				
+
 				ncipProperties.setProperty(requesterAgencyId + "." + id,
 						jsonObject.getJsonArray(returnArray).getJsonObject(0).getString(identifier));
 
@@ -645,15 +632,17 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		} catch (Exception e) {
 			logger.error("Failed attempting to initialize the properties needed to make the API calls");
 			logger.error(e.getLocalizedMessage());
-			throw new Exception("Initializing NCIP properties failed.  Are you sure you have NCIP properties set for this AgencyId: "  + requesterAgencyId );
+			throw new Exception(
+					"Initializing NCIP properties failed.  Are you sure you have NCIP properties set for this AgencyId: "
+							+ requesterAgencyId);
 		}
 
 	}
-	
+
 	/**
-	   * Lookup patron method shared by several of the services
-	   *
-	*/
+	 * Lookup patron method shared by several of the services
+	 *
+	 */
 	public JsonObject lookupPatronRecord(UserId userid) throws Exception {
 		String barcode = userid.getUserIdentifierValue();
 		// LOOKUP THE PATRON
@@ -665,17 +654,17 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JsonObject users = new JsonObject(response);
 		if (users.getJsonArray("users").size() == 0)
 			return null;
-		
+
 		JsonObject user = users.getJsonArray("users").getJsonObject(0);
 		return user;
 	}
-	
+
 	/**
-	   * Lookup patron method used by LookupUser service
-	   * when AuthenticationInput is used instead of UserId
-	   *
-	*/
-	public JsonObject lookupPatronRecordBy(String type,String value) throws Exception {
+	 * Lookup patron method used by LookupUser service when AuthenticationInput is
+	 * used instead of UserId
+	 *
+	 */
+	public JsonObject lookupPatronRecordBy(String type, String value) throws Exception {
 		// LOOKUP THE PATRON
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String userApiUri = baseUrl + "/users?query=(" + type + "==" + value + ")&limit=1";
@@ -685,20 +674,20 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JsonObject users = new JsonObject(response);
 		if (users.getJsonArray("users").size() == 0)
 			return null;
-		
+
 		JsonObject user = users.getJsonArray("users").getJsonObject(0);
 		return user;
 	}
 
-
-  /**
-   * Method the LookupUser service calls.
-   * Pulls together user and user details (e.g. accounts)
-   *
-   */
+	/**
+	 * Method the LookupUser service calls. Pulls together user and user details
+	 * (e.g. accounts)
+	 *
+	 */
 	public JsonObject lookupUser(UserId userid) throws Exception {
 		JsonObject user = lookupPatronRecord(userid);
-		if (user == null) return user;
+		if (user == null)
+			return user;
 		String id = user.getString("id");
 		user = gatherPatronData(user, id);
 		return user;
