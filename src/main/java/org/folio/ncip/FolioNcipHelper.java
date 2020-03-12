@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
@@ -353,7 +354,7 @@ public class FolioNcipHelper {
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
 		String returnValue = null;
 		String okapiBaseEndpoint = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + code + ")";
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + URLEncoder.encode(code) + ")";
 
 		try {
 			String response = callApiGet(configEndpoint, okapiHeaders);
