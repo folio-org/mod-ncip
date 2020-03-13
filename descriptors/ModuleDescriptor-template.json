@@ -13,6 +13,8 @@
           "modulePermissions": [
 			"users.collection.get",
 			"circulation.requests.item.post",
+			"ui-circulation.settings.overdue-fines-policies",
+			"ui-circulation.settings.lost-item-fees-policies",
 			"inventory-storage.all",
 			"inventory-storage.items.collection.get",
 			"inventory-storage.service-points.collection.get",
