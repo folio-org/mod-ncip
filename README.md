@@ -94,16 +94,16 @@ There are three types of settings that can exist in mod-configuration for the NC
 
 | MODULE        | configName (the AgencyID)   |   code          | value  (examples) |   
 | ------------- |:-------------:| :-----------------------------|------------------:|		
-| NCIP          | Relais 		| instance.type.name 			| PALCI             |	
-| NCIP          | Relais     	| instance.source 				| PALCI             |	
-| NCIP          | Relais      	| item.material.type.name 		| PALCI             |	
-| NCIP          | Relais 		| item.perm.loan.type.name 		| PALCI             |	
+| NCIP          | Relais 		| instance.type.name 			| RESHARE             |	
+| NCIP          | Relais     	| instance.source 				| RESHARE             |	
+| NCIP          | Relais      	| item.material.type.name 		| RESHARE             |	
+| NCIP          | Relais 		| item.perm.loan.type.name 		| RESHARE             |	
 | NCIP          | Relais     	| item.status.name   			| Available         |
-| NCIP          | Relais      	| item.perm.location.code 		| PALCI_LEHIGH      |	
-| NCIP          | Relais 		| holdings.perm.location.code 	| PALCI_LEHIGH      |	
-| NCIP          | Relais     	| instance.custom.identifier.name| PALCI Request ID |		
-| NCIP          | Relais      	| checkout.service.point.code	| FAIRCHILD         |		
-| NCIP          | Relais      	| checkin.service.point.code 	| FAIRCHILD         |		
+| NCIP          | Relais      	| item.perm.location.code 		| RESHARE_DATALOGISK      |	
+| NCIP          | Relais 		| holdings.perm.location.code 	| RESHARE_DATALOGISK      |	
+| NCIP          | Relais     	| instance.custom.identifier.name| ReShare Request ID |		
+| NCIP          | Relais      	| checkout.service.point.code	| cd2               |		
+| NCIP          | Relais      	| checkin.service.point.code 	| cd2               |		
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
    
