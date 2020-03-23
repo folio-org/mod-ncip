@@ -20,24 +20,26 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:
 
-    * instance.type.name
-    * instance.source
-    * item.material.type.name
-    * item.perm.loan.type.name
-    * item.status.name
-    * item.perm.location.code
-    * holdings.perm.location.code
-    * instance.custom.identifier.name
-    * checkout.service.point.code
-    * checkin.service.point.code
+    * (1) instance.type.name
+    * (2) instance.source
+    * (3) item.material.type.name
+    * (4) item.perm.loan.type.name
+    * (5) item.status.name
+    * (6) item.perm.location.code
+    * (7) holdings.perm.location.code
+    * (8) instance.custom.identifier.name
+    * (9) checkout.service.point.code
+    * (10)checkin.service.point.code
 
 Notes 
 * You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for differnt Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
 
 
-* The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.  “instance.custom.identifier.name” was used so the item could be searched for in the inventory module.  It shows up like this and is searchable:
+* The screen prints below illustrate how these values are used by the NCIP module on the instance, holdings and item records:
 
-![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
+![Illustrates how the NCIP property values will be used on the instance record](docs/images/instanceNcipExample.png?raw=true "Illustrates how the NCIP property values will be used on the instance record")
+
+![Illustrates how the NCIP property values will be used on the item record](docs/images/ncipItemExample.png.png?raw=true "Illustrates how the NCIP property values will be used on the item record")
 
 This can be removed if it is no longer needed becuase of the evolution of the inventory module.
  
