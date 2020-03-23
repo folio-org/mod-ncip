@@ -14,6 +14,9 @@ import time
 import urllib.request, json 
 from collections import OrderedDict
 
+#THIS SCRIPT CREATES VALUES IN MOD-CONFIGURATION FOR DIKUU NCIP TESTING
+#FOR MORE INFORMATION ABOUT USING THIS SCRIPT SEE:
+#https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit#
 
 #url = "https://folio-testing-okapi.aws.indexdata.com"
 url = "https://folio-snapshot-load-okapi.aws.indexdata.com"
