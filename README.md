@@ -52,11 +52,7 @@ This module does have a companion 'edge' module - edge-ncip - that can be used t
 https://github.com/folio-org/edge-ncip
 
 
-## Configuration
-
-### Shortcut for initial setup/testing - step-by-step instructions with references to Python scripts for DIKU tenant on the snapshot image:
-https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
-
+### Configuration
 
 <table>
   <tr>
@@ -86,9 +82,10 @@ https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/
 </table>
 
 
-
-
 ## mod-configuration setup
+
+Shortcut for bare minimum initial setup/testing - step-by-step instructions with references to Python scripts for DIKU tenant on the snapshot image:
+https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
 
 There are three types of settings that can exist in mod-configuration for the NCIP module:
 
