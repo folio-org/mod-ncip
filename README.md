@@ -51,6 +51,9 @@ Notes
 This module does have a companion 'edge' module - edge-ncip - that can be used to expose this service to external applications.
 https://github.com/folio-org/edge-ncip
 
+### Shortcut for initial testing - step-by-step instructions with references to Python scripts for DIKU tenant:
+https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
+
 ### Configuration
 
 
