@@ -117,16 +117,16 @@ You will need a set of these settings in mod-configuration for each individual A
 
 When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are initialized.  This means the first request may be a bit slow to respond.
 
-If you later add settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
+If you later add or change settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
 
-* To reinitialize the NCIP properties --> send a GET request to ../ncip/initncipproperties
-* To reinitialize the Toolkit properties --> send a GET request to ../ncip/inittoolkit
-* To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
+* To reinitialize the NCIP properties --> send a GET request to //yourokapiendoint/initncipproperties
+* To reinitialize the Toolkit properties --> send a GET request to /yourokapiendpoint/inittoolkit
+* To reinitialize the Rules properties --> send a GET request to //yourokapiendpoint/initrules
 
 
 As you are setting up mod-nicp, the NCIP properties and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
-* To validate your configuration settings --> send a GET request to ../ncipconfigcheck
+* To validate your configuration settings --> send a GET request to //yourokapiendpoint/ncipconfigcheck
 
 If the service is able to retrieve a UUID for each of the settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 
