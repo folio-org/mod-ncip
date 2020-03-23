@@ -94,7 +94,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
 3) Rule properties: Use these setting if you want the LookupUser service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The LookupUser service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
 
-#### NCIP Properties
+#### NCIP Properties Examples
 
 | MODULE        | configName (the AgencyID)   |   code          | value  (examples) |   
 | ------------- |:-------------:| :-----------------------------|------------------:|		
