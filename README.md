@@ -39,7 +39,7 @@ Notes
 
 ![Illustrates how the NCIP property values will be used on the instance record](docs/images/instanceNcipExample.png?raw=true "Illustrates how the NCIP property values will be used on the instance record")
 
-![Illustrates how the NCIP property values will be used on the item record](docs/images/ncipItemExample.png.png?raw=true "Illustrates how the NCIP property values will be used on the item record")
+![Illustrates how the NCIP property values will be used on the item record](docs/images/ncipItemExample.png?raw=true "Illustrates how the NCIP property values will be used on the item record")
 
 This can be removed if it is no longer needed becuase of the evolution of the inventory module.
  
