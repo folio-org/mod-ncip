@@ -41,7 +41,6 @@ Notes
 
 ![Illustrates how the NCIP property values will be used on the item record](docs/images/ncipItemExample.png?raw=true "Illustrates how the NCIP property values will be used on the item record")
 
-This can be removed if it is no longer needed becuase of the evolution of the inventory module.
  
 ## Installing the module
 
