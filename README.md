@@ -107,8 +107,8 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP          | Relais      	| item.perm.location.code 		| RESHARE_DATALOGISK      |	
 | NCIP          | Relais 		| holdings.perm.location.code 	| RESHARE_DATALOGISK      |	
 | NCIP          | Relais     	| instance.custom.identifier.name| ReShare Request ID |		
-| NCIP          | Relais      	| checkout.service.point.code	| cd2               |		
-| NCIP          | Relais      	| checkin.service.point.code 	| cd2               |		
+| NCIP          | Relais      	| checkout.service.point.code	| online               |		
+| NCIP          | Relais      	| checkin.service.point.code 	| online               |		
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
