@@ -35,7 +35,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * (10)checkin.service.point.code
 
 Notes 
-* You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for differnt Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
+* You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
 
 
 * The screen prints below illustrate how these values are used by the NCIP module on the instance, holdings and item records:
@@ -84,7 +84,7 @@ https://github.com/folio-org/edge-ncip
 
 ## mod-configuration setup
 
-Shortcut for bare minimum initial setup/testing - step-by-step instructions with references to Python scripts for DIKU tenant on the snapshot image:
+This document is a shortcut for bare minimum initial setup/testing for the DIKU tenant.  It includes step-by-step instructions with references to Python scripts for DIKU tenant reference values on the snapshot image:
 https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
 
 There are three types of settings that can exist in mod-configuration for the NCIP module:
