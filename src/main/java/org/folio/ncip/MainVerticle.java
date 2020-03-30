@@ -36,6 +36,7 @@ public class MainVerticle extends AbstractVerticle {
 		router.route(HttpMethod.GET,"/inittoolkit").handler(this::initToolkit);
 		router.route(HttpMethod.GET,"/initrules").handler(this::initRules);
 		router.route(HttpMethod.GET,"/initncipproperties").handler(this::initNcipProperties);
+		router.route(HttpMethod.GET, "/nciphealthcheck").handler(this::healthCheck);
 		vertx.createHttpServer().requestHandler(router).listen(port);
 	}
 
@@ -103,6 +104,24 @@ public class MainVerticle extends AbstractVerticle {
 		try {
 			NcipConfigCheck ncipConfigCheck = new NcipConfigCheck(promise);
 			ncipConfigCheck.process(ctx);
+		}
+		catch(Exception e) {
+			logger.error("***************");
+			logger.error(e.toString());
+			ctx.response()
+			.setStatusCode(500)
+			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
+			.end("<Problem><message>problem processing NCIP request</message><exception>" + e.toString()+ "</exception></Problem>");
+		}
+		ctx.response()
+		.setStatusCode(200)
+		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING)
+		.end(Constants.OK);
+	}
+	
+	protected void healthCheck(RoutingContext ctx) {
+		try {
+			logger.info("healthcheck called");
 		}
 		catch(Exception e) {
 			logger.error("***************");

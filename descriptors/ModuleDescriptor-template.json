@@ -59,7 +59,17 @@
     {
           "methods": [ "GET" ],
           "pathPattern": "/inittoolkit",
-		  "permissionsRequired": ["ncip.inittoolkit.get"],
+      "permissionsRequired": ["ncip.inittoolkit.get"],
+          "modulePermissions": [
+        "configuration.entries.collection.get",
+        "configuration.entries.item.get"
+          ]
+          
+        },
+        {
+          "methods": [ "GET" ],
+          "pathPattern": "/nciphealthcheck",
+      "permissionsRequired": ["ncip.check.get"],
           "modulePermissions": [
         "configuration.entries.collection.get",
         "configuration.entries.item.get"
@@ -157,6 +167,11 @@
       "displayName": "NCIP - initialize properties",
       "description": "Initialize NCIP properties"
     },
+     {
+      "permissionName": "ncip.check.get",
+      "displayName": "NCIP - simple connection check",
+      "description": "Check connection to ncip server"
+    },
     {
       "permissionName": "ncip.all",
       "displayName": "NCIP - all permissions",
@@ -166,7 +181,8 @@
         "ncip.ncipconfigcheck.get",
         "ncip.inittoolkit.get",
         "ncip.initrules.get",
-        "ncip.initncipproperties.get"
+        "ncip.initncipproperties.get",
+        "ncip.check.get"
       ]
     }
   ],

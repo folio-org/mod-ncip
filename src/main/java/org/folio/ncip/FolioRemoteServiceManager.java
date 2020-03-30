@@ -343,6 +343,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		// IF USER ID WAS NOT FOUND - RETURN AN ERROR:
 		if (user == null)
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
+		
+		if (initData.getRequestId() == null) {
+			throw new FolioNcipException(Constants.REQUEST_ID_MISSING);
+		}
 
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
