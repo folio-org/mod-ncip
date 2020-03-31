@@ -87,6 +87,26 @@ https://github.com/folio-org/edge-ncip
 This document is a shortcut for bare minimum initial setup/testing for the DIKU tenant.  It includes step-by-step instructions with references to Python scripts for DIKU tenant reference values on the snapshot image:
 https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
 
+Note: The instructions below refer to adding entries to mod-configuration.  This is an example of how you could do that:
+
+```java
+curl -X POST \
+ http://localhost:9130/configurations/entries \
+ -H 'Content-Type: application/json' \
+ -H 'X-Okapi-Tenant: <tenant>' \
+ -H 'x-okapi-token: <token>' \
+ -d
+   '{
+     "module": "NCIP",
+     "configName": "Relais",
+     "code": "instance.type.name",
+     "description": "optional description",
+     "default": true,
+     "enabled": true,
+     "value": "RESHARE"
+   }'
+```
+
 There are three types of settings that can exist in mod-configuration for the NCIP module:
 
 ### Required Configurations:
