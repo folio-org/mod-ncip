@@ -15,31 +15,35 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ```
     ncip.all
     inventory-storage.items.collection.get
+    ui-circulation.settings.overdue-fines-policies
+    ui-circulation.settings.lost-item-fees-policies
+    
 ```
 2. If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
 
 3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:
 
-    * instance.type.name
-    * instance.source
-    * item.material.type.name
-    * item.perm.loan.type.name
-    * item.status.name
-    * item.perm.location.code
-    * holdings.perm.location.code
-    * instance.custom.identifier.name
-    * checkout.service.point.code
-    * checkin.service.point.code
+    * (1) instance.type.name
+    * (2) instance.source
+    * (3) item.material.type.name
+    * (4) item.perm.loan.type.name
+    * (5) item.status.name
+    * (6) item.perm.location.code
+    * (7) holdings.perm.location.code
+    * (8) instance.custom.identifier.name
+    * (9) checkout.service.point.code
+    * (10)checkin.service.point.code
 
 Notes 
-* You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for differnt Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
+* You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
 
 
-* The configuration settings are fairly self-explanatory with the exception of the “instance.custom.identifer.name”.  “instance.custom.identifier.name” was used so the item could be searched for in the inventory module.  It shows up like this and is searchable:
+* The screen prints below illustrate how these values are used by the NCIP module on the instance, holdings and item records:
 
-![Illustrates the details of an instance record pointing out the custom identifier used by this module](docs/images/folioCustomIdentifer.png?raw=true "Illustrates the details of an instance record pointing out the custom identifier used by this module")
+![Illustrates how the NCIP property values will be used on the instance record](docs/images/instanceNcipExample.png?raw=true "Illustrates how the NCIP property values will be used on the instance record")
 
-This can be removed if it is no longer needed becuase of the evolution of the inventory module.
+![Illustrates how the NCIP property values will be used on the item record](docs/images/ncipItemExample.png?raw=true "Illustrates how the NCIP property values will be used on the item record")
+
  
 ## Installing the module
 
@@ -47,8 +51,8 @@ This can be removed if it is no longer needed becuase of the evolution of the in
 This module does have a companion 'edge' module - edge-ncip - that can be used to expose this service to external applications.
 https://github.com/folio-org/edge-ncip
 
-### Configuration
 
+### Configuration
 
 <table>
   <tr>
@@ -78,9 +82,30 @@ https://github.com/folio-org/edge-ncip
 </table>
 
 
-
-
 ## mod-configuration setup
+
+This document is a shortcut for bare minimum initial setup/testing for the DIKU tenant.  It includes step-by-step instructions with references to Python scripts for DIKU tenant reference values on the snapshot image:
+https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
+
+Note: The instructions below refer to adding entries to mod-configuration.  This is an example of how you could do that:
+
+```java
+curl -X POST \
+ http://localhost:9130/configurations/entries \
+ -H 'Content-Type: application/json' \
+ -H 'X-Okapi-Tenant: <tenant>' \
+ -H 'x-okapi-token: <token>' \
+ -d
+   '{
+     "module": "NCIP",
+     "configName": "Relais",
+     "code": "instance.type.name",
+     "description": "optional description",
+     "default": true,
+     "enabled": true,
+     "value": "RESHARE"
+   }'
+```
 
 There are three types of settings that can exist in mod-configuration for the NCIP module:
 
@@ -90,7 +115,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
 3) Rule properties: Use these setting if you want the LookupUser service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The LookupUser service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
 
-#### NCIP Properties
+#### NCIP Properties 
 
 | MODULE        | configName (the AgencyID)   |   code          | value  (examples) |   
 | ------------- |:-------------:| :-----------------------------|------------------:|		
@@ -102,27 +127,46 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP          | Relais      	| item.perm.location.code 		| RESHARE_DATALOGISK      |	
 | NCIP          | Relais 		| holdings.perm.location.code 	| RESHARE_DATALOGISK      |	
 | NCIP          | Relais     	| instance.custom.identifier.name| ReShare Request ID |		
-| NCIP          | Relais      	| checkout.service.point.code	| cd2               |		
-| NCIP          | Relais      	| checkin.service.point.code 	| cd2               |		
+| NCIP          | Relais      	| checkout.service.point.code	| online               |		
+| NCIP          | Relais      	| checkin.service.point.code 	| online               |		
+
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
    
 
 ![Illustrates NCIP message pointing out the agency ID](docs/images/ncipMessageIllustratesAgencyId.png?raw=true "Illustrates NCIP message pointing out the agency ID")
 
+#### NCIP Toolkit properties
+
+| MODULE   | configName   |   code          | value  (examples) |   
+| --------|:-------------:| :-----------------------------|:------------|		
+| NCIP    | toolkit 	| ToolkitConfiguration.PropertiesFileTitle 		| My new value  |	
+| NCIP    | toolkit     | TranslatorConfiguration.LogMessages 			| false             |	
+| NCIP    | toolkit      | NCIPServiceValidatorConfiguration.AddDefaultNamespaceURI | true     |	
+| NCIP    | toolkit 	| RemoteServiceManager.Class 		| org.folio.ncip.FolioRemoteServiceManager |	
+
+For the full list of NCIP toolkit properties see: /src/main/resources/toolkit.properties
+
+#### NCIP Rules properties (Used by LookupUser Service)
+
+| MODULE        | configName|   code          | value  (examples) |   
+| ------------- |:-------------:| :-----------------------------|------------------:|		
+| NCIP          | rules 		| max-fine-amount			| 500             |	
+| NCIP          | rules     	| max-loan-count				| 100             |	
+
 
 When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are initialized.  This means the first request may be a bit slow to respond.
 
-If you later add settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
+If you later add or change settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
 
-* To reinitialize the NCIP properties --> send a GET request to ../ncip/initncipproperties
-* To reinitialize the Toolkit properties --> send a GET request to ../ncip/inittoolkit
-* To reinitialize the Rules properties --> send a GET request to ../ncip/initrules
+* To reinitialize the NCIP properties --> send a GET request to //yourokapiendoint/initncipproperties
+* To reinitialize the Toolkit properties --> send a GET request to /yourokapiendpoint/inittoolkit
+* To reinitialize the Rules properties --> send a GET request to //yourokapiendpoint/initrules
 
 
 As you are setting up mod-nicp, the NCIP properties and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
-* To validate your configuration settings --> send a GET request to ../ncipconfigcheck
+* To validate your configuration settings --> send a GET request to //yourokapiendpoint/ncipconfigcheck
 
 If the service is able to retrieve a UUID for each of the settings it will send back an “ok” string.  If it cannot locate any of the settings it will return an error message to let you know which setting it couldn’t find.
 

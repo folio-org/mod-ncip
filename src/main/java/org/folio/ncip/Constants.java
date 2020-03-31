@@ -32,6 +32,7 @@ public class Constants {
 	public static final String ITEM_ID_IS_MISSING = "Item id missing";
 	public static final String  ITEM_ID_IS_INVALID = "Item id is invalid";
 	public static final String PICKUP_LOCATION_MISSING = "Pickup location is missing";
+	public static final String REQUEST_ID_MISSING = "Request ID Missing";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
