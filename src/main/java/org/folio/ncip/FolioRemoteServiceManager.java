@@ -494,13 +494,13 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String groupId = user.getString("patronGroup");
 		// HttpClient client = HttpClient.newBuilder().build();
-		final long LONG_DELAY_MS = 5000;
+		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)",
-				baseUrl + "/accounts?query=(userId==" + userId + ")", baseUrl + "/groups/" + groupId,
+				baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)&limit=700",
+				baseUrl + "/accounts?query=(userId==" + userId + ")&limit=700", baseUrl + "/groups/" + groupId,
 				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
-				baseUrl + "/service-points-users?query=(userId==" + userId + ")");
+				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
@@ -534,7 +534,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				}
 			}
 			if (millisElapsedSince(startTime) > LONG_DELAY_MS) {
-				user.mergeIn(new JsonObject("{'error':'timedout'}"));
+				JsonObject timeOutMessage = new JsonObject();
+				timeOutMessage.put("error", "Request for user data took too long too respond.");
+				user.mergeIn(timeOutMessage);
 				break;
 			}
 		}
@@ -634,7 +636,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			logger.error(e.getLocalizedMessage());
 			throw new Exception(
 					"Initializing NCIP properties failed.  Are you sure you have NCIP properties set for this AgencyId: "
-							+ requesterAgencyId);
+							+ requesterAgencyId + ".  DETAILS: " + e.getLocalizedMessage());
 		}
 
 	}

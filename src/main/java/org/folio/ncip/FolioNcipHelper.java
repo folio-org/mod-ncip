@@ -127,6 +127,7 @@ public class FolioNcipHelper {
 				initToolkit(context);
 			} catch (Exception e) {
 				logger.info(e.getLocalizedMessage());
+				logger.info("Unable to initialize custom toolkit properties.  Using default");
 				logger.info(e.getLocalizedMessage());
 			}
 
