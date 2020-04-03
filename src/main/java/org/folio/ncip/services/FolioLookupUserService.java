@@ -102,7 +102,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 				 logger.error("error during performService:");
 				 logger.error(e.toString());
 				 ProblemType problemType = new ProblemType("");
-				 Problem p = new Problem(problemType,Constants.GENERAL_ERROR, Constants.LOOKUP_USER_FAILED + e.toString());
+				 Problem p = new Problem(problemType,Constants.GENERAL_ERROR, Constants.LOOKUP_USER_FAILED + ": " + e.toString());
 		    	 responseData.setProblems(new ArrayList<Problem>());
 		    	 responseData.getProblems().add(p);
 		    	 return responseData;
@@ -181,8 +181,8 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		    	Iterator  i = blocks.iterator();
 		    	while (i.hasNext()) {
 		    		JsonObject block = (JsonObject) i.next();
-		    		if (block.getBoolean(Constants.BORROWING_BLOCK)) return Constants.BLOCKED;
-		    		if (block.getBoolean(Constants.REQUEST_BLOCK)) return Constants.BLOCKED;;
+		    		if (block.getBoolean(Constants.BORROWING_BLOCK)!= null && block.getBoolean(Constants.BORROWING_BLOCK)) return Constants.BLOCKED;
+		    		if (block.getBoolean(Constants.REQUEST_BLOCK) != null && block.getBoolean(Constants.REQUEST_BLOCK)) return Constants.BLOCKED;;
 	
 		    	}
 		    	
@@ -246,7 +246,6 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    private ArrayList<UserPrivilege> retrievePrivileges(JsonObject jsonObject,String agencyId) {
 	    	String patronType = jsonObject.getString("group");
 	    	String patronHomeLibrary = jsonObject.getString("code");
-	    	if (patronHomeLibrary == null) patronHomeLibrary = this.ncipProperties.getProperty(agencyId.toLowerCase() + ".library" );
 	    	ArrayList<UserPrivilege> list = new ArrayList<UserPrivilege>();;
 	    	list.add(this.retrievePrivilegeFor(patronType, "User Profile", "PROFILE",agencyId));
 	    	list.add(this.retrievePrivilegeFor(patronHomeLibrary,"User Library","LIBRARY",agencyId));

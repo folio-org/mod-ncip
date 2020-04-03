@@ -117,15 +117,7 @@ public class FolioNcipHelper {
 
 		String tenant = context.request().headers().get(Constants.X_OKAPI_TENANT);
 
-		//The first time a tenant makes a request, it will attempt
-		//to initialize configuration values using mod-configuration.
-		//Tenants can later manually initialize configuration values using
-		//the endpoints:
-		//inittoolkit
-		//initrules
-		//initncipproperties
-		
-		if (toolkitProperties.get(tenant) == null) {
+
 			// INITIALIZE THIS TENANTS TOOLKIT PROPERTIES WITH THE DEFAULT VALUES:
 			toolkitProperties.put(tenant, defaultToolkitObjects.get("toolkit"));
 			serviceContext.put(tenant, defaultToolkitObjects.get("servicecontext"));
@@ -143,18 +135,16 @@ public class FolioNcipHelper {
 				initNcipProperties(context);
 			} catch (Exception e) {
 				logger.info("Unable to initialize NCIP properties with mod-configuration.");
-				logger.info("Initialize them later by calling the initncipproperties endpoint.");
 				logger.info(e.getLocalizedMessage());
 			}
+			
 			try {
 				initRules(context);
 			} catch (Exception e) {
 				logger.info("Unable to initialize drools rules with mod-configuration.");
-				logger.info("Initialize them later by calling the initrules endpoint.");
 				logger.info(e.getLocalizedMessage());
 			}
 
-		}
 
 		InputStream stream = new ByteArrayInputStream(context.getBodyAsString().getBytes(StandardCharsets.UTF_8));
 		NCIPInitiationData initiationData = null;
@@ -325,7 +315,7 @@ public class FolioNcipHelper {
 				throw new Exception(
 						"max-loan-count not set in mod-configuration.  Rules will not be used for lookup user");
 			
-			properties.put(Constants.MAX_FINE_AMOUNT, maxLoanCountResponse);
+			properties.put(Constants.MAX_FINE_AMOUNT, maxAmountResponse);
 			properties.put(Constants.MAX_LOAN_COUNT, maxLoanCountResponse);
 			rulesProperties.put(tenant, properties);
 		} catch (Exception e) {

@@ -37,7 +37,8 @@
 			"inventory.instances.item.delete",
 			"inventory-storage.holdings.item.post",
 			"inventory-storage.service-points-users.collection.get",
-			"inventory.items.item.post"
+			"inventory.items.item.post",
+			"inventory-storage.service-points.item.get"
 		]
         },
         {
@@ -55,46 +56,6 @@
 			 "inventory-storage.loan-types.collection.get"
           ]
          
-        },
-    {
-          "methods": [ "GET" ],
-          "pathPattern": "/inittoolkit",
-      "permissionsRequired": ["ncip.inittoolkit.get"],
-          "modulePermissions": [
-        "configuration.entries.collection.get",
-        "configuration.entries.item.get"
-          ]
-          
-        },
-        {
-          "methods": [ "GET" ],
-          "pathPattern": "/nciphealthcheck",
-      "permissionsRequired": ["ncip.check.get"],
-          "modulePermissions": [
-        "configuration.entries.collection.get",
-        "configuration.entries.item.get"
-          ]
-          
-        },
-        {
-          "methods": [ "GET" ],
-          "pathPattern": "/initrules",
-		  "permissionsRequired": ["ncip.initrules.get"],
-          "modulePermissions": [
-			"configuration.entries.collection.get",
-			"configuration.entries.item.get"
-          ]
-          
-        },
-      {
-          "methods": [ "GET" ],
-          "pathPattern": "/initncipproperties",
-		  "permissionsRequired": ["ncip.initncipproperties.get"],
-          "modulePermissions": [
-			 "configuration.entries.collection.get",
-			 "configuration.entries.item.get"
-          ]
-          
         }
       ]
     }
@@ -153,36 +114,12 @@
       "description": "Check NCIP configuraitons"
     },
     {
-      "permissionName": "ncip.inittoolkit.get",
-      "displayName": "NCIP - initialize toolkit properties",
-      "description": "Initialize NCIP toolkit properties"
-    },
-    {
-      "permissionName": "ncip.initrules.get",
-      "displayName": "NCIP - initialize rules",
-      "description": "Initialize NCIP Drools rules"
-    },
-     {
-      "permissionName": "ncip.initncipproperties.get",
-      "displayName": "NCIP - initialize properties",
-      "description": "Initialize NCIP properties"
-    },
-     {
-      "permissionName": "ncip.check.get",
-      "displayName": "NCIP - simple connection check",
-      "description": "Check connection to ncip server"
-    },
-    {
       "permissionName": "ncip.all",
       "displayName": "NCIP - all permissions",
       "description": "Entire set of permissions needed to use NCIP",
       "subPermissions": [
         "ncip.post",
-        "ncip.ncipconfigcheck.get",
-        "ncip.inittoolkit.get",
-        "ncip.initrules.get",
-        "ncip.initncipproperties.get",
-        "ncip.check.get"
+        "ncip.ncipconfigcheck.get"
       ]
     }
   ],

@@ -10,7 +10,7 @@ public class Constants {
 	public static final String CODE_KEY = "code";
 	public static final String UNABLE_TO_INIT_TOOLKIT = "Unable to initialize the default toolkit properties.";
 	public static final String BORROWING_BLOCK = "borrowing";
-	public static final String REQUEST_BLOCK = "requesting";
+	public static final String REQUEST_BLOCK = "requests";
 	public static final String ACCEPT_ITEM_PROBLEM = "Problem performing AcceptItem";
 	public static final String ACCEPT_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id, item id or pickup location)";
 	public static final String LOOKUP_USER_VALIDATION_PROBLEM = "Problem occurred validating user id";

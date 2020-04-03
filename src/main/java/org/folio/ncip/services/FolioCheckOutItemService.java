@@ -47,7 +47,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	checkOutItemResponseData.getProblems().add(p);
         	return checkOutItemResponseData;
         } 
-        
+
         //ATTEMPT TO DETERMINE AGENCY ID
         //INITIATION HEADER IS NOT REQUIRED
         String requesterAgencyId = null;
@@ -79,7 +79,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	//THE SERVICE MANAGER CALLS THE OKAPI APIs
         	 JsonObject checkOutItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).checkOut(initData,requesterAgencyId.toLowerCase());
         	 dueDate = checkOutItemResponseDetails.getString("dueDate");
-         	 SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_CIRC);
+         	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
          	 Date d = sdf.parse(dueDate);
          	 calendar.setTime(d);
          }

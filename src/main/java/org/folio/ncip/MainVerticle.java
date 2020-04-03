@@ -33,71 +33,11 @@ public class MainVerticle extends AbstractVerticle {
 		router.route().handler(BodyHandler.create());
 		router.route(HttpMethod.POST, "/ncip").handler(this::handleNcip);
 		router.route(HttpMethod.GET, "/ncipconfigcheck").handler(this::ncipConfigCheck);
-		router.route(HttpMethod.GET,"/inittoolkit").handler(this::initToolkit);
-		router.route(HttpMethod.GET,"/initrules").handler(this::initRules);
-		router.route(HttpMethod.GET,"/initncipproperties").handler(this::initNcipProperties);
-		router.route(HttpMethod.GET, "/nciphealthcheck").handler(this::healthCheck);
+		router.route(HttpMethod.GET, "/admin/health").handler(this::healthCheck);
 		vertx.createHttpServer().requestHandler(router).listen(port);
 	}
 
 	
-	protected void initNcipProperties(RoutingContext ctx) {
-		try {
-			folioNcipHelper.initNcipProperties(ctx);
-		} 
-		catch(Exception e) {
-			logger.error("***************");
-			logger.error(e.toString());
-			ctx.response()
-			.setStatusCode(500)
-			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
-			.end("<Problem><message>problem processing initNcipProperties request</message><exception>" + e.toString()+ "</exception></Problem>");
-		}
-		ctx.response()
-		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING) //TODO CONSTANT
-		.end(Constants.OK);
-	}
-	
-	
-	
-	protected void initRules(RoutingContext ctx) {
-		try {
-			folioNcipHelper.initRules(ctx);
-		} 
-		catch(Exception e) {
-			logger.error("***************");
-			logger.error(e.toString());
-			ctx.response()
-			.setStatusCode(500)
-			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
-			.end("<Problem><message>problem processing initRules request</message><exception>" + e.toString()+ "</exception></Problem>");
-		}
-		ctx.response()
-		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING) 
-		.end(Constants.OK);
-	}
-	
-	
-	protected void initToolkit(RoutingContext ctx) {
-		try {
-			folioNcipHelper.initToolkit(ctx);
-		} 
-		catch(Exception e) {
-			logger.error("***************");
-			logger.error(e.toString());
-			ctx.response()
-			.setStatusCode(500)
-			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML) 
-			.end("<Problem><message>problem processing inittoolkit request</message><exception>" + e.toString()+ "</exception></Problem>");
-		}
-		ctx.response()
-		.setStatusCode(200)
-		.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING) 
-		.end(Constants.OK);
-	}
-
 
 	protected void ncipConfigCheck(RoutingContext ctx) {
 		final Promise<Void> promise = Promise.promise();
