@@ -155,14 +155,7 @@ For the full list of NCIP toolkit properties see: /src/main/resources/toolkit.pr
 | NCIP          | rules     	| max-loan-count				| 100             |	
 
 
-When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are initialized.  This means the first request may be a bit slow to respond.
-
-If you later add or change settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
-
-* To reinitialize the NCIP properties --> send a GET request to //yourokapiendoint/initncipproperties
-* To reinitialize the Toolkit properties --> send a GET request to /yourokapiendpoint/inittoolkit
-* To reinitialize the Rules properties --> send a GET request to //yourokapiendpoint/initrules
-
+Your new configuration values will be picked up during the next NCIP request.
 
 As you are setting up mod-nicp, the NCIP properties and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
