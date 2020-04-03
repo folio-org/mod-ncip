@@ -219,7 +219,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			logger.fatal(
 					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set so the Checkin Item service can be called");
 			throw new Exception(
-					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
+					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called.");
 		}
 
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
@@ -230,11 +230,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		UUID id = UUID.randomUUID();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 
-		// IF REQUIRED CONFIG VALUES HAVE NOT BEEN INITIALIZED, THEN INIT THEM
-		// THIS HAS TO HAPPEN HERE (AND NOT DURING VERT.X START) BECAUSE IT NEEDS
-		// AN AUTHENTICATED USER TO MAKE THE API CAllS
-		if (ncipProperties.get(agencyId + Constants.INITIALIZED_PROPERTY) == null)
-			initProperties(agencyId, baseUrl);
+		initProperties(agencyId, baseUrl);
 
 		String servicePoint = ncipProperties.getProperty(agencyId + ".checkin.service.point.id");
 
@@ -259,7 +255,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			logger.fatal(
 					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set so the Checkout item service can be called");
 			throw new Exception(
-					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set  in mod-configuration so the Checkout item service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
+					"NCIP Properties have not been initialized.  These properties (e.g. checkout.service.point.code) have to be set  in mod-configuration so the Checkout item service can be called.");
 		}
 
 		UUID id = UUID.randomUUID();
@@ -294,9 +290,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			throw new FolioNcipException(Constants.BLOCKED);
 		/// END CHECKING FOR BLOCK
 
-		// IF REQUIRED CONFIG VALUES HAVE NOT BEEN INITIALIZED, THEN INIT THEM
-		if (ncipProperties.get(agencyId + Constants.INITIALIZED_PROPERTY) == null)
-			initProperties(agencyId, baseUrl);
+		initProperties(agencyId, baseUrl);
 
 		String servicePoint = ncipProperties.getProperty(agencyId + ".checkout.service.point.id");
 		JsonObject jsonObject = new JsonObject();
@@ -334,7 +328,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			logger.fatal(
 					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set so the AcceptItem service can be called");
 			throw new Exception(
-					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set in mod-configuration so the AcceptItem service can be called.  After your properties have been added to mod-configuration initialize those properties by making a GET call to /initncipproperties");
+					"NCIP Properties have not been initialized.  These properties (e.g. instance.type.name) have to be set in mod-configuration so the AcceptItem service can be called.");
 		}
 
 		// LOOKUP THE USER
@@ -343,7 +337,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		// IF USER ID WAS NOT FOUND - RETURN AN ERROR:
 		if (user == null)
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
-		
+
 		if (initData.getRequestId() == null) {
 			throw new FolioNcipException(Constants.REQUEST_ID_MISSING);
 		}
@@ -362,9 +356,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		UUID holdingsUuid = UUID.randomUUID();
 		UUID itemUuid = UUID.randomUUID();
 
-		// IF REQUIRED CONFIG VALUES HAVE NOT BEEN INITIALIZED, THEN INIT THEM
-		if (ncipProperties.get(requesterAgencyId + Constants.INITIALIZED_PROPERTY) == null)
-			initProperties(requesterAgencyId, baseUrl);
+		initProperties(requesterAgencyId, baseUrl);
 
 		// BUILD INSTANCE
 		JsonObject instance = new JsonObject();
@@ -555,12 +547,16 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			String defaultServicePointId = user.getJsonArray("servicePointsUsers").getJsonObject(0)
 					.getString("defaultServicePointId");
+			if (defaultServicePointId == null) return user;
 			String url = baseUrl + "/service-points/" + defaultServicePointId;
 			String response = callApiGet(url);
 			JsonObject servicePoint = new JsonObject(response);
 			user.mergeIn(servicePoint);
 		} catch (Exception e) {
-			// THIS IS FINE
+			//IF THIS IS AN ISSUE WITH PERMISSIONS - THROW AN ERROR:
+			if (e.getLocalizedMessage() != null && e.getLocalizedMessage().contains("permission")) {
+				throw e;
+			}
 			logger.info("patron does not have a preferred service point assigned");
 		}
 		return user;

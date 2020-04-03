@@ -47,7 +47,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	checkOutItemResponseData.getProblems().add(p);
         	return checkOutItemResponseData;
         } 
-        
+
         //ATTEMPT TO DETERMINE AGENCY ID
         //INITIATION HEADER IS NOT REQUIRED
         String requesterAgencyId = null;
