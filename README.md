@@ -112,7 +112,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 ### Required Configurations:
 1) NCIP properties: these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
 ### Optional Configurations
-2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use these as default values.  You can override them in mod-configuration if you need to.
+2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use values.  You can override them in mod-configuration if you need to.
 3) Rule properties: Use these setting if you want the LookupUser service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The LookupUser service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
 
 #### NCIP Properties 
@@ -155,14 +155,7 @@ For the full list of NCIP toolkit properties see: /src/main/resources/toolkit.pr
 | NCIP          | rules     	| max-loan-count				| 100             |	
 
 
-When the module is started the default Toolkit property files are initialized.  When the first request is received by mod-ncip (per tenant) the configuration values from mod-configuration are initialized.  This means the first request may be a bit slow to respond.
-
-If you later add or change settings to mod-configuration you can initialize them in mod-ncip by calling these endpoints:
-
-* To reinitialize the NCIP properties --> send a GET request to //yourokapiendoint/initncipproperties
-* To reinitialize the Toolkit properties --> send a GET request to /yourokapiendpoint/inittoolkit
-* To reinitialize the Rules properties --> send a GET request to //yourokapiendpoint/initrules
-
+Your new configuration values will be picked up during the next NCIP request.
 
 As you are setting up mod-nicp, the NCIP properties and the settings values in FOLIO, you can use this utility service to validate the NCIP property values you have set (it attempts to look up each value you have configured):
 
