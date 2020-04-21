@@ -1,3 +1,5 @@
+## 1.1.2 2020-04-21
+ * Corrected - include email in response when no physical address exists for patron
 ## 1.1.1 2020-04-02
  * Config values are looked up during each request
  * Corrected due date formatting
