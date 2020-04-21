@@ -283,6 +283,8 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	  
 	   private ArrayList<UserAddressInformation> retrieveAddress(JsonObject jsonObject) {
 	    	ArrayList<UserAddressInformation> list = new ArrayList<UserAddressInformation>();
+	    	list.add(retrieveEmail(jsonObject));
+	    	list.add(retrieveTelephoneNumber(jsonObject));
 	    	JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL);
 	    	JsonArray arrayOfAddresses = personal.getJsonArray("addresses");
 	    	if (arrayOfAddresses == null || arrayOfAddresses.isEmpty()) return list;
@@ -290,8 +292,6 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    		   JsonObject jsonAddress = arrayOfAddresses.getJsonObject(i);
 	    		   list.add(retrievePhysicalAddress(jsonAddress));
 	    	}
-	    	list.add(retrieveEmail(jsonObject));
-	    	list.add(retrieveTelephoneNumber(jsonObject));
 	    	return list;
 	    }
 	  
