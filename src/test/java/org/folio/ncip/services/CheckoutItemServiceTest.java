@@ -1,4 +1,4 @@
-package org.folio.ncip.unitTests;
+package org.folio.ncip.services;
 
 
 import java.io.IOException;
@@ -32,9 +32,6 @@ import static org.junit.Assert.*;
 
 
 public class CheckoutItemServiceTest {
-
-	//retrieveAuthenticationInputTypeOf
-	//retrieveUserId
 
 	
 	/**

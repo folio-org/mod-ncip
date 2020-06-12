@@ -1,4 +1,4 @@
-package org.folio.ncip.unitTests;
+package org.folio.ncip.services;
 
 
 

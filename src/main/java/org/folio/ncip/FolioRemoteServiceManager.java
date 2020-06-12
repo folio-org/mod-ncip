@@ -282,8 +282,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			JsonObject block = (JsonObject) i.next();
 			if (block.getBoolean(Constants.BORROWING_BLOCK))
 				throw new FolioNcipException(Constants.BLOCKED);
-			if (block.getBoolean(Constants.REQUEST_BLOCK))
-				throw new FolioNcipException(Constants.BLOCKED);
 		}
 		// IS THE PATRON ACTIVE?
 		if (!user.getBoolean("active"))
@@ -595,12 +593,19 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				String identifier = (String) setting.get("identifier");
 
 				String lookupValue = ncipProperties.getProperty(requesterAgencyId + "." + lookup);
+				
+				if (lookupValue == null) throw new Exception("configuration value missing for " + requesterAgencyId + "." + lookup);
 
 				logger.info("Initializing ");
 				logger.info(lookup);
 				logger.info(" using lookup value ");
 				logger.info(lookupValue);
-
+				
+				//TODO - BETTER WAY?
+				//IF LOCATION CODES CONTAINS '/' WHICH MANY OF THEM DO
+				//LOOKUP LOCATION DOESN'T WORK UNLESS THE LOCATION CODE
+				//IS SURROUNDED BY QUOTES 
+				if (lookupValue.contains("/")) lookupValue = '"' + lookupValue + '"';
 				url = url.replace("{lookup}", URLEncoder.encode(lookupValue));
 
 				HttpUriRequest request = RequestBuilder.get().setUri(baseUrl + url.trim())

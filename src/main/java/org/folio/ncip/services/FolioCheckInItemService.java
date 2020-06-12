@@ -55,9 +55,9 @@ public class FolioCheckInItemService extends FolioNcipService implements CheckIn
 			if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
 				throw new Exception("Agency ID could nto be determined");
 		} catch (Exception e) {
-			logger.error("Could not determine agency id from initiation header or request id element.  Using default");
+			logger.error("Could not determine agency id from initiation header.");
 			if (checkInItemResponseData.getProblems() == null) checkInItemResponseData.setProblems(new ArrayList<Problem>());
-        	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.AGENCY_ID,Constants.CHECK_OUT_PROBLEM ,e.getMessage());
+        	Problem p = new Problem(new ProblemType(Constants.CHECK_IN_PROBLEM),Constants.AGENCY_ID,Constants.FROM_AGENCY_MISSING ,e.getMessage());
         	checkInItemResponseData.getProblems().add(p);
         	return checkInItemResponseData;
 		}

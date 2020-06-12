@@ -68,9 +68,9 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 	        			throw new Exception("From Agency ID Missing");
 	        	}
 	        	catch(Exception except) {
-	        		logger.error("Could not determine agency id from initiation header or request id element.  Using default");
+	        		logger.error("Could not determine agency id from initiation header or request id element.");
 	        		if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
-	            	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.UNKNOWN_DATA_ELEMENT,Constants.CHECK_OUT_PROBLEM ,e.getMessage());
+	            	Problem p = new Problem(new ProblemType(Constants.ACCEPT_ITEM_PROBLEM),Constants.AGENCY_ID,Constants.FROM_AGENCY_MISSING ,e.getMessage());
 	            	responseData.getProblems().add(p);
 	            	return responseData;
 	        	}
