@@ -78,7 +78,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			String returnArray = (String) setting.get("returnArray");
 			String identifier = (String) setting.get("identifier");
 			Enumeration<String> properties = (Enumeration<String>) ncipProperties.propertyNames();
-			CloseableHttpClient client = HttpClients.createDefault();
+			CloseableHttpClient client = HttpClients.custom().build();
 			HttpResponse lookupResponse = null;
 			
 			
