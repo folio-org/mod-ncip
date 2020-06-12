@@ -68,7 +68,7 @@ print(response)
 configuration = {}
 configuration['configName'] = "ReShare" #AGENCY ID
 configuration['code'] = "user.priv.blocked.status"
-configuration['value'] = "DO NOT LEND"
+configuration['value'] = "BLOCKED"
 configuration['module'] = "NCIP"
 the_data = json.dumps(configuration)
 print(the_data)
