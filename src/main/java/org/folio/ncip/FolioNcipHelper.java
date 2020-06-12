@@ -73,7 +73,7 @@ public class FolioNcipHelper {
 	/*
 	 * 
 	 * When the module starts, default config. values for the NCIP toolkit are loaded. When
-	 * the first request (per tenant) is made, the module will check for updated
+	 * ncip requests are made, the module will check for updated
 	 * configurations using mod-configuration.
 	 * 
 	 */
