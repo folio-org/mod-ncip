@@ -42,7 +42,38 @@ print(response)
 
 headers = {"x-okapi-tenant": "diku", "Content-type": "application/json","x-okapi-token":token}
 
-#SET OF 10 CONFIGURATION VALUES *FOR EACH AGENCY ID*
+#CONFIGURATION VALUES *FOR EACH AGENCY ID*
+
+configuration = {}
+configuration['configName'] = "ReShare" #AGENCY ID
+configuration['code'] = "response.includes.physical.address"
+configuration['value'] = "true"
+configuration['module'] = "NCIP"
+the_data = json.dumps(configuration)
+print(the_data)
+response = requests.post("http://localhost:9130/configurations/entries",the_data,headers=headers)
+print(response)
+
+
+configuration = {}
+configuration['configName'] = "ReShare" #AGENCY ID
+configuration['code'] = "user.priv.ok.status"
+configuration['value'] = "OK"
+configuration['module'] = "NCIP"
+the_data = json.dumps(configuration)
+print(the_data)
+response = requests.post("http://localhost:9130/configurations/entries",the_data,headers=headers)
+print(response)
+
+configuration = {}
+configuration['configName'] = "ReShare" #AGENCY ID
+configuration['code'] = "user.priv.blocked.status"
+configuration['value'] = "DO NOT LEND"
+configuration['module'] = "NCIP"
+the_data = json.dumps(configuration)
+print(the_data)
+response = requests.post("http://localhost:9130/configurations/entries",the_data,headers=headers)
+print(response)
 
 configuration = {}
 configuration['configName'] = "ReShare" #AGENCY ID
