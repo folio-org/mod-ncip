@@ -114,7 +114,8 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			logger.info(baseUrl + url.trim());
 			logger.info(lookupResponse.getStatusLine().getStatusCode());
 			logger.info(responseString);
-
+			
+			client.close();
 
 			
 			if (responseCode> 399) {
