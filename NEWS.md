@@ -1,3 +1,10 @@
+## 1.3.0 2020-06-12
+ * Physical address included in LookupUser response is configurable
+ * OK and BLOCKED message (for LookupUser) configurable
+ * Removed check for 'request' block in Checkout service
+ * Fix for locations with '/' characters
+ * Dynamic types in addresses
+ * Include more of physical address
 ## 1.1.2 2020-04-21
  * Corrected - include email in response when no physical address exists for patron
 ## 1.1.1 2020-04-02

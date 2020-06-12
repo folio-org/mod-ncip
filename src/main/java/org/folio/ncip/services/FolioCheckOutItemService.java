@@ -66,7 +66,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	catch(Exception except) {
         		logger.error("Could not determine agency id from initiation header or request id element.  Using default");
         		if (checkOutItemResponseData.getProblems() == null) checkOutItemResponseData.setProblems(new ArrayList<Problem>());
-            	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.AGENCY_ID,Constants.CHECK_OUT_PROBLEM ,e.getMessage());
+            	Problem p = new Problem(new ProblemType(Constants.CHECK_OUT_PROBLEM),Constants.AGENCY_ID,Constants.FROM_AGENCY_MISSING ,e.getMessage());
             	checkOutItemResponseData.getProblems().add(p);
             	return checkOutItemResponseData;
         	}

@@ -73,7 +73,7 @@ public class FolioNcipHelper {
 	/*
 	 * 
 	 * When the module starts, default config. values for the NCIP toolkit are loaded. When
-	 * the first request (per tenant) is made, the module will check for updated
+	 * ncip requests are made, the module will check for updated
 	 * configurations using mod-configuration.
 	 * 
 	 */
@@ -137,7 +137,6 @@ public class FolioNcipHelper {
 				logger.info("Unable to initialize NCIP properties with mod-configuration.");
 				logger.info(e.getLocalizedMessage());
 			}
-			
 			try {
 				initRules(context);
 			} catch (Exception e) {
@@ -254,14 +253,19 @@ public class FolioNcipHelper {
 				logger.info(line);
 				if (line.contains("#"))
 					continue; // ignore comments in the file
-
+				String[] parts = line.split("=");
 				// IF THE CONFIG EXISTS IN MOD-CONFIGURATION, ADD TO PROPERTIES VAR
 				// IF THE CONFIG DOES NOT EXIST IN MOD-CONFIGURATION,
 				// THROW AN EXCEPTION.
 				try {
-					String response = callApiGet(configEndpoint + line + "&limit=200", context.request().headers());
+					String response = callApiGet(configEndpoint + parts[0] + "&limit=200", context.request().headers());
 					JsonObject jsonObject = new JsonObject(response);
 					JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
+					if (configs.size() < 1 && parts.length == 2) {
+						//NO CONFIG SETTING - USE THE DEFAULT
+						properties.setProperty(parts[0], parts[1]);
+						continue;
+					}
 					if (configs.size() < 1) {
 						throw new Exception("No ncip properties found in mod-configuration for property: " + line);
 					}
@@ -287,6 +291,18 @@ public class FolioNcipHelper {
 							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
 				}
 			}
+			
+			logger.info("=======> initializing address types");
+			String addressTypesEndpoint =  okapiBaseEndpoint + Constants.ADDRESS_TYPES;
+			String addressTypesResponse = callApiGet(addressTypesEndpoint,context.request().headers());
+			JsonObject addressesTypesAsJson = new JsonObject(addressTypesResponse);
+			JsonArray addressTypeArray = addressesTypesAsJson.getJsonArray("addressTypes");
+			Iterator addressTypeIterator = addressTypeArray.iterator();
+			while (addressTypeIterator.hasNext()) {
+				JsonObject addressType = (JsonObject) addressTypeIterator.next();
+				properties.setProperty(addressType.getString("id"), addressType.getString("addressType"));
+			}
+			
 			ncipProperties.put(tenant, properties);
 		
 	}
@@ -340,6 +356,8 @@ public class FolioNcipHelper {
 		kieContainer.put(tenant, kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId()));
 
 	}
+	
+
 
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
 		String returnValue = null;

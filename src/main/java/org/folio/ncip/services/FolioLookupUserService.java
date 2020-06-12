@@ -70,9 +70,29 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			 this.ncipProperties = ((FolioRemoteServiceManager)serviceManager).getNcipProperties();
 			 this.kieContainer = ((FolioRemoteServiceManager)serviceManager).getKieContainer();
 			 this.rulesProperties = ((FolioRemoteServiceManager)serviceManager).getRulesProperties();
-					 
-			 UserId userId = retrieveUserId(initData,serviceManager);
-		     
+			 
+				//ATTEMPT TO DETERMINE AGENCY ID
+				// INITIATION HEADER IS NOT REQUIRED
+				String requesterAgencyId = null;
+				try {
+					requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+					if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase(""))
+						throw new Exception("Agency ID could not be determined");
+				} catch (Exception e) {
+					logger.error("Could not determine agency id from initiation header.");
+					if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
+		        	Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_FAILED),Constants.AGENCY_ID,Constants.FROM_AGENCY_MISSING ,e.getMessage());
+		        	responseData.getProblems().add(p);
+		        	return responseData;
+				}
+			 
+			   UserId userId = retrieveUserId(initData,serviceManager);
+			   if (userId == null) {
+				   if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
+		        	Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_VALIDATION_PROBLEM),Constants.LOOKUP_USER_VALIDATION_PROBLEM,Constants.COULD_NOT_DETERMINE_USER,"");
+		        	responseData.getProblems().add(p);
+		        	return responseData;
+			   }
 		     
 		       try {
 		        	validateUserId(userId);
@@ -94,7 +114,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			    	  responseData.getProblems().add(p);
 			    	  return responseData;
 				 }
-				 responseData =constructResponse(initData,patronDetailsAsJson);
+				 responseData =constructResponse(initData,patronDetailsAsJson,requesterAgencyId);
 				 logger.info("API LOOKUP RESULTS...");
 				 logger.info(patronDetailsAsJson.toString());
 
@@ -113,12 +133,11 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		   
 	 }
 
-	 private LookupUserResponseData constructResponse(LookupUserInitiationData initData,JsonObject userDetails) throws Exception {
+	 private LookupUserResponseData constructResponse(LookupUserInitiationData initData,JsonObject userDetails,String requesterAgencyId) throws Exception {
 		 
 		 LookupUserResponseData responseData = new LookupUserResponseData();
 		 try {
 			 
-			 String agencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
 			  if (responseData.getUserOptionalFields()==null)
 		        	responseData.setUserOptionalFields(new UserOptionalFields());
 			  
@@ -127,14 +146,14 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			 }
 			 
 			 if (initData.getUserIdDesired())
-				 responseData.setUserId(this.retrieveBarcode(userDetails,agencyId));
+				 responseData.setUserId(this.retrieveBarcode(userDetails,requesterAgencyId));
 			 
 			  if (initData.getUserAddressInformationDesired())
-		        	responseData.getUserOptionalFields().setUserAddressInformations(this.retrieveAddress(userDetails));
+		        	responseData.getUserOptionalFields().setUserAddressInformations(this.retrieveAddress(userDetails,requesterAgencyId));
 			   
 			  if (initData.getUserPrivilegeDesired()) {
-		        	responseData.getUserOptionalFields().setUserPrivileges(this.retrievePrivileges(userDetails,agencyId));
-			        responseData.getUserOptionalFields().getUserPrivileges().add(this.retrieveBorrowingPrvilege(userDetails,agencyId));
+		        	responseData.getUserOptionalFields().setUserPrivileges(this.retrievePrivileges(userDetails,requesterAgencyId));
+			        responseData.getUserOptionalFields().getUserPrivileges().add(this.retrieveBorrowingPrvilege(userDetails,requesterAgencyId));
 			  }
 		 }
 		 catch(Exception e) {
@@ -161,33 +180,38 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	up.setAgencyId( new AgencyId(agencyId));
 	    	up.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("","STATUS"));
 	    	UserPrivilegeStatus ups = new UserPrivilegeStatus();
-	    	String patronBorrowingStatus = checkRules(jsonObject);
+	    	String patronBorrowingStatus = checkRules(jsonObject,agencyId);
 	    	ups.setUserPrivilegeStatusType(new UserPrivilegeStatusType("",patronBorrowingStatus));
 	    	up.setUserPrivilegeStatus(ups);
 	    	return up;
 	    }
 	    
 	    
-	    private String checkRules(JsonObject jsonObject) throws Exception {
-	    	
-	    	//IF KIESESSION IS NULL - JUST RETURN 'OK' - THEY DON'T WANT TO USE RULES
+	    private String checkRules(JsonObject jsonObject,String agencyId) throws Exception {
 	    	
 	    	
+	    	String okMessage = getOkMessage(agencyId);
+	    	String blockedMessage = getBlockedMessage(agencyId);
+
 	    	try {
 
 		    	
 		    	//do any manual blocks exist?
+	    		//NOTE: - CHECKING FOR BOTH BORROWING BLOCK ~AND~ REQUEST BLOCK
+	    		//BECAUSE IF THE PATRON ENDS UP REQUESTING AN ITEM TO BORROW,
+	    		//A 'HOLD' WILL BE INVOVLED IN THAT TRANSACTION...AND IF THERE
+	    		//IS A REQUEST BLOCK...IT WILL FAIL
 		    	JsonArray blocks = jsonObject.getJsonArray("manualblocks");
 		    	Iterator  i = blocks.iterator();
 		    	while (i.hasNext()) {
 		    		JsonObject block = (JsonObject) i.next();
-		    		if (block.getBoolean(Constants.BORROWING_BLOCK)!= null && block.getBoolean(Constants.BORROWING_BLOCK)) return Constants.BLOCKED;
-		    		if (block.getBoolean(Constants.REQUEST_BLOCK) != null && block.getBoolean(Constants.REQUEST_BLOCK)) return Constants.BLOCKED;;
+		    		if (block.getBoolean(Constants.BORROWING_BLOCK)!= null && block.getBoolean(Constants.BORROWING_BLOCK)) return blockedMessage;
+		    		if (block.getBoolean(Constants.REQUEST_BLOCK) != null && block.getBoolean(Constants.REQUEST_BLOCK)) return blockedMessage;
 	
 		    	}
 		    	
 		    	//IS THE PATRON ACTIVE
-		    	if (!jsonObject.getBoolean("active")) return Constants.BLOCKED;
+		    	if (!jsonObject.getBoolean("active")) return blockedMessage;
 		    	
 		    	if (kieContainer != null) {
 		    		
@@ -227,10 +251,10 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			    	        logger.info( rule.getName() );
 			    	    }
 			    	}
-			    	return patron.canBorrow() ? Constants.ACTIVE : Constants.BLOCKED;
+			    	return patron.canBorrow() ? okMessage : blockedMessage;
 		    	}
 		    	
-		    	return Constants.ACTIVE;
+		    	return okMessage;
 			     
 	    	}
 	    	catch(Exception e) {
@@ -267,8 +291,8 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	  
 	   private NameInformation retrieveName(JsonObject jsonObject) {
 		    JsonObject personal = jsonObject.getJsonObject("personal"); //TODO constants
-	    	String firstName = personal.getString("lastName");
-	    	String lastName = personal.getString("firstName");
+	    	String firstName = personal.getString("firstName");
+	    	String lastName = personal.getString("lastName");
 	    	NameInformation nameInformation = new NameInformation();
 	    	PersonalNameInformation personalNameInformation = new PersonalNameInformation();
 	    	StructuredPersonalUserName structuredPersonalUserName = new StructuredPersonalUserName();
@@ -281,11 +305,19 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    }
 	  
 	  
-	   private ArrayList<UserAddressInformation> retrieveAddress(JsonObject jsonObject) {
+	   private ArrayList<UserAddressInformation> retrieveAddress(JsonObject jsonObject,String agencyId) {
 	    	ArrayList<UserAddressInformation> list = new ArrayList<UserAddressInformation>();
 	    	list.add(retrieveEmail(jsonObject));
-	    	list.add(retrieveTelephoneNumber(jsonObject));
+	    	list.add(retrieveTelephoneNumber(jsonObject,"phone"));
+	    	list.add(retrieveTelephoneNumber(jsonObject,"mobilePhone"));
 	    	JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL);
+	    	//DON'T RETURN THE PATRON'S PHYSICAL ADDRESS UNLESS CONFIGURED TO DO SO:
+	    	String includePhyscialAddressSetting = "false";
+	    	if (ncipProperties != null) {
+	    		includePhyscialAddressSetting = ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.RESPONSE_INCLUDES_PHYSICAL_ADDRESS);
+	    		if (includePhyscialAddressSetting == null) includePhyscialAddressSetting = ncipProperties.getProperty(Constants.RESPONSE_INCLUDES_PHYSICAL_ADDRESS);
+	   		}
+	    	if (includePhyscialAddressSetting == null || includePhyscialAddressSetting.equalsIgnoreCase("false")) return list;
 	    	JsonArray arrayOfAddresses = personal.getJsonArray("addresses");
 	    	if (arrayOfAddresses == null || arrayOfAddresses.isEmpty()) return list;
 	    	for(int i = 0; i < arrayOfAddresses.size(); i++) {
@@ -294,18 +326,18 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	}
 	    	return list;
 	    }
+	   
 	  
-	  
-	    private UserAddressInformation retrieveTelephoneNumber(JsonObject jsonObject) {
+	    private UserAddressInformation retrieveTelephoneNumber(JsonObject jsonObject,String phoneType) {
 	    	
-		    JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL); //TODO constants
-	    	String phoneNumber = personal.getString("phone");
+		    JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL); 
+	    	String phoneNumber = personal.getString(phoneType);
 	    	if (phoneNumber != null) {
 	    		ElectronicAddress phone = new ElectronicAddress();
 	    		phone.setElectronicAddressData(phoneNumber);
-	    		phone.setElectronicAddressType(new ElectronicAddressType("TEL")); //TODO constants
+	    		phone.setElectronicAddressType(new ElectronicAddressType("TEL")); 
 	    		UserAddressInformation uai = new UserAddressInformation();
-	    		uai.setUserAddressRoleType(new UserAddressRoleType(Constants.CAMPUS)); //TODO: constants, what should this be?  
+	    		uai.setUserAddressRoleType(new UserAddressRoleType(Constants.OTHER));
 	    		uai.setElectronicAddress(phone);
 	    		return uai;
 	    	}
@@ -330,13 +362,18 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	//TODO constants
 	    	String streetAddresss = jsonObject.getString("addressLine1");
 	    	String city = jsonObject.getString("city");
+	    	String addressType = jsonObject.getString("addressTypeId");
+	    	String region = jsonObject.getString("region");
+	    	String postalCode = jsonObject.getString("postalCode");
 	        UserAddressInformation uai = new UserAddressInformation();
 	        PhysicalAddress pa = new PhysicalAddress();
 	        StructuredAddress sa = new StructuredAddress();
 	        sa.setLine1(streetAddresss);
 	        sa.setLocality(city);
+	        sa.setRegion(region);
+	        sa.setPostalCode(postalCode);
 	    	pa.setStructuredAddress(sa);
-	    	uai.setUserAddressRoleType(new UserAddressRoleType(Constants.CAMPUS)); 
+	    	uai.setUserAddressRoleType(new UserAddressRoleType(ncipProperties.getProperty(addressType))); 
 	    	pa.setPhysicalAddressType(new PhysicalAddressType(null,"Postal Address")); //TODO
 	    	uai.setPhysicalAddress(pa);
 	    	return uai;
@@ -378,6 +415,18 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		    		uid.setUserIdentifierValue(uidString);
 		    	}
 		    	return uid;
+		}
+		
+		private String getBlockedMessage(String agencyId) {
+				if (ncipProperties != null && ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.BLOCKED_CONFIG) != null) return ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.BLOCKED_CONFIG);
+				if (ncipProperties != null && ncipProperties.getProperty(Constants.BLOCKED_CONFIG) != null) return ncipProperties.getProperty(Constants.BLOCKED_CONFIG);
+				return Constants.BLOCKED;
+		}
+		
+		private String getOkMessage(String agencyId) {
+			if (ncipProperties != null && ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.OK_CONFIG) != null) return ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.OK_CONFIG);
+			if (ncipProperties != null && ncipProperties.getProperty(Constants.OK_CONFIG) != null) return ncipProperties.getProperty(Constants.OK_CONFIG);
+			return Constants.ACTIVE;
 		}
 
 }

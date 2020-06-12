@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Properties;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -37,7 +36,6 @@ public class NcipConfigCheck extends FolioNcipHelper {
 	
 	public NcipConfigCheck(Promise<Void> promise) {
 		super(promise);
-		// TODO Auto-generated constructor stub
 	}
 
 	private MultiMap okapiHeaders;
@@ -49,17 +47,14 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		String baseUrl = routingContext.request().headers().get(Constants.X_OKAPI_URL);
 		logger.info("BaseEndpoint: " + baseUrl);
 		JSONParser parser = new JSONParser();
-		//InputStream inputStream =this.getClass().getResourceAsStream(Constants.INIT_PROP_FILE);
 		InputStream inputStream =this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 		JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 		JSONArray jsonArray = (JSONArray) obj.get("lookups");
 		
 		
 		String okapiBaseEndpoint = routingContext.request().getHeader(Constants.X_OKAPI_URL);
-		String tenant = routingContext.request().getHeader(Constants.X_OKAPI_TENANT);
 		String conifgQuery = URLEncoder.encode("(module==NCIP and configName<>rules and configName<>toolkit)");
 		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=query=" + conifgQuery + "&limit=200";
-		//String encodedUrl = URLEncoder.encode(configEndpoint, "UTF-8");
 		String response = callApiGet(configEndpoint, routingContext.request().headers());
 		JsonObject jsonObject = new JsonObject(response);
 		JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
@@ -83,17 +78,17 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			String returnArray = (String) setting.get("returnArray");
 			String identifier = (String) setting.get("identifier");
 			Enumeration<String> properties = (Enumeration<String>) ncipProperties.propertyNames();
-			CloseableHttpClient client = HttpClients.createDefault();
+			CloseableHttpClient client = HttpClients.custom().build();
 			HttpResponse lookupResponse = null;
 			
 			
 		
 				
-			  logger.info("Initializing ");
-			  logger.info(lookup);
-			  logger.info(" using lookup value ");
-			  logger.info(lookup);
-
+			 logger.info("Initializing ");
+			 logger.info(lookup);
+			 logger.info(" using lookup value ");
+			 logger.info(value);
+			 if (value.contains("/")) value = '"' + value + '"';
 			 url = url.replace("{lookup}", URLEncoder.encode(value));
 			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + value);
 			 
@@ -119,7 +114,8 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			logger.info(baseUrl + url.trim());
 			logger.info(lookupResponse.getStatusLine().getStatusCode());
 			logger.info(responseString);
-
+			
+			client.close();
 
 			
 			if (responseCode> 399) {
@@ -141,8 +137,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		  for(Object o: a){
 			    if ( o instanceof JSONObject ) {
 			        String config =(String) ((JSONObject) o).get("lookup");
-			       // String actualValue = searchValue.substring(searchValue.indexOf('.')+1);
-			        System.out.println("=====>" + config + " vs " + searchValue);
+			        logger.info("=====>" + config + " vs " + searchValue);
 			        if (config.equalsIgnoreCase(searchValue)) return (JSONObject) o;
 			    }
 			}

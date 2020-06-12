@@ -21,6 +21,7 @@ public class Constants {
 	public static final String USER_NOT_FOUND = "Did not find a user with that id";
 	public static final String PERSONAL = "personal";
 	public static final String CAMPUS = "CAMPUS";
+	public static final String OTHER = "OTH";
 	public static final String USER_PROBLEM_ELEMENT = "AuthenticationInput or UserId";
 	public static final String CHECK_OUT_PROBLEM = "Problem performing checkout";
 	public static final String CHECK_OUT_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
@@ -33,6 +34,8 @@ public class Constants {
 	public static final String  ITEM_ID_IS_INVALID = "Item id is invalid";
 	public static final String PICKUP_LOCATION_MISSING = "Pickup location is missing";
 	public static final String REQUEST_ID_MISSING = "Request ID Missing";
+	public static final String FROM_AGENCY_MISSING = "Could not determine FromAgency";
+	public static final String COULD_NOT_DETERMINE_USER = "User id missing from request or user id provided in authentication input does not exist";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
@@ -61,14 +64,18 @@ public class Constants {
 	public static final String MAX_LOAN_COUNT = "max-loan-count";
 	public static final String CONFIGS = "configs";
 	public static final String AGENCY_ID = "Agency ID";
+	public static final String RESPONSE_INCLUDES_PHYSICAL_ADDRESS = "response.includes.physical.address";
+	public static final String OK_CONFIG = "user.priv.ok.status"; 
+	public static final String BLOCKED_CONFIG = "user.priv.blocked.status";
 	
 	
-	//URLS
+	//ENDPOINTS
 	public static final String CHECK_IN_BY_BARCODE = "/circulation/check-in-by-barcode";
 	public static final String CHECK_OUT_BY_BARCODE  = "/circulation/check-out-by-barcode";
 	public static final String INSTANCE_URL = "/inventory/instances";
 	public static final String HOLDINGS_URL = "/holdings-storage/holdings";
 	public static final String ITEM_URL = "/inventory/items";
 	public static final String REQUEST_URL = "/circulation/requests";
+	public static final String ADDRESS_TYPES = "/addresstypes";
 
 }

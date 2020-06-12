@@ -32,7 +32,10 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * (7) holdings.perm.location.code
     * (8) instance.custom.identifier.name
     * (9) checkout.service.point.code
-    * (10)checkin.service.point.code
+    * (10) checkin.service.point.code
+    * (11) response.includes.physical.address (optional - will default to false. For LookupUser response)
+    * (12) user.priv.ok.status (optional - will default to "ACTIVE")
+    * (13) user.priv.blocked.status (optional - will default to "BLOCKED")
 
 Notes 
 * You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
@@ -110,7 +113,7 @@ curl -X POST \
 There are three types of settings that can exist in mod-configuration for the NCIP module:
 
 ### Required Configurations:
-1) NCIP properties: these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
+1) NCIP properties: most of these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
 ### Optional Configurations
 2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use values.  You can override them in mod-configuration if you need to.
 3) Rule properties: Use these setting if you want the LookupUser service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The LookupUser service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
@@ -129,6 +132,9 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP          | Relais     	| instance.custom.identifier.name| ReShare Request ID |		
 | NCIP          | Relais      	| checkout.service.point.code	| online               |		
 | NCIP          | Relais      	| checkin.service.point.code 	| online               |		
+| NCIP          | Relais      	| response.includes.physical.address 	| false               |
+| NCIP          | Relais      	| user.priv.ok.status 	| OK               |
+| NCIP          | Relais      	| user.priv.blocked.status 	| BLOCKED               |
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
