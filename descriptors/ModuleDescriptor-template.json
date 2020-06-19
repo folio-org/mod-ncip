@@ -12,6 +12,7 @@
 		  "permissionsRequired": ["ncip.post"],
           "modulePermissions": [
 			"users.collection.get",
+		  	"automated-patron-blocks.collection.get",
 			"circulation.requests.item.post",
 			"ui-circulation.settings.overdue-fines-policies",
 			"ui-circulation.settings.lost-item-fees-policies",

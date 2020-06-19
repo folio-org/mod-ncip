@@ -1,3 +1,5 @@
+## 1.3.1 2020-06-19
+ * Added module permission: automated-patron-blocks.collection.get
 ## 1.3.0 2020-06-12
  * Physical address included in LookupUser response is configurable
  * OK and BLOCKED message (for LookupUser) configurable
