@@ -292,15 +292,21 @@ public class FolioNcipHelper {
 				}
 			}
 			
-			logger.info("=======> initializing address types");
-			String addressTypesEndpoint =  okapiBaseEndpoint + Constants.ADDRESS_TYPES;
-			String addressTypesResponse = callApiGet(addressTypesEndpoint,context.request().headers());
-			JsonObject addressesTypesAsJson = new JsonObject(addressTypesResponse);
-			JsonArray addressTypeArray = addressesTypesAsJson.getJsonArray("addressTypes");
-			Iterator addressTypeIterator = addressTypeArray.iterator();
-			while (addressTypeIterator.hasNext()) {
-				JsonObject addressType = (JsonObject) addressTypeIterator.next();
-				properties.setProperty(addressType.getString("id"), addressType.getString("addressType"));
+			try {
+				logger.info("=======> initializing address types");
+				String addressTypesEndpoint =  okapiBaseEndpoint + Constants.ADDRESS_TYPES ;
+				String addressTypesResponse = callApiGet(addressTypesEndpoint,context.request().headers());
+				JsonObject addressesTypesAsJson = new JsonObject(addressTypesResponse);
+				JsonArray addressTypeArray = addressesTypesAsJson.getJsonArray("addressTypes");
+				Iterator addressTypeIterator = addressTypeArray.iterator();
+				while (addressTypeIterator.hasNext()) {
+					JsonObject addressType = (JsonObject) addressTypeIterator.next();
+					properties.setProperty(addressType.getString("id"), addressType.getString("addressType"));
+				}
+			}
+			catch(Exception e) {
+				logger.fatal("Unable to initialize address types.");
+				logger.fatal(e.getLocalizedMessage());
 			}
 			
 			ncipProperties.put(tenant, properties);
