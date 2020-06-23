@@ -305,6 +305,7 @@ public class FolioNcipHelper {
 				}
 			}
 			catch(Exception e) {
+				//THIS IS FINE...CAN CONTINUE
 				logger.fatal("Unable to initialize address types.");
 				logger.fatal(e.getLocalizedMessage());
 			}
