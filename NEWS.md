@@ -1,3 +1,5 @@
+## 1.3.2 2020-06-26
+ * Added module permission: addresstypes.collection.get
 ## 1.3.1 2020-06-19
  * Added module permission: automated-patron-blocks.collection.get
 ## 1.3.0 2020-06-12
