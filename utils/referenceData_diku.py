@@ -20,8 +20,8 @@ from collections import OrderedDict
 #https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit#
 
 
-#url = "https://folio-testing-okapi.aws.indexdata.com"
-url = "https://folio-snapshot-load-okapi.aws.indexdata.com"
+#url = "https://folio-testing-okapi.dev.folio.org"
+url = "https://folio-snapshot-load-okapi.dev.folio.org"
 
 headers = {"x-okapi-tenant": "diku", "Content-type": "application/json"}
 
