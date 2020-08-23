@@ -36,6 +36,7 @@ import io.vertx.core.json.JsonObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -101,16 +102,38 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	public String callApiGet(String uriString) throws Exception, IOException, InterruptedException {
 		CloseableHttpClient client = HttpClients.custom().build();
+		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+	    int timeout = Integer.parseInt(timeoutString);
+	    logger.info("Using timeout: " + timeout);
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
+				.setConfig(config)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
 				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
 				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
 				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
-
-		HttpResponse response = client.execute(request);
-		HttpEntity entity = response.getEntity();
-		String responseString = EntityUtils.toString(entity, "UTF-8");
-		int responseCode = response.getStatusLine().getStatusCode();
+		
+		HttpResponse response = null;
+		HttpEntity entity = null;
+		String responseString = null;
+		int responseCode = 0;
+		try {
+			response = client.execute(request);
+			entity = response.getEntity();
+			responseString = EntityUtils.toString(entity, "UTF-8");
+			responseCode = response.getStatusLine().getStatusCode();
+		}
+		catch(Exception e) {
+			logger.fatal("getApiGet failed");
+			logger.fatal(uriString);
+			throw e;
+		}
+		finally {
+			client.close();
+		}
 
 		logger.info("GET:");
 		logger.info(uriString);
@@ -119,7 +142,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		if (responseCode > 399) {
 			String responseBody = processErrorResponse(responseString);
-			throw new Exception(responseString);
+			throw new Exception(responseBody);
 		}
 
 		return responseString;
@@ -128,8 +151,16 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	public String callApiPost(String uriString, JsonObject body) 
 		throws Exception, IOException, InterruptedException {
+		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+	    int timeout = Integer.parseInt(timeoutString);
+	    logger.info("Using timeout: " + timeout);
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .build();
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.post()
+				.setConfig(config)
 				.setUri(uriString)
 				.setEntity(new StringEntity(body.toString()))
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
@@ -139,10 +170,27 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
 				.build();
 
-		HttpResponse response = client.execute(request);
-		HttpEntity entity = response.getEntity();
-		String responseString = EntityUtils.toString(entity, "UTF-8");
-		int responseCode = response.getStatusLine().getStatusCode();
+		HttpResponse response = null;
+		HttpEntity entity = null;
+		String responseString = null;
+		int responseCode = 0;
+		try {
+			response = client.execute(request);
+			entity = response.getEntity();
+			responseString = EntityUtils.toString(entity, "UTF-8");
+			responseCode = response.getStatusLine().getStatusCode();
+		}
+		catch(Exception e) {
+			String responseBody = e.getLocalizedMessage();
+			logger.fatal("callApiPost failed");
+			logger.fatal(uriString);
+			logger.fatal(body);
+			logger.fatal(e.getMessage());
+			throw e;
+		}
+		finally {
+			client.close();
+		}
 
 		logger.info("POST:");
 		logger.info(body.toString());
@@ -161,9 +209,17 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	public HttpResponse callApiDelete(String uriString) throws Exception, IOException, InterruptedException {
 
+		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+	    int timeout = Integer.parseInt(timeoutString);
+	    logger.info("Using timeout: " + timeout);
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .build();
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.delete() // set timeout?
 				.setUri(uriString)
+				.setConfig(config)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
 				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
 				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
@@ -171,9 +227,24 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
 				.build();
 
-		HttpResponse response = client.execute(request);
-		int responseCode = response.getStatusLine().getStatusCode();
-
+		HttpResponse response = null;
+		HttpEntity entity = null;
+		String responseString = null;
+		int responseCode = 0;
+		try {
+			response = client.execute(request);
+			responseCode = response.getStatusLine().getStatusCode();
+		}
+		catch(Exception e) {
+			logger.fatal("callApiDelete failed");
+			logger.fatal(uriString);
+			logger.fatal(e.getMessage());
+			throw e;
+		}
+		finally {
+			client.close();
+		}
+		
 		logger.info("DELETE:");
 		logger.info(uriString);
 		logger.info(responseCode);
@@ -571,6 +642,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		logger.info("=======> initializing properties");
 		JSONParser parser = new JSONParser();
+		CloseableHttpClient client = HttpClients.custom().build();
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.INIT_PROP_FILE);
 			JSONObject obj = (JSONObject) parser.parse(new InputStreamReader(inputStream));
@@ -581,8 +653,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			requesterAgencyId = requesterAgencyId.toLowerCase();
 			int responseCode = 0;
 			JsonObject jsonObject = null;
-
-			CloseableHttpClient client = HttpClients.custom().build();
 
 			while (i.hasNext()) {
 				JSONObject setting = (JSONObject) i.next();
@@ -607,8 +677,17 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				//IS SURROUNDED BY QUOTES 
 				if (lookupValue.contains("/")) lookupValue = '"' + lookupValue + '"';
 				url = url.replace("{lookup}", URLEncoder.encode(lookupValue));
+				
+				final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+			    int timeout = Integer.parseInt(timeoutString);
+			    logger.info("Using timeout: " + timeout);
+		        RequestConfig config = RequestConfig.custom()
+		                .setConnectTimeout(timeout)
+		                .setSocketTimeout(timeout)
+		                .build();
 
 				HttpUriRequest request = RequestBuilder.get().setUri(baseUrl + url.trim())
+						.setConfig(config)
 						.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
 						.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
 						.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
@@ -632,7 +711,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 						jsonObject.getJsonArray(returnArray).getJsonObject(0).getString(identifier));
 
 			}
-			client.close();
 			// IF WE MADE IT THIS FAR, ALL OF THE PROPERTIES HAVE BEEN INITIALIZED
 			ncipProperties.setProperty(requesterAgencyId + Constants.INITIALIZED_PROPERTY, "true");
 
@@ -642,6 +720,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			throw new Exception(
 					"Initializing NCIP properties failed.  Are you sure you have NCIP properties set for this AgencyId: "
 							+ requesterAgencyId + ".  DETAILS: " + e.getLocalizedMessage());
+		}
+		finally {
+			client.close();
 		}
 
 	}

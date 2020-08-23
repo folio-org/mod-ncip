@@ -77,5 +77,9 @@ public class Constants {
 	public static final String ITEM_URL = "/inventory/items";
 	public static final String REQUEST_URL = "/circulation/requests";
 	public static final String ADDRESS_TYPES = "/addresstypes";
+	
+	
+	public static final String DEFAULT_TIMEOUT = "3000";
+	public static final String SERVICE_MGR_TIMEOUT = "service_manager_timeout_ms";
 
 }
