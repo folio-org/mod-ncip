@@ -110,11 +110,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			.setSocketTimeout(timeout)
 			.build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
-				.setConfig(config)
-				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
-				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+			.setConfig(config)
+			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
+			.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+			.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
 		
 		HttpResponse response = null;
 		HttpEntity entity = null;
@@ -160,15 +160,15 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			.build();
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.post()
-				.setConfig(config)
-				.setUri(uriString)
-				.setEntity(new StringEntity(body.toString()))
-				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
-				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
-				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-				.build();
+			.setConfig(config)
+			.setUri(uriString)
+			.setEntity(new StringEntity(body.toString()))
+			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
+			.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
+			.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+			.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+			.build();
 
 		HttpResponse response = null;
 		HttpEntity entity = null;
@@ -218,14 +218,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			.build();
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.delete() // set timeout?
-				.setUri(uriString)
-				.setConfig(config)
-				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
-				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
-				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-				.build();
+			.setUri(uriString)
+			.setConfig(config)
+			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
+			.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
+			.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+			.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+			.build();
 
 		HttpResponse response = null;
 		HttpEntity entity = null;
@@ -566,10 +566,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)&limit=700",
-				baseUrl + "/accounts?query=(userId==" + userId + ")&limit=700", baseUrl + "/groups/" + groupId,
-				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
-				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
+			baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)&limit=700",
+			baseUrl + "/accounts?query=(userId==" + userId + ")&limit=700", baseUrl + "/groups/" + groupId,
+			baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
+			baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
@@ -682,16 +682,16 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				int timeout = Integer.parseInt(timeoutString);
 				logger.info("Using timeout: " + timeout);
 				RequestConfig config = RequestConfig.custom()
-						.setConnectTimeout(timeout)
-						.setSocketTimeout(timeout)
-						.build();
+					.setConnectTimeout(timeout)
+					.setSocketTimeout(timeout)
+					.build();
 
 				HttpUriRequest request = RequestBuilder.get().setUri(baseUrl + url.trim())
-						.setConfig(config)
-						.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-						.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
-						.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-						.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+					.setConfig(config)
+					.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+					.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
+					.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+					.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
 
 				response = client.execute(request);
 				HttpEntity entity = response.getEntity();

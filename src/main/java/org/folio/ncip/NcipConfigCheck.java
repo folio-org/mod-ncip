@@ -99,13 +99,13 @@ public class NcipConfigCheck extends FolioNcipHelper {
 				.setSocketTimeout(timeout)
 				.build();
 			HttpUriRequest request = RequestBuilder.get()
-					.setUri(baseUrl + url.trim())
-					.setConfig(httpConfig)
-					.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-					.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
-					.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-					.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-					.build();
+				.setUri(baseUrl + url.trim())
+				.setConfig(httpConfig)
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+				.build();
 					
 			 lookupResponse = client.execute(request);
 			 HttpEntity entity = lookupResponse.getEntity(); 
