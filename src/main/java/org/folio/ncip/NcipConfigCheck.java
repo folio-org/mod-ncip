@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -65,7 +66,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		}
 		
 		Iterator configsIterator = configs.iterator();
-		
+		CloseableHttpClient client = HttpClients.custom().build();
 		while (configsIterator.hasNext()) {
 			JsonObject config = (JsonObject) configsIterator.next();
 			String code = config.getString(Constants.CODE_KEY);
@@ -78,12 +79,9 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			String returnArray = (String) setting.get("returnArray");
 			String identifier = (String) setting.get("identifier");
 			Enumeration<String> properties = (Enumeration<String>) ncipProperties.propertyNames();
-			CloseableHttpClient client = HttpClients.custom().build();
+			
 			HttpResponse lookupResponse = null;
 			
-			
-		
-				
 			 logger.info("Initializing ");
 			 logger.info(lookup);
 			 logger.info(" using lookup value ");
@@ -93,31 +91,33 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + value);
 			 
 
-			 
-			 
+			final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+			int timeout = Integer.parseInt(timeoutString);
+			logger.info("Using timeout: " + timeout);
+			RequestConfig httpConfig = RequestConfig.custom()
+				.setConnectTimeout(timeout)
+				.setSocketTimeout(timeout)
+				.build();
 			HttpUriRequest request = RequestBuilder.get()
-					.setUri(baseUrl + url.trim())
-					.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-					.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
-					.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-					.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
-					.build();
+				.setUri(baseUrl + url.trim())
+				.setConfig(httpConfig)
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) //do i need version here?
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+				.build();
 					
-			lookupResponse = client.execute(request);
-			 HttpEntity entity = lookupResponse.getEntity();
+			 lookupResponse = client.execute(request);
+			 HttpEntity entity = lookupResponse.getEntity(); 
 			 String responseString = EntityUtils.toString(entity, "UTF-8");
 			 int responseCode = lookupResponse.getStatusLine().getStatusCode();
 			 
-			
-
 			logger.info("GET:");
 			logger.info(baseUrl + url.trim());
 			logger.info(lookupResponse.getStatusLine().getStatusCode());
 			logger.info(responseString);
 			
-			client.close();
 
-			
 			if (responseCode> 399) {
 				String responseBody = processErrorResponse(responseString);
 				throw new Exception(responseBody);
@@ -127,21 +127,21 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
 							"The lookup of " + value + " could not be found for " + code);
-	      
-	    }
+
+		}
+		client.close();
 	}
 	
 	
 	  public JSONObject returnSearch(JSONArray a, String searchValue){
 		  
 		  for(Object o: a){
-			    if ( o instanceof JSONObject ) {
-			        String config =(String) ((JSONObject) o).get("lookup");
-			        logger.info("=====>" + config + " vs " + searchValue);
-			        if (config.equalsIgnoreCase(searchValue)) return (JSONObject) o;
-			    }
+				if ( o instanceof JSONObject ) {
+					String config =(String) ((JSONObject) o).get("lookup");
+					logger.info("=====>" + config + " vs " + searchValue);
+					if (config.equalsIgnoreCase(searchValue)) return (JSONObject) o;
+				}
 			}
 		  return null;
-	  }
-	  
+	}
 }

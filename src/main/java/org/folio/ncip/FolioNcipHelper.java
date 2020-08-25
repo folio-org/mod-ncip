@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -391,25 +392,43 @@ public class FolioNcipHelper {
 	public String callApiGet(String uriString, MultiMap okapiHeaders)
 			throws Exception  {
 		CloseableHttpClient client = HttpClients.custom().build();
+		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+		int timeout = Integer.parseInt(timeoutString);
+		logger.info("Using timeout: " + timeout);
+		RequestConfig config = RequestConfig.custom()
+			.setConnectTimeout(timeout)
+			.setSocketTimeout(timeout)
+			.build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
-				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
-				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
-
-		HttpResponse response = client.execute(request);
-		HttpEntity entity = response.getEntity();
-		String responseString = EntityUtils.toString(entity, "UTF-8");
-		int responseCode = response.getStatusLine().getStatusCode();
-
-		logger.info("GET:");
-		logger.info(uriString);
-		logger.info(responseCode);
-		logger.info(responseString);
-
-		if (responseCode > 399) {
-			String responseBody = processErrorResponse(responseString);
-			throw new Exception(responseBody);
+			.setConfig(config)
+			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
+			.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+			.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+		String responseString = "";
+		try {
+			HttpResponse response = client.execute(request);
+			HttpEntity entity = response.getEntity();
+			responseString = EntityUtils.toString(entity, "UTF-8");
+			int responseCode = response.getStatusLine().getStatusCode();
+	
+			logger.info("GET:");
+			logger.info(uriString);
+			logger.info(responseCode);
+			logger.info(responseString);
+	
+			if (responseCode > 399) {
+				String responseBody = processErrorResponse(responseString);
+				throw new Exception(responseBody);
+			}
+		}
+		catch(Exception e) {
+			logger.fatal("callApiGet failed");
+			logger.fatal(uriString);
+			throw e;
+		}
+		finally {
+			client.close();
 		}
 
 		return responseString;
