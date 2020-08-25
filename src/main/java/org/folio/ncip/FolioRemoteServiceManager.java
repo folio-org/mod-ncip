@@ -103,12 +103,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public String callApiGet(String uriString) throws Exception, IOException, InterruptedException {
 		CloseableHttpClient client = HttpClients.custom().build();
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-	    int timeout = Integer.parseInt(timeoutString);
-	    logger.info("Using timeout: " + timeout);
-        RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+		int timeout = Integer.parseInt(timeoutString);
+		logger.info("Using timeout: " + timeout);
+		RequestConfig config = RequestConfig.custom()
+			.setConnectTimeout(timeout)
+			.setSocketTimeout(timeout)
+			.build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
 				.setConfig(config)
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
@@ -152,12 +152,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public String callApiPost(String uriString, JsonObject body) 
 		throws Exception, IOException, InterruptedException {
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-	    int timeout = Integer.parseInt(timeoutString);
-	    logger.info("Using timeout: " + timeout);
-        RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+		int timeout = Integer.parseInt(timeoutString);
+		logger.info("Using timeout: " + timeout);
+		RequestConfig config = RequestConfig.custom()
+			.setConnectTimeout(timeout)
+			.setSocketTimeout(timeout)
+			.build();
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.post()
 				.setConfig(config)
@@ -210,12 +210,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public HttpResponse callApiDelete(String uriString) throws Exception, IOException, InterruptedException {
 
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-	    int timeout = Integer.parseInt(timeoutString);
-	    logger.info("Using timeout: " + timeout);
-        RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+		int timeout = Integer.parseInt(timeoutString);
+		logger.info("Using timeout: " + timeout);
+		RequestConfig config = RequestConfig.custom()
+			.setConnectTimeout(timeout)
+			.setSocketTimeout(timeout)
+			.build();
 		CloseableHttpClient client = HttpClients.custom().build();
 		HttpUriRequest request = RequestBuilder.delete() // set timeout?
 				.setUri(uriString)

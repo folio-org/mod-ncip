@@ -393,18 +393,18 @@ public class FolioNcipHelper {
 			throws Exception  {
 		CloseableHttpClient client = HttpClients.custom().build();
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-	    int timeout = Integer.parseInt(timeoutString);
-	    logger.info("Using timeout: " + timeout);
-        RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+		int timeout = Integer.parseInt(timeoutString);
+		logger.info("Using timeout: " + timeout);
+		RequestConfig config = RequestConfig.custom()
+			.setConnectTimeout(timeout)
+			.setSocketTimeout(timeout)
+			.build();
 		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
-				.setConfig(config)
-				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
-				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
+			.setConfig(config)
+			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
+			.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+			.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
 		String responseString = "";
 		try {
 			HttpResponse response = client.execute(request);
