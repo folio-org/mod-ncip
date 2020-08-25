@@ -83,6 +83,14 @@ https://github.com/folio-org/edge-ncip
    <td>You may not need this if you are accessing the NCIP module through the edge-ncip module
    </td>
   </tr>
+  <tr>
+   <td>service_manager_timeout_ms
+   </td>
+   <td>int
+   </td>
+   <td>Timeout setting in milliseconds that mod-ncip will use when calling FOLIO APIs (e.g. checkout-item-by-barcode).  Defaults to 3000
+   </td>
+  </tr>
 </table>
 
 
