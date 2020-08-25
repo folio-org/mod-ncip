@@ -92,12 +92,12 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 
 
 			final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-		    int timeout = Integer.parseInt(timeoutString);
-		    logger.info("Using timeout: " + timeout);
-	        RequestConfig httpConfig = RequestConfig.custom()
-	                .setConnectTimeout(timeout)
-	                .setSocketTimeout(timeout)
-	                .build();
+			int timeout = Integer.parseInt(timeoutString);
+			logger.info("Using timeout: " + timeout);
+			RequestConfig httpConfig = RequestConfig.custom()
+				.setConnectTimeout(timeout)
+				.setSocketTimeout(timeout)
+				.build();
 			HttpUriRequest request = RequestBuilder.get()
 					.setUri(baseUrl + url.trim())
 					.setConfig(httpConfig)
@@ -127,8 +127,8 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 if (responseCode > 200 || jsonObject.getJsonArray(returnArray).size() == 0)
 					throw new Exception(
 							"The lookup of " + value + " could not be found for " + code);
-	      
-	    }
+
+		}
 		client.close();
 	}
 	
@@ -136,13 +136,12 @@ public class NcipConfigCheck extends FolioNcipHelper {
 	  public JSONObject returnSearch(JSONArray a, String searchValue){
 		  
 		  for(Object o: a){
-			    if ( o instanceof JSONObject ) {
-			        String config =(String) ((JSONObject) o).get("lookup");
-			        logger.info("=====>" + config + " vs " + searchValue);
-			        if (config.equalsIgnoreCase(searchValue)) return (JSONObject) o;
-			    }
+				if ( o instanceof JSONObject ) {
+					String config =(String) ((JSONObject) o).get("lookup");
+					logger.info("=====>" + config + " vs " + searchValue);
+					if (config.equalsIgnoreCase(searchValue)) return (JSONObject) o;
+				}
 			}
 		  return null;
-	  }
-	  
+	}
 }

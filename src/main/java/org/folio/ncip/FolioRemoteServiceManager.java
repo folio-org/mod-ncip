@@ -679,12 +679,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				url = url.replace("{lookup}", URLEncoder.encode(lookupValue));
 				
 				final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-			    int timeout = Integer.parseInt(timeoutString);
-			    logger.info("Using timeout: " + timeout);
-		        RequestConfig config = RequestConfig.custom()
-		                .setConnectTimeout(timeout)
-		                .setSocketTimeout(timeout)
-		                .build();
+				int timeout = Integer.parseInt(timeoutString);
+				logger.info("Using timeout: " + timeout);
+				RequestConfig config = RequestConfig.custom()
+						.setConnectTimeout(timeout)
+						.setSocketTimeout(timeout)
+						.build();
 
 				HttpUriRequest request = RequestBuilder.get().setUri(baseUrl + url.trim())
 						.setConfig(config)
