@@ -1,3 +1,5 @@
+## 1.5.0 2020-10-01
+ * [MODNCIP-8](https://issues.folio.org/browse/MODNCIP-8) Upgrade to openJdk11
 ## 1.4.2 2020-08-25
  * Added timeouts and try/catch to API calls
 ## 1.3.2 2020-06-26
