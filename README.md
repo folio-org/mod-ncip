@@ -125,7 +125,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 1) NCIP properties: most of these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
 ### Optional Configurations
 2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use values.  You can override them in mod-configuration if you need to.
-3) Rule properties: Use these setting if you want the LookupUser service to use two rules when determining if a patron can borrow.  They are max fine amount and max loan count.  YOU DON'T HAVE TO SET THESE RULES if you don't want to use them.  The lookup user service will function even if they are not set. The LookupUser service will look for blocks on the patron and the active/inactive indicator.  If you also want it to consider limits on fines and checked out items you can configuration these rules.  
+
 
 #### NCIP Properties 
 
@@ -162,13 +162,6 @@ You will need a set of these settings in mod-configuration for each individual A
 
 For the full list of NCIP toolkit properties see: /src/main/resources/toolkit.properties
 
-#### NCIP Rules properties (Used by LookupUser Service)
-
-| MODULE        | configName|   code          | value  (examples) |   
-| ------------- |:-------------:| :-----------------------------|------------------:|		
-| NCIP          | rules 		| max-fine-amount			| 500             |	
-| NCIP          | rules     	| max-loan-count				| 100             |	
-
 
 Your new configuration values will be picked up during the next NCIP request.
 
@@ -198,9 +191,8 @@ These particular four services were selected because they are required to intera
 #### Supported Services
 
 ##### Lookup User
-The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "blocked" or "active" value to indicate whether or not a patron can borrow.  The service looks for 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
+The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "BLOCKED" or "ACTIVE" value to indicate whether or not a patron can borrow.  The service looks for manual and automated 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
 
-This service can also use the Drools rules to help determine the 'blocked' or 'active' value for the response.  The Drools rules look at the number of items checked out and the amount of outstanding fines.  The values used in the rules can be adjusted in mod-configuration.  If you don't want to use them skip setting any values for them in mod-configuration.
 
 Sample XML Request:
 
