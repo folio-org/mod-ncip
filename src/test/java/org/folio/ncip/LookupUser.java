@@ -44,8 +44,6 @@ public class LookupUser extends TestBase {
 
 	@Test
 	public void callLookupUserSuccess() throws MalformedURLException {
-		   //using junit 4
-		   //https://stackoverflow.com/questions/46717693/eclipse-no-tests-found-using-junit-5-caused-by-noclassdeffounderror-for-launcher
 			Response response = postData("src/test/resources/mockdata/ncip-lookupUser.xml");
 			response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserId.UserIdentifierValue", Matchers.equalTo(TestConstants.GOOD_PATRON_BARCODE));
 			response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserOptionalFields.UserPrivilege[2].UserPrivilegeStatus.UserPrivilegeStatusType", Matchers.equalTo(TestConstants.ACTIVE));
@@ -69,10 +67,10 @@ public class LookupUser extends TestBase {
 	}
 	
 	
-	//@Test
-	public void callLookupUserBlockedByRule() throws MalformedURLException {
-		Response response = postData("src/test/resources/mockdata/ncip-lookupUserBlockedFine.xml");
-		response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserId.UserIdentifierValue", Matchers.equalTo(TestConstants.BLOCKED_PATRON_BARCODE_BY_RULES));
+	@Test
+	public void callLookupUserAutomatedBlock() throws MalformedURLException {
+		Response response = postData("src/test/resources/mockdata/ncip-lookupUserAutomatedBlock.xml");
+		response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserId.UserIdentifierValue", Matchers.equalTo(TestConstants.BLOCKED_PATRON_BARCODE_BY_AUTOMATED));
 		response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserOptionalFields.UserPrivilege[2].UserPrivilegeStatus.UserPrivilegeStatusType", Matchers.equalTo(TestConstants.BLOCKED));
 		System.out.println(response.getBody().prettyPrint());
 	}

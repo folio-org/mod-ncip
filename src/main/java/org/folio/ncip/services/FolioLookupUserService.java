@@ -30,21 +30,11 @@ import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatus;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
-import org.folio.ncip.domain.Account;
-import org.folio.ncip.domain.DroolsResponse;
-import org.folio.ncip.domain.Loan;
-import org.folio.ncip.domain.Patron;
 import java.util.Properties;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.kie.api.definition.KiePackage;
-import org.kie.api.definition.rule.Rule;
-import org.kie.api.KieBase;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 
 
 
@@ -54,7 +44,6 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	 private static final Logger logger = Logger.getLogger(FolioLookupUserService.class);
 	 public long reqTimeoutMs;
 	 public JsonObject obj;
-	 private KieContainer kieContainer;
 	 private Properties ncipProperties;
 	 private Properties rulesProperties;
 	 
@@ -63,13 +52,11 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	 
      public LookupUserResponseData performService(LookupUserInitiationData initData,
 			 ServiceContext serviceContext,
-             RemoteServiceManager serviceManager) {
+			 RemoteServiceManager serviceManager) {
 		     logger.info("data passed into performService  : ");
 		     logger.info(initData.toString());
 			 LookupUserResponseData responseData = new LookupUserResponseData();
 			 this.ncipProperties = ((FolioRemoteServiceManager)serviceManager).getNcipProperties();
-			 this.kieContainer = ((FolioRemoteServiceManager)serviceManager).getKieContainer();
-			 this.rulesProperties = ((FolioRemoteServiceManager)serviceManager).getRulesProperties();
 			 
 				//ATTEMPT TO DETERMINE AGENCY ID
 				// INITIATION HEADER IS NOT REQUIRED
@@ -86,25 +73,23 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		        	return responseData;
 				}
 			 
-			   UserId userId = retrieveUserId(initData,serviceManager);
-			   if (userId == null) {
-				   if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
-		        	Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_VALIDATION_PROBLEM),Constants.LOOKUP_USER_VALIDATION_PROBLEM,Constants.COULD_NOT_DETERMINE_USER,"");
-		        	responseData.getProblems().add(p);
-		        	return responseData;
-			   }
-		     
-		       try {
-		        	validateUserId(userId);
-		       }
-		       catch(Exception exception) {
-		        	if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
-		        	Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_VALIDATION_PROBLEM),Constants.LOOKUP_USER_VALIDATION_PROBLEM,exception.getMessage(),exception.getMessage());
-		        	responseData.getProblems().add(p);
-		        	return responseData;
-		        } 
-
-			  try {
+			UserId userId = retrieveUserId(initData,serviceManager);
+			if (userId == null) {
+				if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
+				Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_VALIDATION_PROBLEM),Constants.LOOKUP_USER_VALIDATION_PROBLEM,Constants.COULD_NOT_DETERMINE_USER,"");
+				responseData.getProblems().add(p);
+				return responseData;
+			}
+			try {
+				validateUserId(userId);
+			}
+			catch(Exception exception) {
+				if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());
+				Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_VALIDATION_PROBLEM),Constants.LOOKUP_USER_VALIDATION_PROBLEM,exception.getMessage(),exception.getMessage());
+				responseData.getProblems().add(p);
+				return responseData;
+			} 
+			try {
 				//THE SERVICE MANAGER CALLS THE OKAPI APIs
 				 JsonObject patronDetailsAsJson = ((FolioRemoteServiceManager)serviceManager).lookupUser(userId);
 				 if (patronDetailsAsJson == null) {
@@ -180,14 +165,14 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	up.setAgencyId( new AgencyId(agencyId));
 	    	up.setAgencyUserPrivilegeType(new AgencyUserPrivilegeType("","STATUS"));
 	    	UserPrivilegeStatus ups = new UserPrivilegeStatus();
-	    	String patronBorrowingStatus = checkRules(jsonObject,agencyId);
+	    	String patronBorrowingStatus = checkForBlocks(jsonObject,agencyId);
 	    	ups.setUserPrivilegeStatusType(new UserPrivilegeStatusType("",patronBorrowingStatus));
 	    	up.setUserPrivilegeStatus(ups);
 	    	return up;
 	    }
 	    
 	    
-	    private String checkRules(JsonObject jsonObject,String agencyId) throws Exception {
+	    private String checkForBlocks(JsonObject jsonObject,String agencyId) throws Exception {
 	    	
 	    	
 	    	String okMessage = getOkMessage(agencyId);
@@ -195,8 +180,6 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 
 	    	try {
 
-		    	
-		    	//do any manual blocks exist?
 	    		//NOTE: - CHECKING FOR BOTH BORROWING BLOCK ~AND~ REQUEST BLOCK
 	    		//BECAUSE IF THE PATRON ENDS UP REQUESTING AN ITEM TO BORROW,
 	    		//A 'HOLD' WILL BE INVOVLED IN THAT TRANSACTION...AND IF THERE
@@ -207,60 +190,27 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		    		JsonObject block = (JsonObject) i.next();
 		    		if (block.getBoolean(Constants.BORROWING_BLOCK)!= null && block.getBoolean(Constants.BORROWING_BLOCK)) return blockedMessage;
 		    		if (block.getBoolean(Constants.REQUEST_BLOCK) != null && block.getBoolean(Constants.REQUEST_BLOCK)) return blockedMessage;
-	
 		    	}
 		    	
-		    	//IS THE PATRON ACTIVE
+		    	JsonArray automatedPatronBlocks = jsonObject.getJsonArray("automatedPatronBlocks");
+		    	Iterator  automatedPatronBlocksIterator = automatedPatronBlocks.iterator();
+		    	while (automatedPatronBlocksIterator.hasNext()) {
+		    		JsonObject block = (JsonObject) automatedPatronBlocksIterator.next();
+		    		if (block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)!= null && block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)) return blockedMessage;
+		    		if (block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK) != null && block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK)) return blockedMessage;
+		    	}
+		    	
+		    	//IS THE PATRON ACTIVE?
 		    	if (!jsonObject.getBoolean("active")) return blockedMessage;
 		    	
-		    	if (kieContainer != null) {
-		    		
-		    		String maxFineAmount = rulesProperties.getProperty(Constants.MAX_FINE_AMOUNT);
-		    		String maxLoanCounts = rulesProperties.getProperty(Constants.MAX_LOAN_COUNT);
-			    	Patron patron = new Patron();
-			    	patron.setMaxFineAmount(new Integer(maxFineAmount));
-			    	patron.setMaxLoanCount(new Integer(maxLoanCounts));
-			    	JsonArray loans = jsonObject.getJsonArray("loans");
-			    	for (int x = 0 ; x < loans.size(); x++) {
-			    	        JsonObject loanObject = loans.getJsonObject(x);
-			    	        Loan loan = new Loan();
-			    	        loan.setId(loanObject.getString("id"));
-			    	        patron.getLoans().add(loan);
-			    	}
-			    	JsonArray fines = jsonObject.getJsonArray("accounts");
-			    	for (int x = 0 ; x < fines.size(); x++) {
-			    	        JsonObject fineObject = fines.getJsonObject(x);
-			    	        Account account = new Account();
-			    	        account.setRemaining(fineObject.getDouble("remaining"));
-			    	        patron.getAccounts().add(account);
-			    	}
-			    	
-			    	
-			    	//CHECK NCIP CIRC RULES - RULE VALUES WERE SET IN MOD-CONFIGURATION
-			    	KieSession ksession = kieContainer.newKieSession();
-			    	ksession.insert(patron);
-			    	DroolsResponse droolsResponse = new DroolsResponse();
-			    	ksession.insert(droolsResponse);
-			    	int firedRules = ksession.fireAllRules();
-			    	logger.info("RULES FIRED: " + firedRules);
-			    	logger.info("PATRON CAN BORROW" + patron.canBorrow());
-			    	KieBase kieBase = ksession.getKieBase();
-			    	Collection<KiePackage> kiePackages = kieBase.getKiePackages();
-			    	for( KiePackage kiePackage: kiePackages ){
-			    	    for( Rule rule: kiePackage.getRules() ){ 
-			    	        logger.info( rule.getName() );
-			    	    }
-			    	}
-			    	return patron.canBorrow() ? okMessage : blockedMessage;
-		    	}
-		    	
+		    	//NO BLOCKS FOUND - RETURN THE okMessage
 		    	return okMessage;
 			     
 	    	}
 	    	catch(Exception e) {
 	    		logger.error("error during checkRules");
 	    		logger.error(e.getLocalizedMessage());
-	    		throw new Exception("  Error during checkRules.  Looking at blocks, loans, and fines.  " , e);
+	    		throw new Exception("  Error during checkRules.  Looking at blocks.  " , e);
 	    	}
 	    }
 	    

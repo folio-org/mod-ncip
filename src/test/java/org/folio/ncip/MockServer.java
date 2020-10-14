@@ -1,57 +1,34 @@
 package org.folio.ncip;
 
-import io.restassured.http.Header;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-
-import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
-
-
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
-
-import org.extensiblecatalog.ncip.v2.common.MappedMessageHandler;
-import org.extensiblecatalog.ncip.v2.common.MessageHandlerFactory;
 import org.extensiblecatalog.ncip.v2.common.Translator;
-import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
-import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-import org.kie.api.runtime.KieContainer;
-
 import static org.junit.Assert.fail;
-
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class MockServer {
@@ -60,7 +37,6 @@ public class MockServer {
 	  private Translator translator; //for toolkit
 	  private Properties toolkitProperties;
 	  private Properties ncipProperties;
-	  private KieContainer kieContainer;
 	  private  ServiceContext serviceContext;
 	  private static FolioNcipHelper folioNcipHelper;
 	
@@ -118,58 +94,30 @@ public class MockServer {
 			    router.post("/ncip").handler(this::ncip);
 			    router.get("/groups/:id").handler(this::groupLookup);
 			    router.get("/users").handler(this::users);
-			    router.get("/circulation/loans").handler(this::circulation);
-			    router.get("/accounts").handler(this::accounts);
 			    router.get("/service-points-users").handler(this::servicePointUsers);
 			    router.get("/manualblocks").handler(this::manualBlocks);
-			    router.get("/configurations/entries/maxloancount").handler(this::getMaxLoanCount);
-			    router.get("/configurations/entries/maxfineamount").handler(this::getMaxFineAmount);
+			    router.get("/automated-patron-blocks/:id").handler(this::automatedBlocks);
+			    //router.get("/configurations/entries/maxloancount").handler(this::getMaxLoanCount);
+			    //router.get("/configurations/entries/maxfineamount").handler(this::getMaxFineAmount);
 			    router.get("/configurations/entries/toolkit").handler(this::getToolkitCofigs);
 			    router.get("/configurations/entries").handler(this::getNcipConfigs);
 			    
 			   
 			    return router;
 		  }
-		  
-		  private void getMaxLoanCount(RoutingContext ctx) {
-			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "max-loan-count.json";
-			  String body = readLineByLine(mockFileName);
-			  serverResponse(ctx,200,APPLICATION_JSON,body);
-		  }
-		  
-		  private void getMaxFineAmount(RoutingContext ctx) {
-			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "max-fine-amount.json";
-			  String body = readLineByLine(mockFileName);
-			  serverResponse(ctx,200,APPLICATION_JSON,body);
-		  }
-		  
+
 		  private void getNcipConfigs(RoutingContext ctx) {
-			  logger.fatal("___________" + ctx.request().path());
-			  if (ctx.request().path().contains("max-loan-count")) {
-				  String path = ctx.request().path();
-				  path = path.replace("(", "");
-				  path = path.replace(")", "");
-				  //LOG.info("Path changed to {}", path);
-				  ctx.reroute(path);
-			  }
-			  
 
 			  MultiMap params =  ctx.request().params();
 			  List<String> param = params.getAll("query");
 			  String toolkit = "configName=toolkit";
-			  String maxFine = "(code==max-fine-amount)";
-			  String maxCount = "(code==max-loan-count)";
+
 			  					  
 			  param.contains(toolkit);
 			  if (param.contains(toolkit)) {
 				  ctx.reroute("/configurations/entries/toolkit");
 			  }
-			  if (param.contains(maxFine)) {
-				  ctx.reroute("/configurations/entries/maxfineamount");
-			  }
-			  if (param.contains(maxCount)) {
-				  ctx.reroute("/configurations/entries/maxloancount");
-			  }
+
 			  
 			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "ncip-configs.json";
 			  String body = readLineByLine(mockFileName);
@@ -199,26 +147,20 @@ public class MockServer {
 			  serverResponse(ctx,200,APPLICATION_JSON,body);
 		  }
 		  
+		  private void automatedBlocks(RoutingContext ctx) {
+			  String query = ctx.request().getParam("id");
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "automatedBlocks-get-noblocks.json";
+			  if (query.contains(TestConstants.BLOCKED_PATRON_ID_BY_AUTOMATED )) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "automatedBlocks-get-blocked.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+		  
 		  private void users(RoutingContext ctx) {
 			  String query = ctx.request().getParam("query");
 			  String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "usersByBarcode-get.json";
 			  if (query.contains(TestConstants.BLOCKED_PATRON_BARCODE)) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "usersByBarcode-get-blocked.json";
 			  if (query.contains(TestConstants.PATRON_DOESNT_EXIST_BARCODE)) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "usersByBarcode-get-notFound.json";
-			  if (query.contains(TestConstants.BLOCKED_PATRON_BARCODE_BY_RULES)) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "usersByBarcode-get-blocked-fine.json";
-			  String body = readLineByLine(mockFileName);
-			  serverResponse(ctx,200,APPLICATION_JSON,body);
-		  }
-		  
-		  private void circulation(RoutingContext ctx) {
-			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "loans-get.json";
-			  String body = readLineByLine(mockFileName);
-			  serverResponse(ctx,200,APPLICATION_JSON,body);
-		  }
-		  
-		  private void accounts(RoutingContext ctx) {
-			  String query = ctx.request().getParam("query");
-			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "accounts-get.json";
-			  if (query.contains(TestConstants.BLOCKED_PATRON_ID_BY_RULES)) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "accounts-get-large-fine.json";
+			  if (query.contains(TestConstants.BLOCKED_PATRON_BARCODE_BY_AUTOMATED)) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "usersByBarcode-get-blocked-fine.json";
 			  String body = readLineByLine(mockFileName);
 			  serverResponse(ctx,200,APPLICATION_JSON,body);
 		  }
@@ -292,9 +234,5 @@ public class MockServer {
 				});
 			    
 		 }
-		  
 
-		  
-		  
-		  
 }

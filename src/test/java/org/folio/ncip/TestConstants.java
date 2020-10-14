@@ -11,8 +11,8 @@ public class TestConstants {
 	static final String BLOCKED_PATRON_BARCODE = "5551213";
 	static final String BLOCKED_PATRON_ID = "99999999-9999-1999-8999-999999999902";
 	
-	static final String BLOCKED_PATRON_BARCODE_BY_RULES = "5551214";
-	static final String BLOCKED_PATRON_ID_BY_RULES = "9999999-9999-1999-8999-999999999903";
+	static final String BLOCKED_PATRON_BARCODE_BY_AUTOMATED = "5551214";
+	static final String BLOCKED_PATRON_ID_BY_AUTOMATED = "9999999-9999-1999-8999-999999999903";
 	
 	static final String PATH_TO_MOCK_FILES = "src/test/resources/mockdata/";
 	

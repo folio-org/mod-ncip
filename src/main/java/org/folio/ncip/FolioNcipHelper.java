@@ -29,10 +29,6 @@ import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.runtime.KieContainer;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
@@ -50,8 +46,6 @@ public class FolioNcipHelper {
 	protected Properties translator = new Properties();
 	// INSTANCES OF java.util.Properties.Properties PER TENANT
 	protected Properties toolkitProperties = new Properties();
-	// INSTANCES OF org.kie.api.runtime.KieContainer PER TENANT
-	protected Properties kieContainer = new Properties();
 	// INSTANCE OF java.util.Properties.Properties PER TENANT
 	protected Properties ncipProperties = new Properties();
 	// INSTANCE OF java.util.Properties.Properties PER TENANT
@@ -138,14 +132,7 @@ public class FolioNcipHelper {
 				logger.info("Unable to initialize NCIP properties with mod-configuration.");
 				logger.info(e.getLocalizedMessage());
 			}
-			try {
-				initRules(context);
-			} catch (Exception e) {
-				logger.info("Unable to initialize drools rules with mod-configuration.");
-				logger.info(e.getLocalizedMessage());
-			}
-
-
+			
 		InputStream stream = new ByteArrayInputStream(context.getBodyAsString().getBytes(StandardCharsets.UTF_8));
 		NCIPInitiationData initiationData = null;
 		InputStream responseMsgInputStream = null;
@@ -157,10 +144,8 @@ public class FolioNcipHelper {
 					(org.extensiblecatalog.ncip.v2.service.ServiceContext) serviceContext.get(tenant), stream);
 
 			folioRemoteServiceManager = new FolioRemoteServiceManager();
-			folioRemoteServiceManager.setKieContainer((KieContainer) kieContainer.get(tenant));
 			folioRemoteServiceManager.setOkapiHeaders(context.request().headers());
 			folioRemoteServiceManager.setNcipProperties((Properties) ncipProperties.get(tenant));
-			folioRemoteServiceManager.setRulesProperties((Properties) rulesProperties.get(tenant));
 
 			// MESSAGEHANDLER IS A DYNAMIC TYPE BASED ON INCOMING XML
 			// E.G. INCOMING XML = LookupUserRequest, then messageHandler WILL BE
@@ -314,57 +299,6 @@ public class FolioNcipHelper {
 			ncipProperties.put(tenant, properties);
 		
 	}
-
-	/**
-	 * This method attempts to load from mod-configuration values that have been set
-	 * up for the two drools rules used by the LookupUser service (to determine
-	 * borrowing privileges. These rules are optional. If no configuration values
-	 * are found LookupUser will function without checking the rules.
-	 * 
-	 * MAX-LOAN-COUNT MAX-FINE-AMOUNT
-	 *
-	 */
-	public void initRules(RoutingContext context) {
-		logger.info("...initialize variables for drools rules....");
-		String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-		Properties properties = new Properties();
-		try {
-			String maxAmountResponse = getConfigValue(Constants.MAX_FINE_AMOUNT, context.request().headers());
-			if (maxAmountResponse == null)
-				throw new Exception(
-						"max-fine-amount not set in mod-configuration.  Rules will not be used for lookup user");
-			
-			String maxLoanCountResponse = getConfigValue(Constants.MAX_LOAN_COUNT, context.request().headers());
-			if (maxLoanCountResponse == null)
-				throw new Exception(
-						"max-loan-count not set in mod-configuration.  Rules will not be used for lookup user");
-			
-			properties.put(Constants.MAX_FINE_AMOUNT, maxAmountResponse);
-			properties.put(Constants.MAX_LOAN_COUNT, maxLoanCountResponse);
-			rulesProperties.put(tenant, properties);
-		} catch (Exception e) {
-			logger.info("****NO RULES WILL BE USED FOR LOOKUPUSER SERVICE****");
-			logger.info("****UNABLE TO RETRIEVE DROOLS CONFIGURATION VALUES****");
-			logger.error(e.getLocalizedMessage());
-			//REMOVING ANY PREVIOUSLY EXISTING RULES IN PROPERTIES
-			rulesProperties.remove(tenant);
-			kieContainer.remove(tenant);
-			return;
-
-		}
-
-		// LOAD IN RULES FILES
-		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream(Constants.RULES_FILE);
-		KieServices kieServices = KieServices.Factory.get();
-		KieFileSystem kfs = kieServices.newKieFileSystem();
-		kfs.write( "src/main/resources/nciprules.drl",
-		           kieServices.getResources().newInputStreamResource( resourceAsStream ) );
-		KieBuilder Kiebuilder = kieServices.newKieBuilder(kfs);
-		Kiebuilder.buildAll();
-		kieContainer.put(tenant, kieServices.newKieContainer(kieServices.getRepository().getDefaultReleaseId()));
-
-	}
-	
 
 
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
