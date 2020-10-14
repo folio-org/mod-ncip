@@ -3,9 +3,7 @@ package org.folio.ncip;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URLEncoder;
-import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,17 +26,13 @@ import org.extensiblecatalog.ncip.v2.service.AcceptItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.CheckInItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.CheckOutItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.kie.api.runtime.KieContainer;
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
@@ -53,16 +47,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	private static final Logger logger = Logger.getLogger(FolioRemoteServiceManager.class);
 	private MultiMap okapiHeaders;
 	private Properties ncipProperties;
-	private KieContainer kieContainer;
-	private Properties rulesProperties;
-
-	public Properties getRulesProperties() {
-		return rulesProperties;
-	}
-
-	public void setRulesProperties(Properties rulesProperties) {
-		this.rulesProperties = rulesProperties;
-	}
 
 	public FolioRemoteServiceManager() throws Exception {
 
@@ -78,14 +62,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	public void setNcipProperties(Properties ncipProperties) {
 		this.ncipProperties = ncipProperties;
-	}
-
-	public KieContainer getKieContainer() {
-		return kieContainer;
-	}
-
-	public void setKieContainer(KieContainer kieContainer) {
-		this.kieContainer = kieContainer;
 	}
 
 	public MultiMap getOkapiHeaders() {
@@ -228,8 +204,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			.build();
 
 		HttpResponse response = null;
-		HttpEntity entity = null;
-		String responseString = null;
 		int responseCode = 0;
 		try {
 			response = client.execute(request);
@@ -566,10 +540,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-			baseUrl + "/circulation/loans?query=(userId=" + userId + "+and+status=open)&limit=700",
-			baseUrl + "/accounts?query=(userId==" + userId + ")&limit=700", baseUrl + "/groups/" + groupId,
-			baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
-			baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
+				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
+				baseUrl + "/automated-patron-blocks/" + userId + "&limit=100",
+				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
@@ -598,8 +571,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					logger.error("an api call failed");
 					logger.error(e.toString());
 					throw new Exception(
-							" An API call failed.   Error when looking up patron details.  API calls to circ, accounts, manual blocks and service points.  ",
-							e);
+							" An API call failed.   Error when looking up patron details.  "
+							+ "API manual and automated blocks and service points.  ", e);
 				}
 			}
 			if (millisElapsedSince(startTime) > LONG_DELAY_MS) {

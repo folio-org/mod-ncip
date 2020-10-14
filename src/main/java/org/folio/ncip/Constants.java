@@ -11,6 +11,8 @@ public class Constants {
 	public static final String UNABLE_TO_INIT_TOOLKIT = "Unable to initialize the default toolkit properties.";
 	public static final String BORROWING_BLOCK = "borrowing";
 	public static final String REQUEST_BLOCK = "requests";
+	public static final String AUTOMATED_REQUEST_BLOCK = "blockRequests";
+	public static final String AUTOMATED_BORROWING_BLOCK = "blockBorrowing";
 	public static final String ACCEPT_ITEM_PROBLEM = "Problem performing AcceptItem";
 	public static final String ACCEPT_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id, item id or pickup location)";
 	public static final String LOOKUP_USER_VALIDATION_PROBLEM = "Problem occurred validating user id";
@@ -45,7 +47,6 @@ public class Constants {
 	public static final String INIT_PROP_FILE = "init-values.properties";
 	public static final String TOOLKIT_PROP_FILE = "toolkit.properties";
 	public static final String NCIP_PROP_FILE = "ncip.properties";
-	public static final String RULES_FILE = "rules.drl";
 	public static final String X_OKAPI_TENANT = "x-okapi-tenant";
 	public static final String X_OKAPI_TOKEN = "X-Okapi-Token";
 	public static final String X_OKAPI_URL = "X-Okapi-Url";
@@ -60,8 +61,6 @@ public class Constants {
 	public static final String ITEM_BARCODE = "Item Barcode";
 	public static final String USER_BARCODE = "User Barcode";
 	public static final String REQUEST_ID = "Request Id";
-	public static final String MAX_FINE_AMOUNT = "max-fine-amount";
-	public static final String MAX_LOAN_COUNT = "max-loan-count";
 	public static final String CONFIGS = "configs";
 	public static final String AGENCY_ID = "Agency ID";
 	public static final String RESPONSE_INCLUDES_PHYSICAL_ADDRESS = "response.includes.physical.address";
