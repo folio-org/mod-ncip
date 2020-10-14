@@ -45,9 +45,6 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	 public long reqTimeoutMs;
 	 public JsonObject obj;
 	 private Properties ncipProperties;
-	 private Properties rulesProperties;
-	 
-
 	 
 	 
      public LookupUserResponseData performService(LookupUserInitiationData initData,

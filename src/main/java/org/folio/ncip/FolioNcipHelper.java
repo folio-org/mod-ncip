@@ -48,8 +48,6 @@ public class FolioNcipHelper {
 	protected Properties toolkitProperties = new Properties();
 	// INSTANCE OF java.util.Properties.Properties PER TENANT
 	protected Properties ncipProperties = new Properties();
-	// INSTANCE OF java.util.Properties.Properties PER TENANT
-	protected Properties rulesProperties = new Properties();
 
 	// USE THESE TOOLKIT PROPERTIES AS DEFAULTS:
 	protected Properties defaultToolkitObjects = new Properties();
