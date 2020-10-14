@@ -47,7 +47,6 @@ public class Constants {
 	public static final String INIT_PROP_FILE = "init-values.properties";
 	public static final String TOOLKIT_PROP_FILE = "toolkit.properties";
 	public static final String NCIP_PROP_FILE = "ncip.properties";
-	public static final String RULES_FILE = "rules.drl";
 	public static final String X_OKAPI_TENANT = "x-okapi-tenant";
 	public static final String X_OKAPI_TOKEN = "X-Okapi-Token";
 	public static final String X_OKAPI_URL = "X-Okapi-Url";
