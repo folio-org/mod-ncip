@@ -320,19 +320,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		user = gatherPatronData(user, user.getString("id"));
 
-		// DO MANUAL BLOCKS EXIST?
-		JsonArray blocks = user.getJsonArray("manualblocks");
-		Iterator i = blocks.iterator();
-		while (i.hasNext()) {
-			JsonObject block = (JsonObject) i.next();
-			if (block.getBoolean(Constants.BORROWING_BLOCK))
-				throw new FolioNcipException(Constants.BLOCKED);
-		}
-		// IS THE PATRON ACTIVE?
-		if (!user.getBoolean("active"))
-			throw new FolioNcipException(Constants.BLOCKED);
-		/// END CHECKING FOR BLOCK
-
 		initProperties(agencyId, baseUrl);
 
 		String servicePoint = ncipProperties.getProperty(agencyId + ".checkout.service.point.id");
@@ -541,7 +528,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		List<String> apiCallsNeeded = Arrays.asList(
 				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
-				baseUrl + "/automated-patron-blocks/" + userId + "&limit=100",
+				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
