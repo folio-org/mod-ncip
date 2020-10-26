@@ -334,7 +334,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
     	while (automatedPatronBlocksIterator.hasNext()) {
     		JsonObject block = (JsonObject) automatedPatronBlocksIterator.next();
     		if (block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)!= null && block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)) throw new FolioNcipException(Constants.BLOCKED);
-    		if (block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK) != null && block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK)) throw new FolioNcipException(Constants.BLOCKED);
     	}
 		// IS THE PATRON ACTIVE?
 		if (!user.getBoolean("active"))
