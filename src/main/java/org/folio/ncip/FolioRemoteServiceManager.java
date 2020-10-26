@@ -329,12 +329,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				throw new FolioNcipException(Constants.BLOCKED);
 		}
 		// DO AUTOMATED BLOCKS EXIST?
-    	JsonArray automatedPatronBlocks = user.getJsonArray("automatedPatronBlocks");
-    	Iterator  automatedPatronBlocksIterator = automatedPatronBlocks.iterator();
-    	while (automatedPatronBlocksIterator.hasNext()) {
-    		JsonObject block = (JsonObject) automatedPatronBlocksIterator.next();
-    		if (block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)!= null && block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)) throw new FolioNcipException(Constants.BLOCKED);
-    	}
+    		JsonArray automatedPatronBlocks = user.getJsonArray("automatedPatronBlocks");
+    		Iterator  automatedPatronBlocksIterator = automatedPatronBlocks.iterator();
+    		while (automatedPatronBlocksIterator.hasNext()) {
+    			JsonObject block = (JsonObject) automatedPatronBlocksIterator.next();
+    			if (block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)!= null && block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)) throw new FolioNcipException(Constants.BLOCKED);
+    		}
 		// IS THE PATRON ACTIVE?
 		if (!user.getBoolean("active"))
 			throw new FolioNcipException(Constants.BLOCKED);
