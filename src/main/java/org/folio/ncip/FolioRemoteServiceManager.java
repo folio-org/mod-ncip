@@ -320,6 +320,27 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		user = gatherPatronData(user, user.getString("id"));
 
+		// DO MANUAL BLOCKS EXIST?
+		JsonArray blocks = user.getJsonArray("manualblocks");
+		Iterator i = blocks.iterator();
+		while (i.hasNext()) {
+			JsonObject block = (JsonObject) i.next();
+			if (block.getBoolean(Constants.BORROWING_BLOCK))
+				throw new FolioNcipException(Constants.BLOCKED);
+		}
+		// DO AUTOMATED BLOCKS EXIST?
+    	JsonArray automatedPatronBlocks = user.getJsonArray("automatedPatronBlocks");
+    	Iterator  automatedPatronBlocksIterator = automatedPatronBlocks.iterator();
+    	while (automatedPatronBlocksIterator.hasNext()) {
+    		JsonObject block = (JsonObject) automatedPatronBlocksIterator.next();
+    		if (block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)!= null && block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)) throw new FolioNcipException(Constants.BLOCKED);
+    		if (block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK) != null && block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK)) throw new FolioNcipException(Constants.BLOCKED);
+    	}
+		// IS THE PATRON ACTIVE?
+		if (!user.getBoolean("active"))
+			throw new FolioNcipException(Constants.BLOCKED);
+		/// END CHECKING FOR BLOCK
+
 		initProperties(agencyId, baseUrl);
 
 		String servicePoint = ncipProperties.getProperty(agencyId + ".checkout.service.point.id");

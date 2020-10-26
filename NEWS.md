@@ -1,5 +1,6 @@
 ## 1.6.1 2020-10-23
-* Correct automated patron block endpoint
+ * Correct automated patron block endpoint
+ * Checkout should check for automated patron blocks
 ## 1.6.0 2020-10-14
  * [MODNCIP-9](https://issues.folio.org/browse/MODNCIP-9) <br>
 Use automated patron blocks for the LookupUser service
