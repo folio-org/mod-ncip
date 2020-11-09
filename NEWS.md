@@ -1,3 +1,6 @@
+## 1.6.2 2020-11-09
+ * Fix for new dueDate format ParseException
+ * Removed loanDate from check-out-by-barcode (not needed)
 ## 1.6.1 2020-10-23
  * Correct automated patron block endpoint
  * Checkout should check for automated patron blocks
