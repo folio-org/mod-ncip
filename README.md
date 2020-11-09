@@ -13,11 +13,12 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ## Preparation
 1. The NCIP module requires a FOLIO user with the following permissions:
 ```
-    ncip.all
-    inventory-storage.items.collection.get
-    ui-circulation.settings.overdue-fines-policies
-    ui-circulation.settings.lost-item-fees-policies
-    automated-patron-blocks.collection.get
+	ncip.all
+	inventory-storage.items.collection.get
+	ui-circulation.settings.overdue-fines-policies
+	ui-circulation.settings.lost-item-fees-policies
+	automated-patron-blocks.collection.get
+	circulation-storage.circulation-rules.get
     
 ```
 2. If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)

@@ -347,7 +347,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		jsonObject.put("itemBarcode", itemBarcode);
 		jsonObject.put("userBarcode", userBarcode);
 		jsonObject.put("id", id.toString());
-		jsonObject.put("loanDate", loanDate);
+		//jsonObject.put("loanDate", loanDate); //use default - current date/time
 		jsonObject.put("servicePointId", servicePoint);
 
 		String url = baseUrl + Constants.CHECK_OUT_BY_BARCODE;

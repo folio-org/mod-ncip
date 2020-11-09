@@ -79,7 +79,9 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	//THE SERVICE MANAGER CALLS THE OKAPI APIs
         	 JsonObject checkOutItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).checkOut(initData,requesterAgencyId.toLowerCase());
         	 dueDate = checkOutItemResponseDetails.getString("dueDate");
-         	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        	 //DUE DATE PARSE STARTED FAILING 11-2020
+         	 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
          	 Date d = sdf.parse(dueDate);
          	 calendar.setTime(d);
          }
