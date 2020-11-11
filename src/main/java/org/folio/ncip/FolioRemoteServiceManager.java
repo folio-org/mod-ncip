@@ -549,6 +549,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		List<String> apiCallsNeeded = Arrays.asList(
 				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
 				baseUrl + "/automated-patron-blocks/" + userId,
+				baseUrl + "/groups/" + groupId,
 				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
