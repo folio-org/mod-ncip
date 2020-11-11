@@ -1,3 +1,5 @@
+## 1.6.3 2020-11-11
+ * Putting back patron group lookup (was unintentionally removed)
 ## 1.6.2 2020-11-09
  * Fix for new dueDate format ParseException
  * Removed loanDate from check-out-by-barcode (not needed)

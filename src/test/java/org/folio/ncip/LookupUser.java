@@ -47,6 +47,7 @@ public class LookupUser extends TestBase {
 			Response response = postData("src/test/resources/mockdata/ncip-lookupUser.xml");
 			response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserId.UserIdentifierValue", Matchers.equalTo(TestConstants.GOOD_PATRON_BARCODE));
 			response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserOptionalFields.UserPrivilege[2].UserPrivilegeStatus.UserPrivilegeStatusType", Matchers.equalTo(TestConstants.ACTIVE));
+			response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserOptionalFields.UserPrivilege[0].UserPrivilegeStatus.UserPrivilegeStatusType", Matchers.equalTo("GRAD"));
 			System.out.println(response.getBody().prettyPrint());
 	}
 	
