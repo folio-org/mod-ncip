@@ -127,7 +127,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 ### Required Configurations:
 1) NCIP properties: most of these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
 ### Optional Configurations
-2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use values.  You can override them in mod-configuration if you need to.
+2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use default values.  You can override them in mod-configuration if you need to.
 
 
 #### NCIP Properties 
