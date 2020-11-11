@@ -186,7 +186,8 @@ This initial version of the NCIP module supports four of the existing 50ish serv
 
 POST to http://yourokapiendoint/ncip    (if you are calling the mod-ncip directly)
 
-POST to http://youredgencipendpoint/ncip (if you are calling mod-ncip through edge-ncip)
+POST to http://youredgencipendpoint/ncip/yourapikey (if you are calling mod-ncip through edge-ncip)
+or http://youredgencipendpoint/ncip?apikey=yourapikey
 
 The module determines which service is being called based on the XML passed into the service.
 These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog (XC) NCIP toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
