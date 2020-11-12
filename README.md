@@ -27,7 +27,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:
 
-    * (1) instance.type.name
+    * (1) instance.type.name   (this is under settings > inventory > instances > resource type)
     * (2) instance.source
     * (3) item.material.type.name
     * (4) item.perm.loan.type.name
