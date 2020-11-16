@@ -27,14 +27,14 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:
 
-    * (1) instance.type.name
+    * (1) instance.type.name   (Settings > Inventory > Instances > Resource Type)
     * (2) instance.source
     * (3) item.material.type.name
     * (4) item.perm.loan.type.name
     * (5) item.status.name
     * (6) item.perm.location.code
     * (7) holdings.perm.location.code
-    * (8) instance.custom.identifier.name
+    * (8) instance.custom.identifier.name (Settings -> Inventory -> Instances -> Resource Identifier Types)
     * (9) checkout.service.point.code
     * (10) checkin.service.point.code
     * (11) response.includes.physical.address (optional - will default to false. For LookupUser response)
@@ -127,7 +127,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 ### Required Configurations:
 1) NCIP properties: most of these are the settings required for the NCIP services to work.  See explanation above in the 'preparation' section of this README file.
 ### Optional Configurations
-2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use values.  You can override them in mod-configuration if you need to.
+2) XC NCIP Toolkit properties:  While there are examples of these properties below YOU DO NOT HAVE TO SET THEM.  The NCIP module will use default values.  You can override them in mod-configuration if you need to.
 
 
 #### NCIP Properties 
@@ -186,7 +186,8 @@ This initial version of the NCIP module supports four of the existing 50ish serv
 
 POST to http://yourokapiendoint/ncip    (if you are calling the mod-ncip directly)
 
-POST to http://youredgencipendpoint/ncip (if you are calling mod-ncip through edge-ncip)
+POST to http://youredgencipendpoint/ncip/yourapikey (if you are calling mod-ncip through edge-ncip)
+or http://youredgencipendpoint/ncip?apikey=yourapikey
 
 The module determines which service is being called based on the XML passed into the service.
 These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog (XC) NCIP toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
