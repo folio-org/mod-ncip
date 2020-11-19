@@ -91,7 +91,7 @@ https://github.com/folio-org/edge-ncip
    </td>
    <td>int
    </td>
-   <td>Timeout setting in milliseconds that mod-ncip will use when calling FOLIO APIs (e.g. checkout-item-by-barcode).  Defaults to 3000
+   <td>Timeout setting in milliseconds that mod-ncip will use when calling FOLIO APIs (e.g. checkout-item-by-barcode).  Defaults to 3000.  <br><b>11/2020 NOTE: </b>we've seen timeouts...so you should plan on using this setting and increasing the timeout (-Dservice_manager_timeout_ms=6000).  I am considering increasing the default in the next release.
    </td>
   </tr>
 </table>
@@ -305,6 +305,8 @@ https://github.com/moravianlibrary/xcncip2toolkit/blob/master/connectors/aleph/2
 
 See project [MODNCIP](https://issues.folio.org/browse/MODNCIP)
 at the [FOLIO issue tracker](https://dev.folio.org/guidelines/issue-tracker).
+<br>
+Related issue: [due date on the UI doesn't match the api](https://issues.folio.org/browse/UICHKOUT-670)
 
 ### ModuleDescriptor
 
