@@ -54,7 +54,7 @@ public class FolioNcipHelper {
 
 	public FolioNcipHelper(Promise<Void> promise) {
 		Future<Void> steps = initToolkitDefaults();
-		steps.setHandler(ar -> {
+		steps.onComplete(ar -> {
 			if (ar.succeeded()) {
 				promise.complete();
 			} else {

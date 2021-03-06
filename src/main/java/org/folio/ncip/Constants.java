@@ -27,7 +27,7 @@ public class Constants {
 	public static final String USER_PROBLEM_ELEMENT = "AuthenticationInput or UserId";
 	public static final String CHECK_OUT_PROBLEM = "Problem performing checkout";
 	public static final String CHECK_OUT_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
-	public static final String UNKNOWN_DATA_ELEMENT = "Unknown Data Element";
+	public static final String UNKNOWN_DATA_ELEMENT = "--";
 	public static final String CHECK_IN_PROBLEM = "Problem performing check in";
 	public static final String FATAL_ERROR_OCCURED = "An error occured processing this request.  Unable to construct a proper NCIP response with problem element";
 	public static final String USER_ID_MISSING = "User id missing";
@@ -78,7 +78,7 @@ public class Constants {
 	public static final String ADDRESS_TYPES = "/addresstypes";
 	
 	
-	public static final String DEFAULT_TIMEOUT = "3000";
+	public static final String DEFAULT_TIMEOUT = "30000";
 	public static final String SERVICE_MGR_TIMEOUT = "service_manager_timeout_ms";
 
 }

@@ -179,6 +179,10 @@ If the service is able to retrieve a UUID for each of the settings it will send 
         <message>problem processing NCIP request</message>
         <exception>java.lang.Exception: The lookup of PALCI_NOTREAL could not be found for relais.instance.type.name</exception>
     </Problem>
+## FAQ
+<b>The NCIP response says read timeout</b>
+<br>
+In previous versions, the default timeout (which tells mod-ncip how long to wait for a repsonse from the FOLIO services it calls) was set to 3000 (3 seconds).  This occassionally caused timeouts when the entire system was slow but could be fixed by increasing the timeout setting mentioned in the Configuration section above (when the module is started (java -jar ...) add this configuration: -Dservice_manager_timeout_ms=6000).  However, as of 03/2021 it defaults to 30000 (30 seconds) because 3000 (3 seconds) was not enough at times.  This setting can still be adjusted with the '-Dservice_manager_timeout_ms' setting.  It just defaults to 30 seconds now instead of 3 to help implementers avoid ever running into the timeout.
 
     
 ## About the NCIP services

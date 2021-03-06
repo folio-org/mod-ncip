@@ -138,7 +138,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		HttpUriRequest request = RequestBuilder.post()
 			.setConfig(config)
 			.setUri(uriString)
-			.setEntity(new StringEntity(body.toString()))
+			.setEntity(new StringEntity(body.toString(),"UTF-8"))
 			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
 			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
 			.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
@@ -351,10 +351,31 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		jsonObject.put("servicePointId", servicePoint);
 
 		String url = baseUrl + Constants.CHECK_OUT_BY_BARCODE;
-
-		String checkoutResponse = callApiPost(url, jsonObject);
-		JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
-		return checkoutResponseAsJson;
+		try {
+			String checkoutResponse = callApiPost(url, jsonObject);
+			JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
+			return checkoutResponseAsJson;
+		}
+		catch(Exception e) {
+			//CHECKOUT FAILED - TRY TO CALL CHECKIN TRANSACTION
+			//SO THE CHECKOUT CAN BE ATTEMPTED AGAIN.
+			//WE'VE SEEN THE CHECKOUT TIMEOUT WHEN THE ENTIRE SYSTEM
+			//IS SLOW - AND THE ITEM ENDS UP CHECKED OUT...SO JUST ATTEMPTING
+			//A CHECKIN FOR CONVENIENCE
+			logger.error("exception occured during checkout item");
+			logger.error("attempting a checkin...in case the checkout actually worked");
+			String returnDate = dtf.format(now);
+			jsonObject.put("checkInDate", returnDate);
+			Thread.sleep(4000);
+			try {
+				url = baseUrl + Constants.CHECK_IN_BY_BARCODE;
+				callApiPost(url, jsonObject);
+			} catch (Exception checkinError) {
+				logger.error("unable to checkin item: " + itemBarcode);
+				logger.error(checkinError.getMessage());
+			}
+			throw e;
+		}
 	}
 
 	/**
