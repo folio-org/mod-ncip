@@ -65,7 +65,7 @@ public class MockServer {
 		   HttpServer server = vertx.createHttpServer();
 		   params.put("port", this.port);
 		    CompletableFuture<HttpServer> deploymentComplete = new CompletableFuture<>();
-		    server.requestHandler(defineRoutes()::accept).listen(port, result -> {
+		    server.requestHandler(defineRoutes()).listen(port, result -> {
 		      if(result.succeeded()) {
 		        deploymentComplete.complete(result.result());
 		      }
