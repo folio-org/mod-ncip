@@ -91,7 +91,7 @@ https://github.com/folio-org/edge-ncip
    </td>
    <td>int
    </td>
-   <td>Timeout setting in milliseconds that mod-ncip will use when calling FOLIO APIs (e.g. checkout-item-by-barcode).  Defaults to 3000.  <br><b>11/2020 NOTE: </b>we've seen timeouts...so you should plan on using this setting and increasing the timeout (-Dservice_manager_timeout_ms=6000).  I am considering increasing the default in the next release.
+   <td>Timeout setting in milliseconds that mod-ncip will use when calling FOLIO APIs (e.g. checkout-item-by-barcode).  Defaults to 30000.
    </td>
   </tr>
 </table>
@@ -259,7 +259,7 @@ Note: Correct capitalization is important for this configuration.  CheckinItemSe
 
 ![Illustrates updating the toolkit.properties file by adding a configuration for the Request Item Service](docs/images/newServiceToolkit.png?raw=true "Illustrates updating the toolkit.properties file")
 
-These are the default values used for the NCIP Toolkit configuraiton.
+These are the default values used for the NCIP Toolkit configuration.
 
 #### Step 2: Create the class you configured in step 1
 The new class should implement the Toolkit's interface for this service.  In this example your new class would implement the RequestItemService interface.  This means your class is required to have a 'performService' method as illustrated below.

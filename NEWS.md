@@ -1,9 +1,11 @@
+## 1.7.0 2021-03-17
+ * Correcting version number for R1 2021
+ * README updates
 ## 1.6.4 2021-03-05
  * [MODNCIP-15](https://issues.folio.org/browse/MODNCIP-15) - specify UTF-8 in POST
  * Default timeout changed to 30 secs (3 was too short - implementers seeing timeouts when system is slow).  As before, the default can be modified on startup.
  * Attempt checkin if checkout fails due to timeout (for convenience).  Only happens when the system gets extremely slow.
  * Removed 'Problem element unknown' from the response when the problem doesn't relate to a specific element.  This was confusing.
- * Moved to vertx 4
 ## 1.6.3 2020-11-11
  * Putting back patron group lookup (was unintentionally removed)
 ## 1.6.2 2020-11-09
