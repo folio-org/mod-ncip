@@ -1,3 +1,5 @@
+## 1.7.1 2021-04-02
+ * Bumping version of mod-circulation to 10
 ## 1.7.0 2021-03-17
  * Correcting version number for R1 2021
  * README updates
