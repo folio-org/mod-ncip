@@ -82,26 +82,29 @@ public class MainVerticle extends AbstractVerticle {
 	protected void handleNcip(RoutingContext ctx) {
 
 		vertx.executeBlocking(promise -> {
-			InputStream responseMsgInputStream = null;
-			try {
-
-				responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
+			try (InputStream responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
+					Scanner scanner = new Scanner(responseMsgInputStream,"UTF-8").useDelimiter("\\A")) {
+				String inputStreamString = scanner.next();
+				promise.complete(inputStreamString);
 			}
-			catch(Exception e) {
-				logger.error("error occured processing this request.  Unable to construct a proper NCIP response with problem element");
-				logger.error(e.toString());
+			catch (Exception e) {
+				promise.fail(e);
+			}
+		}, res -> {
+			if (res.failed()) {
+				logger.error("error occured processing this request.  Unable to construct a proper NCIP response with problem element",
+						res.cause());
 				ctx.response()
 				.setStatusCode(500)
 				.putHeader(HttpHeaders.CONTENT_TYPE, "application/xml") //TODO CONSTANT
 				//THIS REALLY SHOULD BE AN NCIP RESONSE THAT MIRRORS THE NCIP REQUEST TYPE (WITH PROBLEM ELEMENT) HOWEVER...
 				//THAT IS NOT POSSIBLE IF WE'VE REACHED HERE BECAUSE ONLY THE MESSAGE HANDLER CAN CONSTRUCT A RESPONSE OBJECT
 				//WE SHOULDN'T EVER GET HERE IF THE MODULE IS SET UP PROPERLY - FAMOUS LAST WORDS
-				.end("<Problem><message>problem processing NCIP request</message><exception>" + e.getLocalizedMessage() + "</exception></Problem>");
+				.end("<Problem><message>problem processing NCIP request</message><exception>"
+						+ res.cause().getLocalizedMessage() + "</exception></Problem>");
+				return;
 			}
 
-			String inputStreamString = new Scanner(responseMsgInputStream,"UTF-8").useDelimiter("\\A").next();
-			promise.complete(inputStreamString);
-		}, res -> {
 			System.out.println("The result is: " + res.result());
 			ctx.response()
 			.setStatusCode(200)
