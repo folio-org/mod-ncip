@@ -1,3 +1,5 @@
+## 1.9.0 2021-10-11
+ * [MODNCIP-23](https://issues.folio.org/browse/MODNCIP-23) - align dependency versions affected by Inventory's Optimistic Locking
 ## 1.8.0 2021-06-15
  * [MODNCIP-21](https://issues.folio.org/browse/MODNCIP-21) - Update circulation interface dependency to support v11
 ## 1.7.0 2021-03-17
