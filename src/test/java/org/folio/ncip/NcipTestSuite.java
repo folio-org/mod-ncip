@@ -1,7 +1,5 @@
 package org.folio.ncip;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -19,7 +17,7 @@ import io.restassured.RestAssured;
   LookupUser.class,
 })
 public class NcipTestSuite {
-	
+
 	  private static final int okapiPort = Utils.nextFreePort();
 	  static final int mockPort = Utils.nextFreePort();
 	  private static Vertx vertx;
@@ -35,18 +33,19 @@ public class NcipTestSuite {
 	    mockServer = new MockServer(mockPort);
 	    mockServer.start();
 
+	    RestAssured.reset();
 	    RestAssured.baseURI = "http://localhost:" + okapiPort;
 	    RestAssured.port = okapiPort;
 	    RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 	  }
-	  
+
 	  @AfterClass
 	  public static void after() {
 	    vertx.close();
 	    mockServer.close();
 	    initialised = false;
 	  }
-	  
-	  
+
+
 
 }
