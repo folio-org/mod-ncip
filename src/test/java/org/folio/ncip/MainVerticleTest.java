@@ -43,7 +43,7 @@ public class MainVerticleTest {
 		vertx.exceptionHandler(ctx.exceptionHandler());
 	}
 
-	//@Test
+	@Test
 	public void health(TestContext ctx) {
 		vertx.deployVerticle(new MainVerticle(), success(ctx, x -> {
 			get("/admin/health").
