@@ -1,6 +1,7 @@
 package org.folio.ncip;
 
 import static io.restassured.RestAssured.get;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
@@ -81,6 +82,16 @@ public class MainVerticleTest {
 				statusCode(200).
 				body(is("OK"));
 			}));
+		}));
+	}
+
+	@Test
+	public void ncipConfigCheckFailure(TestContext ctx) {
+		vertx.deployVerticle(new MainVerticle(), success(ctx, y -> {
+			get("/ncipconfigcheck").
+			then().
+			statusCode(500).
+			body(containsString("localhost:8082"));
 		}));
 	}
 
