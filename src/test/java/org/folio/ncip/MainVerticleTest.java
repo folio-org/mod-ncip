@@ -11,6 +11,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,6 +24,9 @@ import org.junit.runner.RunWith;
 public class MainVerticleTest {
 	@Rule
 	public Timeout timeout = Timeout.seconds(10);
+
+	@Rule
+	public RunTestOnContext runTestOnContext = new RunTestOnContext();
 
 	private Vertx vertx;
 
@@ -39,7 +43,7 @@ public class MainVerticleTest {
 
 	@Before
 	public void before(TestContext ctx) {
-		vertx = Vertx.vertx();
+		vertx = runTestOnContext.vertx();
 		vertx.exceptionHandler(ctx.exceptionHandler());
 	}
 
