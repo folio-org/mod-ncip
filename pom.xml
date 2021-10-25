@@ -15,7 +15,7 @@
 	</licenses>
 
 	<properties>
-		<vertx.version>3.8.0</vertx.version>
+		<vertx.version>3.9.9</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
@@ -104,7 +104,6 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web</artifactId>
-			<version>3.8.0</version>
 		</dependency>
 
 		<dependency>
@@ -142,36 +141,39 @@
 
 		<!-- Test dependencies -->
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.7</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-core</artifactId>
 			<version>1.3</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>3.1.0</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-unit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>3.1.1</version>
+			<version>4.4.0</version>
+			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.jayway.restassured/xml-path -->
 		<dependency>
 			<groupId>com.jayway.restassured</groupId>
 			<artifactId>xml-path</artifactId>
 			<version>2.9.0</version>
+			<scope>test</scope>
 		</dependency>
 
 
@@ -280,6 +282,19 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<configuration>
+					<includes>
+						<include>**/*Test.java</include>
+						<include>**/*Tests.java</include>
+						<include>**/*Suite.java</include>
+					</includes>
+				</configuration>
 			</plugin>
 
 			<plugin>

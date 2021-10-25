@@ -2,7 +2,6 @@ package org.folio.ncip;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
@@ -26,9 +25,6 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
@@ -53,25 +49,17 @@ public class FolioNcipHelper {
 	protected Properties defaultToolkitObjects = new Properties();
 
 	public FolioNcipHelper(Promise<Void> promise) {
-		Future<Void> steps = initToolkitDefaults();
-			steps.setHandler(ar -> {
-			if (ar.succeeded()) {
-				promise.complete();
-			} else {
-				promise.fail(ar.cause());
-			}
-		});
+		initToolkitDefaults().onComplete(promise);
 	}
 
 	/*
-	 * 
+	 *
 	 * When the module starts, default config. values for the NCIP toolkit are loaded. When
 	 * ncip requests are made, the module will check for updated
 	 * configurations using mod-configuration.
-	 * 
+	 *
 	 */
 	private Future<Void> initToolkitDefaults() {
-		Promise<Void> promise = Promise.promise();
 
 		try {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
@@ -80,23 +68,21 @@ public class FolioNcipHelper {
 			properties.load(inputStream);
 
 			if (properties.isEmpty()) {
-				promise.fail("Unable to initialize the default toolkit properties.");
+				return Future.failedFuture("Unable to initialize the default toolkit properties.");
 			}
 
 			defaultToolkitObjects.put("toolkit", properties);
 			defaultToolkitObjects.put("servicecontext",
 					ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
 			defaultToolkitObjects.put("translator", TranslatorFactory.buildTranslator(null, properties));
-			return promise.future();
+			return Future.succeededFuture();
 		} catch (Exception e) {
 			logger.fatal(Constants.UNABLE_TO_INIT_TOOLKIT);
 			logger.fatal(e.getLocalizedMessage());
-			promise.fail(Constants.UNABLE_TO_INIT_TOOLKIT);
+			return Future.failedFuture(Constants.UNABLE_TO_INIT_TOOLKIT);
 		}
-		return promise.future();
-
 	}
-	
+
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
 
 		logger.info("ncip process called...");
@@ -130,7 +116,7 @@ public class FolioNcipHelper {
 				logger.info("Unable to initialize NCIP properties with mod-configuration.");
 				logger.info(e.getLocalizedMessage());
 			}
-			
+
 		InputStream stream = new ByteArrayInputStream(context.getBodyAsString().getBytes(StandardCharsets.UTF_8));
 		NCIPInitiationData initiationData = null;
 		InputStream responseMsgInputStream = null;
@@ -166,7 +152,7 @@ public class FolioNcipHelper {
 	/**
 	 * XC NCIP Toolkit properties initialized for each tenant using
 	 * mod-configuration
-	 * 
+	 *
 	 * @throws Exception
 	 *
 	 */
@@ -189,7 +175,7 @@ public class FolioNcipHelper {
 				logger.info("No toolkit configurations found.  Using defaults.  QUERY:" + configEndpoint);
 				return;
 			}
-			
+
 			Iterator configsIterator = configs.iterator();
 			while (configsIterator.hasNext()) {
 				JsonObject config = (JsonObject) configsIterator.next();
@@ -216,14 +202,14 @@ public class FolioNcipHelper {
 	 * initialized for each tenant In the future, properties could be configured in
 	 * settings? They don't typically change frequently...so maybe mod-configuration
 	 * file is fine.
-	 * 
+	 *
 	 * @throws Exception
 	 *
 	 */
 	public void initNcipProperties(RoutingContext context) throws Exception {
 
 			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-	
+
 			// THE NCIP PROPERTY FILE CONTAINS A LIST OF PROPERTIES
 			// THAT NEED TO BE INITIALIZED
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
@@ -275,7 +261,7 @@ public class FolioNcipHelper {
 							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
 				}
 			}
-			
+
 			try {
 				logger.info("=======> initializing address types");
 				String addressTypesEndpoint =  okapiBaseEndpoint + Constants.ADDRESS_TYPES ;
@@ -293,9 +279,9 @@ public class FolioNcipHelper {
 				logger.fatal("Unable to initialize address types.");
 				logger.fatal(e.getLocalizedMessage());
 			}
-			
+
 			ncipProperties.put(tenant, properties);
-		
+
 	}
 
 
@@ -343,12 +329,12 @@ public class FolioNcipHelper {
 			HttpEntity entity = response.getEntity();
 			responseString = EntityUtils.toString(entity, "UTF-8");
 			int responseCode = response.getStatusLine().getStatusCode();
-	
+
 			logger.info("GET:");
 			logger.info(uriString);
 			logger.info(responseCode);
 			logger.info(responseString);
-	
+
 			if (responseCode > 399) {
 				String responseBody = processErrorResponse(responseString);
 				throw new Exception(responseBody);
