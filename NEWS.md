@@ -1,3 +1,5 @@
+## 1.8.1 2021-12-17
+ * [MODNCIP-35](https://issues.folio.org/browse/MODNCIP-35) - Juniper R2 2021 - Log4j vulnerability verification and correction
 ## 1.8.0 2021-06-15
  * [MODNCIP-21](https://issues.folio.org/browse/MODNCIP-21) - Update circulation interface dependency to support v11
 ## 1.7.0 2021-03-17
