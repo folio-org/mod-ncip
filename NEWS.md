@@ -1,4 +1,4 @@
-## 1.9.0 2021-10-11
+## 1.9.1 2021-12-17
  * [MODNCIP-23](https://issues.folio.org/browse/MODNCIP-34) - Kiwi R3 2021 - Log4j vulnerability verification and correction
 ## 1.9.0 2021-10-11
  * [MODNCIP-23](https://issues.folio.org/browse/MODNCIP-23) - align dependency versions affected by Inventory's Optimistic Locking
