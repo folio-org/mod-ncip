@@ -60,9 +60,9 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		JsonObject jsonObject = new JsonObject(response);
 		JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 		if (configs.size() < 1) {
-			logger.info("No toolkit configurations found.  Using defaults.  QUERY:" + configEndpoint);
+			logger.info("No NICP configurations found.  Using defaults.  QUERY:" + configEndpoint);
 			throw new Exception(
-					"No NCP configurations found in mod-configuration");
+					"No NICP configurations found in mod-configuration");
 		}
 		
 		Iterator configsIterator = configs.iterator();
