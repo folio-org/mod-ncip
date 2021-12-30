@@ -496,6 +496,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String uid = user.getString("id");
 			request.put("requesterId", uid);
 			request.put("itemId", itemUuid.toString());
+			request.put("instanceId", holdings.getString("instanceId"));
+			request.put("requestLevel", "Item");
+			request.put("holdingsRecordId", holdingsUuid.toString());
 			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
