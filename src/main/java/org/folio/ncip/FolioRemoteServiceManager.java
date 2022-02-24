@@ -267,7 +267,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called.");
 		}
 
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
+		DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 		LocalDateTime now = LocalDateTime.now();
 		String returnDate = dtf.format(now);
 
@@ -501,7 +501,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put("holdingsRecordId", holdingsUuid.toString());
 			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
+			DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 			LocalDateTime now = LocalDateTime.now();
 			request.put("requestDate", dtf.format(now));
 
