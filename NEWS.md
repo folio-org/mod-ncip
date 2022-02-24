@@ -1,5 +1,6 @@
 ## 1.10.0 2022-02-24
  * [MODNCIP-33](https://issues.folio.org/browse/MODNCIP-33) - Adapt mod-ncip to the request schema changes
+ * [MODNCIP-37](https://issues.folio.org/browse/MODNCIP-37) - Support circulation interface v13
 ## 1.9.0 2021-10-11
  * [MODNCIP-23](https://issues.folio.org/browse/MODNCIP-23) - align dependency versions affected by Inventory's Optimistic Locking
 ## 1.8.0 2021-06-15
