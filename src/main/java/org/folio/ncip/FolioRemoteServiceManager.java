@@ -41,6 +41,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class FolioRemoteServiceManager implements RemoteServiceManager {
 
@@ -268,7 +269,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 
 		DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-		LocalDateTime now = LocalDateTime.now();
+		ZonedDateTime now = ZonedDateTime.now();
 		String returnDate = dtf.format(now);
 
 		String itemBarcode = initData.getItemId().getItemIdentifierValue();
@@ -502,7 +503,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
 			DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-			LocalDateTime now = LocalDateTime.now();
+			ZonedDateTime now = ZonedDateTime.now();
 			request.put("requestDate", dtf.format(now));
 
 			url = baseUrl + Constants.REQUEST_URL;
