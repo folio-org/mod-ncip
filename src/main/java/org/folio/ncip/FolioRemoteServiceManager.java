@@ -41,6 +41,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class FolioRemoteServiceManager implements RemoteServiceManager {
 
@@ -267,8 +268,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					"NCIP Properties have not been initialized.  These properties (e.g. checkin.service.point.code) have to be set in mod-configuration so the Checkin Item service service can be called.");
 		}
 
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
-		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+		ZonedDateTime now = ZonedDateTime.now();
 		String returnDate = dtf.format(now);
 
 		String itemBarcode = initData.getItemId().getItemIdentifierValue();
@@ -501,8 +502,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put("holdingsRecordId", holdingsUuid.toString());
 			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
-			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+			ZonedDateTime now = ZonedDateTime.now();
 			request.put("requestDate", dtf.format(now));
 
 			url = baseUrl + Constants.REQUEST_URL;
