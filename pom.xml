@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.folio</groupId>
 	<artifactId>mod-ncip</artifactId>
-	<version>1.11.0-SNAPSHOT</version>
+	<version>1.11.1-SNAPSHOT</version>
 	<name>NCIP</name>
 	<description>NCIP responder for FOLIO (internal module)</description>
 
@@ -15,7 +15,7 @@
 	</licenses>
 
 	<properties>
-		<vertx.version>3.9.9</vertx.version>
+		<vertx.version>4.1.1</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
