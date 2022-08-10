@@ -23,7 +23,7 @@ For the purposes of this form, "store" includes the following:
   - [ ] Log level WARNING includes PD
   - [ ] Log level INFO includes PD
   - [ ] Log level DEBUG includes PD
-- [ ] This module transmits PD (including queues, additional databases, etc.)
+- [x] This module transmits PD (including queues, additional databases, etc.)
 
 ---
 
