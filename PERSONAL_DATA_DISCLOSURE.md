@@ -18,7 +18,7 @@ For the purposes of this form, "store" includes the following:
 - [ ] This module provides [custom fields](https://github.com/folio-org/folio-custom-fields).
 - [ ] This module stores fields with free-form text (tags, notes, descriptions, etc.)
 - [ ] This module caches PD
-- [ ] This module logs PD
+- [x] This module logs PD
   - [ ] Log level ERROR includes PD
   - [ ] Log level WARNING includes PD
   - [ ] Log level INFO includes PD
@@ -38,25 +38,28 @@ For the purposes of this form, "store" includes the following:
 
 Information can be combined with others to form a person’s identity.
 
-- [ ] First name
-- [ ] Last name
+- [x] First name
+- [x] Last name
 - [ ] Gender
 - [ ] Date of birth
 - [ ] Place of birth
 - [ ] Racial or ethnic origin
-- [ ] Address
+- [x] Address
 - [ ] Location information
 - [ ] Geolocation data
-- [ ] Phone number(s)
+- [x] Phone number(s)
 - [ ] Pseudonym / Alias / Nickname
-- [ ] Username / User Identifier (UUID)
-- [ ] Email address
+- [x] Username / User Identifier (UUID)
+- [x] Email address
 - [ ] Financial information / Fees or Fines
-- [ ] Circulation transaction(s)
+- [x] Circulation transaction(s)
 - [ ] Web cookies
 - [ ] IP address / MAC address
 - [ ] Photographs of users (profile picture)
-<!--- - [ ] Other PD - Please list as needed -->
+- [x] Other PD
+  * User status (blocked or okay)
+  * Patron group
+  * Patron service point preference
 
 **NOTE** This is not intended to be a comprehensive list, but instead provide a starting point for module developers/maintainers to use.
 
