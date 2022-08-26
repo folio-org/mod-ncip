@@ -41,39 +41,45 @@
 		</dependency>
 		<!--ncip toolkit dependencies start -->
 		<dependency>
-			<groupId>net.sf.dozer</groupId>
-			<artifactId>dozer</artifactId>
-			<version>5.5.1</version>
-		</dependency>
+                     <groupId>net.sf.dozer</groupId>
+                     <artifactId>dozer</artifactId>
+                     <version>5.3.2</version>
+                     <exclusions>
+                        <exclusion>
+                          <groupId>commons-beanutils</groupId>
+                          <artifactId>commons-beanutils</artifactId>
+                        </exclusion>
+                     </exclusions>
+                </dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.2.4-1</version>
+			<version>2.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-jar</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154735-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ilsdiv1_0_bc</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154744-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ncipv2_01</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154739-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ilsdiv1_0</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154742-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ncipv2_02</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154740-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
@@ -83,17 +89,12 @@
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>common</artifactId>
-			<version>2.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.extensiblecatalog.ncip.v2</groupId>
-			<artifactId>responder</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154735-5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>service</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-20220826.154735-5</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
