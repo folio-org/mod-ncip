@@ -1,0 +1,19 @@
+{
+  "id" : "8b3d8d4b-5c4b-48a3-b375-65c5128f221e",
+  "formerIds" : [ ],
+  "instanceId" : "637fb781-14b2-4d8f-9515-fe913efd5c66",
+  "electronicAccess" : [ ],
+  "notes" : [ ],
+  "holdingsStatements" : [ ],
+  "holdingsStatementsForIndexes" : [ ],
+  "holdingsStatementsForSupplements" : [ ],
+  "discoverySuppress" : true,
+  "statisticalCodeIds" : [ ],
+  "holdingsItems" : [ ],
+  "metadata" : {
+    "createdDate" : "2019-09-20T15:31:45.885+0000",
+    "createdByUserId" : "99999999-9999-9999-9999-999999999901",
+    "updatedDate" : "2019-09-20T15:31:45.885+0000",
+    "updatedByUserId" : "99999999-9999-9999-9999-999999999901"
+  }
+}

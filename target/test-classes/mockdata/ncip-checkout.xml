@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NCIPMessage v:version="5.6" xmlns:v="http://www.niso.org/2008/ncip" xmlns="http://www.niso.org/2008/ncip" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.niso.org/2008/ncip http://www.niso.org/schemas/ncip/v2_0/ncip_v2_0.xsd ">
+  <CheckOutItem>
+    <InitiationHeader>
+      <FromAgencyId>
+        <AgencyId>Relais</AgencyId>
+      </FromAgencyId>
+      <ToAgencyId>
+        <AgencyId>Lehigh University</AgencyId>
+      </ToAgencyId>
+    </InitiationHeader> 
+    <UserId>
+      <AgencyId>LEHI</AgencyId>
+      <UserIdentifierValue>8377630</UserIdentifierValue>
+    </UserId>
+    <ItemId>
+      <AgencyId>LEHI</AgencyId> 
+      <ItemIdentifierValue>LEH-20191003225</ItemIdentifierValue>
+    </ItemId>
+  </CheckOutItem>
+</NCIPMessage>
