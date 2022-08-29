@@ -1,3 +1,5 @@
+## 1.11.1 2022-08-29
+ * [MODNCIP-39](https://issues.folio.org/browse/MODNCIP-39) - Dependency vulnerabilities
 ## 1.11.0 2022-06-24
  * [MODNCIP-40](https://issues.folio.org/browse/MODNCIP-40) - mod-ncip - Morning Glory 2022 R2 - Vert.x 3.9.9/v4 upgrade
 ## 1.10.0 2022-02-24
