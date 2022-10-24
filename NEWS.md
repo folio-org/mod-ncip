@@ -1,3 +1,5 @@
+## 1.12.0 2022-10-24
+ * [MODNCIP-44](https://issues.folio.org/browse/MODNCIP-44) - Support inventory 12.0 in ModuleDescriptor "requires"
 ## 1.11.1 2022-08-29
  * [MODNCIP-39](https://issues.folio.org/browse/MODNCIP-39) - Dependency vulnerabilities
 ## 1.11.0 2022-06-24
