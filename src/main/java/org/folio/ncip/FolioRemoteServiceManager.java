@@ -738,10 +738,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	 *
 	 */
 	public JsonObject lookupPatronRecord(UserId userid) throws Exception {
-		String barcode = userid.getUserIdentifierValue();
+		//String barcode = userid.getUserIdentifierValue();
+		String userIdentifier = userid.getUserIdentifierValue();
 		// LOOKUP THE PATRON
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String userApiUri = baseUrl + "/users?query=(barcode==" + barcode + ")&limit=1";
+		//String userApiUri = baseUrl + "/users?query=(barcode==" + barcode + ")&limit=1";
+		String userApiUri = baseUrl + "/users?query=(barcode==" + userIdentifier + " or username==" + userIdentifier + " or externalSystemId==" + userIdentifier)&limit=1";
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
