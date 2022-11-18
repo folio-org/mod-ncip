@@ -744,7 +744,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		//CHANGE - LOOKUP THE USER IDENTIFIER IN MULTIPLE FIELDS INSTEAD OF BARCODE:
 		//String userApiUri = baseUrl + "/users?query=(barcode==" + barcode + ")&limit=1";
-		String userApiUri = baseUrl + "/users?query=(barcode==" + userIdentifier + " or username==" + userIdentifier + " or externalSystemId==" + userIdentifier)&limit=1";
+		String userApiUri = baseUrl + "/users?query=(barcode==" + userIdentifier + " or username==" + userIdentifier + " or externalSystemId==" + userIdentifier + ")&limit=1";
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
