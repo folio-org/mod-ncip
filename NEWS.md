@@ -1,3 +1,5 @@
+## 1.10.1 2022-11-22
+ * [MODNCIP-50](https://issues.folio.org/browse/MODNCIP-50) - support additional fields for user search
 ## 1.10.0 2022-02-24
  * [MODNCIP-33](https://issues.folio.org/browse/MODNCIP-33) - Adapt mod-ncip to the request schema changes
  * [MODNCIP-37](https://issues.folio.org/browse/MODNCIP-37) - Support circulation interface v13
