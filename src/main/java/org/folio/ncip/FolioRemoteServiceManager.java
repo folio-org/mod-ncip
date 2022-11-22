@@ -346,7 +346,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String servicePoint = ncipProperties.getProperty(agencyId + ".checkout.service.point.id");
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.put("itemBarcode", itemBarcode);
-		jsonObject.put("userBarcode", user.getString("id"));
+		jsonObject.put("userBarcode", user.getString("barcode"));
 		jsonObject.put("id", id.toString());
 		//jsonObject.put("loanDate", loanDate); //use default - current date/time
 		jsonObject.put("servicePointId", servicePoint);
