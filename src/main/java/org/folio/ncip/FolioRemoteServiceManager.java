@@ -311,8 +311,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		LocalDateTime now = LocalDateTime.now();
 		String loanDate = dtf.format(now);
 		String itemBarcode = initData.getItemId().getItemIdentifierValue();
-		String userBarcode = initData.getUserId().getUserIdentifierValue();
-
+		
 		// LOOKUP USER & CHECK FOR BLOCKS
 		// ADDED BECAUSE THE CHECKOUT API DOES NOT LOOK FOR 'BLOCKS'
 		// **THIS CAN BE REMOVED WHEN UXPROD-1683 IS COMPLETED**
