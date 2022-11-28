@@ -453,7 +453,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			JsonObject holdings = new JsonObject();
 			String holdingsPermLocation = ncipProperties.getProperty(requesterAgencyId + ".holdings.perm.location.id");
 			holdings.put("id", holdingsUuid.toString());
-			holdings.put("sourceId", ncipProperties.get(requesterAgencyId + ".holdings.source"));
+			holdings.put("sourceId", ncipProperties.get(requesterAgencyId + ".holdings.source.id"));
 			holdings.put("instanceId", instanceUuid.toString());
 			holdings.put("discoverySuppress", true);
 			// REQUIRED, ELSE IT WILL NOT SHOW UP IN INVENTORY SEARCH BY LOCA.
