@@ -671,6 +671,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 				String lookupValue = ncipProperties.getProperty(requesterAgencyId + "." + lookup);
 				
+				//IF THERE IS A DEFAULT VALUE FOR THE TENANT USE IT
+				if (lookupValue == null) lookupValue = ncipProperties.getProperty(lookup);
+				
 				if (lookupValue == null) throw new Exception("configuration value missing for " + requesterAgencyId + "." + lookup);
 
 				logger.info("Initializing ");
