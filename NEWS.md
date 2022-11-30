@@ -1,3 +1,6 @@
+## 1.12.1 2022-11-22
+ * [MODNCIP-50](https://issues.folio.org/browse/MODNCIP-50) - Create holdings record with holdings source ID
+ * [MODNCIP-47](https://issues.folio.org/browse/MODNCIP-47) - support additional fields for user search
 ## 1.12.0 2022-10-24
  * [MODNCIP-44](https://issues.folio.org/browse/MODNCIP-44) - Support inventory 12.0 in ModuleDescriptor "requires"
 ## 1.11.1 2022-08-29
