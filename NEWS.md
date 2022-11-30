@@ -1,3 +1,5 @@
+## 1.11.2 2022-11-30
+ * [MODNCIP-50](https://issues.folio.org/browse/MODNCIP-50) - support additional fields for user search
 ## 1.11.1 2022-08-29
  * [MODNCIP-39](https://issues.folio.org/browse/MODNCIP-39) - Dependency vulnerabilities
 ## 1.11.0 2022-06-24
