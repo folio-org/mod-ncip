@@ -573,7 +573,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/manualblocks?query=(userId=" + userId + ")&limit=100",
+				baseUrl + "/manualblocks?query=(userId==" + userId + ")&limit=100",
 				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/groups/" + groupId,
 				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
