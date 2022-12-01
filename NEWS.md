@@ -1,6 +1,8 @@
+## 1.12.2 2022-12-01
+ * [MODNCIP-46](https://issues.folio.org/browse/MODNCIP-46) - Replace slf4j-log4j12 by log4j-slf4j-impl fixing vulns
 ## 1.12.1 2022-11-22
- * [MODNCIP-50](https://issues.folio.org/browse/MODNCIP-50) - Create holdings record with holdings source ID
- * [MODNCIP-47](https://issues.folio.org/browse/MODNCIP-47) - support additional fields for user search
+ * [MODNCIP-47](https://issues.folio.org/browse/MODNCIP-47) - Create holdings record with holdings source ID
+ * [MODNCIP-50](https://issues.folio.org/browse/MODNCIP-50) - support additional fields for user search
 ## 1.12.0 2022-10-24
  * [MODNCIP-44](https://issues.folio.org/browse/MODNCIP-44) - Support inventory 12.0 in ModuleDescriptor "requires"
 ## 1.11.1 2022-08-29
