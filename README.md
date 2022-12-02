@@ -41,6 +41,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * (11) response.includes.physical.address (optional - will default to false. For LookupUser response)
     * (12) user.priv.ok.status (optional - will default to "ACTIVE")
     * (13) user.priv.blocked.status (optional - will default to "BLOCKED")
+    * (14) holdings.source.name (optional - will default to "FOLIO")
 
 Notes 
 * You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
