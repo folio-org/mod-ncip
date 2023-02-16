@@ -417,8 +417,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
-		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + "+AND+pickupLocation==true";
-		String pickupLocationUrl = baseUrl + "/service-points?query=" + query;
+		String pickupLocationUrl = baseUrl + "/service-points?query=(code==" + URLEncoder.encode(pickUpLocationCode)
+						+ "+AND+pickupLocation==true)";
 		String servicePointResponse = callApiGet(pickupLocationUrl);
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
