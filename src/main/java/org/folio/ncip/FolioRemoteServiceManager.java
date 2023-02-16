@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.folio.util.StringUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -416,9 +417,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
-		String pickuLocationUrl = baseUrl + "/service-points?query=(code==" + URLEncoder.encode(pickUpLocationCode)
-				+ "+AND+pickupLocation==true)";
-		String servicePointResponse = callApiGet(pickuLocationUrl);
+		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + "+AND+pickupLocation==true";
+		String pickupLocationUrl = baseUrl + "/service-points?query=" + StringUtil.urlEncode(query);
+		String servicePointResponse = callApiGet(pickupLocationUrl);
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
 			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
@@ -573,10 +574,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/manualblocks?query=(userId==" + userId + ")&limit=100",
+				baseUrl + "/manualblocks?query=" + StringUtil.urlEncode("(userId==" + StringUtil.cqlEncode(userId) + ")&limit=100"),
 				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/groups/" + groupId,
-				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
+				baseUrl + "/service-points-users?query=" + StringUtil.urlEncode("(userId==" + StringUtil.cqlEncode(userId) + ")&limit=700"));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
@@ -745,6 +746,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String userIdentifier = userid.getUserIdentifierValue();
 		// LOOKUP THE PATRON
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+		userIdentifier = StringUtil.cqlEncode(userIdentifier);
 		StringBuilder query = new StringBuilder()
 		          .append("(barcode==")
 		          .append(userIdentifier)
@@ -753,7 +755,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		          .append(" or username==")
 		          .append(userIdentifier)
 		          .append(')');
-		String userApiUri = baseUrl + "/users?query="  + URLEncoder.encode(query.toString(),StandardCharsets.UTF_8);
+		String userApiUri = baseUrl + "/users?query="  + StringUtil.urlEncode(query.toString());
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
@@ -772,8 +774,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	 */
 	public JsonObject lookupPatronRecordBy(String type, String value) throws Exception {
 		// LOOKUP THE PATRON
+		type = StringUtil.cqlEncode(type);
+		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String userApiUri = baseUrl + "/users?query=(" + type + "==" + value + ")&limit=1";
+		String query = "(" + type + "==" + value + "&limit=1";
+		String userApiUri = baseUrl + "/users?query=" + StringUtil.urlEncode(query);
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?

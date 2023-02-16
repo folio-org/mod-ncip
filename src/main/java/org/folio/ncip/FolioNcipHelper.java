@@ -25,6 +25,8 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
+import org.folio.util.StringUtil;
+
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
@@ -163,7 +165,8 @@ public class FolioNcipHelper {
 			// DO THE TOOLKIT PROPERTIES EXIST IN MOD-CONFIGURATION?
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=configName=toolkit&limit=200";
+			String query = "configName=toolkit&limit=200";
+			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=" + StringUtil.urlEncode(query);
 			// GET THE EXISTING PROPERTIES FOR THE TOOLKIT
 			// AND JUST OVERWRITE ANY THAT HAVE BEEN SET IN MOD-CONFIGURATION
 			Properties properties = (Properties) toolkitProperties.get(tenant);
@@ -215,7 +218,8 @@ public class FolioNcipHelper {
 			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
-			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=code=";
+			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=";
+
 			Properties properties = new Properties();
 			// LOOK FOR EACH PROPERTY:
 			while (reader.ready()) {
@@ -228,7 +232,10 @@ public class FolioNcipHelper {
 				// IF THE CONFIG DOES NOT EXIST IN MOD-CONFIGURATION,
 				// THROW AN EXCEPTION.
 				try {
-					String response = callApiGet(configEndpoint + parts[0] + "&limit=200", context.request().headers());
+					String configCode = parts[0];
+					String query = "code==" + StringUtil.cqlEncode(configCode);
+					String url = configEndpoint + StringUtil.urlEncode(query);
+					String response = callApiGet(url + "&limit=200", context.request().headers());
 					JsonObject jsonObject = new JsonObject(response);
 					JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 					if (configs.size() < 1 && parts.length == 2) {
@@ -288,10 +295,13 @@ public class FolioNcipHelper {
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
 		String returnValue = null;
 		String okapiBaseEndpoint = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + URLEncoder.encode(code) + ")";
+		//String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + URLEncoder.encode(code) + ")";
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=";
 
 		try {
-			String response = callApiGet(configEndpoint, okapiHeaders);
+			String query = "code==" + StringUtil.cqlEncode(code);
+			String url = configEndpoint + StringUtil.urlEncode(query);
+			String response = callApiGet(url, okapiHeaders);
 			JsonObject jsonObject = new JsonObject(response);
 			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 			if (configs.size() < 1) {

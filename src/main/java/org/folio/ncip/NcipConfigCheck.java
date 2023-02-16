@@ -14,6 +14,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.folio.util.StringUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -54,8 +55,8 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		
 		
 		String okapiBaseEndpoint = routingContext.request().getHeader(Constants.X_OKAPI_URL);
-		String conifgQuery = URLEncoder.encode("(module==NCIP and configName<>rules and configName<>toolkit)");
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=query=" + conifgQuery + "&limit=200";
+		String configQuery = URLEncoder.encode("(module==NCIP and configName<>rules and configName<>toolkit)");
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=query=" + StringUtil.urlEncode(configQuery) + "&limit=200";
 		String response = callApiGet(configEndpoint, routingContext.request().headers());
 		JsonObject jsonObject = new JsonObject(response);
 		JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);

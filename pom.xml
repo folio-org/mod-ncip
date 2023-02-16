@@ -143,6 +143,11 @@
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>1.7.36</version>
 		</dependency>
+		<dependency>
+			<groupId>org.folio</groupId>
+			<artifactId>util</artifactId>
+			<version>35.0.6</version>
+		</dependency>
 
 
 		<!-- Test dependencies -->
