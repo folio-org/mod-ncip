@@ -574,10 +574,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/manualblocks?query=" + StringUtil.urlEncode("userId=" + StringUtil.cqlEncode(userId) + "&limit=100"),
+				baseUrl + "/manualblocks?query=" + StringUtil.urlEncode("userId==" + StringUtil.cqlEncode(userId)),
 				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/groups/" + groupId,
-				baseUrl + "/service-points-users?query=" + StringUtil.urlEncode("userId=" + StringUtil.cqlEncode(userId) + "&limit=700"));
+				baseUrl + "/service-points-users?query=" + StringUtil.urlEncode("userId==" + StringUtil.cqlEncode(userId)));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
