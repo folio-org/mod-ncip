@@ -417,8 +417,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
-		String pickupLocationUrl = baseUrl + "/service-points?query=(code==" + URLEncoder.encode(pickUpLocationCode)
-						+ "+AND+pickupLocation==true)";
+		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + " AND pickupLocation==true";
+		String pickupLocationUrl = baseUrl + "/service-points?query=" + StringUtil.urlEncode(query);
 		String servicePointResponse = callApiGet(pickupLocationUrl);
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
@@ -574,10 +574,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/manualblocks?query=(userId==" + userId + ")&limit=100",
+				baseUrl + "/manualblocks?query=" + StringUtil.urlEncode("userId==" + StringUtil.cqlEncode(userId) + "&limit=100"),
 				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/groups/" + groupId,
-				baseUrl + "/service-points-users?query=(userId==" + userId + ")&limit=700");
+				baseUrl + "/service-points-users?query=" + StringUtil.urlEncode("userId==" + StringUtil.cqlEncode(userId) + "&limit=700"));
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
