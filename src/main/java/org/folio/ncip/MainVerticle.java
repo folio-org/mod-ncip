@@ -2,6 +2,7 @@ package org.folio.ncip;
 
 
 import org.apache.log4j.Logger;
+import org.folio.okapi.common.logging.FolioLoggingContext;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.AbstractVerticle;
@@ -85,6 +86,8 @@ public class MainVerticle extends AbstractVerticle {
 
 	protected void handleNcip(RoutingContext ctx) {
 
+	    FolioLoggingContext.put(FolioLoggingContext.MODULE_ID_LOGGING_VAR_NAME,"mod-ncip");
+	    
 		vertx.executeBlocking(promise -> {
 			try (InputStream responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
 					Scanner scanner = new Scanner(responseMsgInputStream,"UTF-8").useDelimiter("\\A")) {
