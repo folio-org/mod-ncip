@@ -296,26 +296,26 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<executions>
-					<execution>
-						id>set-system-properties</id>
-						<goals>
-							<goal>set-system-properties</goal>
-						</goals>
-						<configuration>
-							<properties>
-								<property>
-									<name>log4j.configurationFile</name>
-									<value>${project.baseUri}src/main/resources/log4j2.properties</value>
-								</property>
-							</properties>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>properties-maven-plugin</artifactId>
+		        <version>1.0.0</version>
+		        <executions>
+		          <execution>
+		            <id>set-system-properties</id>
+		            <goals>
+		              <goal>set-system-properties</goal>
+		            </goals>
+		            <configuration>
+		              <properties>
+		                <property>
+		                  <name>log4j.configurationFile</name>
+		                  <value>${project.baseUri}src/main/resources/log4j2.properties</value>
+		                </property>
+		              </properties>
+		            </configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
