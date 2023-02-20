@@ -17,7 +17,8 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
@@ -47,7 +48,10 @@ import java.time.ZonedDateTime;
 
 public class FolioRemoteServiceManager implements RemoteServiceManager {
 
-	private static final Logger logger = Logger.getLogger(FolioRemoteServiceManager.class);
+		
+	private static final Logger logger = LogManager.getLogger(FolioRemoteServiceManager.class);
+	
+	
 	private MultiMap okapiHeaders;
 	private Properties ncipProperties;
 

@@ -17,7 +17,8 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.common.MappedMessageHandler;
 import org.extensiblecatalog.ncip.v2.common.MessageHandlerFactory;
 import org.extensiblecatalog.ncip.v2.common.ServiceValidatorFactory;
@@ -36,7 +37,8 @@ import io.vertx.ext.web.RoutingContext;
 
 public class FolioNcipHelper {
 
-	private static final Logger logger = Logger.getLogger(FolioNcipHelper.class);
+	private static final Logger logger = LogManager.getLogger(FolioRemoteServiceManager.class);
+	
 	// INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext
 	// serviceContext PER TENANT
 	protected Properties serviceContext = new Properties();
