@@ -2,7 +2,8 @@ package org.folio.ncip;
 
 
 import org.apache.log4j.Logger;
-import org.folio.okapi.common.logging.FolioLoggingContext;
+import org.slf4j.MDC;
+
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.AbstractVerticle;
@@ -14,6 +15,9 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.core.Promise;
 import java.io.InputStream;
 import java.util.Scanner;
+
+import org.folio.okapi.common.XOkapiHeaders;
+import org.folio.okapi.common.logging.FolioLoggingContext;
 
 import static org.folio.ncip.Constants.SYS_PORT;
 import static org.folio.ncip.Constants.DEFAULT_PORT;
