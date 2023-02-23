@@ -575,14 +575,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String groupId = user.getString("patronGroup");
-		final String userIdQuery = "query=" + PercentCodec.encode("userId==" + StringUtil.cqlEncode(userId));
+		final String userIdQuery = "query=(" + PercentCodec.encode("userId==" + StringUtil.cqlEncode(userId) + ")");
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/manualblocks?query=" + userIdQuery,
+				baseUrl + "/manualblocks?query=" + userIdQuery + "&limit=100",
 				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/groups/" + groupId,
-				baseUrl + "/service-points-users?query=" + userIdQuery);
+				baseUrl + "/service-points-users?query=" + userIdQuery + "&limit=700");
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
