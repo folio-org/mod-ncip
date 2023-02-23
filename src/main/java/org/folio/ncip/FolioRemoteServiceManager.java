@@ -779,7 +779,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	 */
 	public JsonObject lookupPatronRecordBy(String type, String value) throws Exception {
 		// LOOKUP THE PATRON
-		type = StringUtil.cqlEncode(type);
+		List<String> validTypes = Arrays.asList("barcode","externalsystemid","username");
+		boolean isValidType = validTypes.stream().anyMatch(type::contains);
+		if (!isValidType) {
+			throw new Exception("invalid patron lookup type provided: " + type);
+		}
 		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String query = "(" + type + "==" + value + "&limit=1";
