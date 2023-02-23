@@ -90,11 +90,11 @@ public class FolioNcipHelper {
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
 
 		logger.info("ncip process called...");
-		logger.info("=====okapi headers================");
-		for (Map.Entry<String, String> entry : context.request().headers().entries()) {
-			logger.info(entry.getKey() + "-" + entry.getValue());
-		}
-		logger.info("==============================");
+		//logger.info("=====okapi headers================");
+		//for (Map.Entry<String, String> entry : context.request().headers().entries()) {
+		//	logger.info(entry.getKey() + "-" + entry.getValue());
+		//}
+		//logger.info("==============================");
 		logger.info("==========BODY===============");
 		logger.info(context.getBodyAsString());
 
