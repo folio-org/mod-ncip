@@ -37,7 +37,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class FolioNcipHelper {
 
-	private static final Logger logger = LogManager.getLogger(FolioRemoteServiceManager.class);
+	private static final Logger logger = LogManager.getLogger(FolioNcipHelper.class);
 	
 	// INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext
 	// serviceContext PER TENANT
