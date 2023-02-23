@@ -27,7 +27,7 @@ import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
 import org.folio.util.StringUtil;
-
+import org.folio.util.PercentCodec;
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
@@ -167,8 +167,7 @@ public class FolioNcipHelper {
 			// DO THE TOOLKIT PROPERTIES EXIST IN MOD-CONFIGURATION?
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-			String query = "configName=toolkit&limit=200";
-			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=" + StringUtil.urlEncode(query);
+			String configEndpoint = okapiBaseEndpoint + "/configurations/entries" + "?query=" + PercentCodec.encode("configName=toolkit") + "&limit=200";
 			// GET THE EXISTING PROPERTIES FOR THE TOOLKIT
 			// AND JUST OVERWRITE ANY THAT HAVE BEEN SET IN MOD-CONFIGURATION
 			Properties properties = (Properties) toolkitProperties.get(tenant);
@@ -236,7 +235,7 @@ public class FolioNcipHelper {
 				try {
 					String configCode = parts[0];
 					String query = "code==" + StringUtil.cqlEncode(configCode);
-					String url = configEndpoint + StringUtil.urlEncode(query);
+					String url = configEndpoint + PercentCodec.encode(query);
 					String response = callApiGet(url + "&limit=200", context.request().headers());
 					JsonObject jsonObject = new JsonObject(response);
 					JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
@@ -302,7 +301,7 @@ public class FolioNcipHelper {
 
 		try {
 			String query = "code==" + StringUtil.cqlEncode(code);
-			String url = configEndpoint + StringUtil.urlEncode(query);
+			String url = configEndpoint + PercentCodec.encode(query);
 			String response = callApiGet(url, okapiHeaders);
 			JsonObject jsonObject = new JsonObject(response);
 			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);

@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
+import org.folio.util.PercentCodec;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -422,7 +423,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
 		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + " AND pickupLocation==true";
-		String pickupLocationUrl = baseUrl + "/service-points?query=" + StringUtil.urlEncode(query);
+		String pickupLocationUrl = baseUrl + "/service-points?query=" + PercentCodec.encode(query);
 		String servicePointResponse = callApiGet(pickupLocationUrl);
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
@@ -574,14 +575,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String groupId = user.getString("patronGroup");
-		// HttpClient client = HttpClient.newBuilder().build();
+		final String userIdQuery = "query=" + PercentCodec.encode("userId==" + StringUtil.cqlEncode(userId));
 		final long LONG_DELAY_MS = 10000;
 
 		List<String> apiCallsNeeded = Arrays.asList(
-				baseUrl + "/manualblocks?query=" + StringUtil.urlEncode("userId==" + StringUtil.cqlEncode(userId)),
+				baseUrl + "/manualblocks?query=" + userIdQuery,
 				baseUrl + "/automated-patron-blocks/" + userId,
 				baseUrl + "/groups/" + groupId,
-				baseUrl + "/service-points-users?query=" + StringUtil.urlEncode("userId==" + StringUtil.cqlEncode(userId)));
+				baseUrl + "/service-points-users?query=" + userIdQuery);
 
 		ExecutorService executor = Executors.newFixedThreadPool(6);
 		CompletionService<String> cs = new ExecutorCompletionService<>(executor);
@@ -759,7 +760,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		          .append(" or username==")
 		          .append(userIdentifier)
 		          .append(')');
-		String userApiUri = baseUrl + "/users?query="  + StringUtil.urlEncode(query.toString());
+		String userApiUri = baseUrl + "/users?query="  + PercentCodec.encode(query.toString());
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
