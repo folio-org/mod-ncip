@@ -222,6 +222,11 @@ public class FolioNcipHelper {
 			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=";
 
 			Properties properties = new Properties();
+			//DEFAULT VALUES
+			properties.setProperty("holdings.source.name", "FOLIO");
+			properties.setProperty("response.includes.physical.address","false");
+			properties.setProperty("user.priv.ok.status","ACTIVE");
+			properties.setProperty("user.priv.blocked.status","BLOCKED");
 			// LOOK FOR EACH PROPERTY:
 			while (reader.ready()) {
 				String line = reader.readLine();

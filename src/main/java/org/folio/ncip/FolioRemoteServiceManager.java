@@ -780,8 +780,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public JsonObject lookupPatronRecordBy(String type, String value) throws Exception {
 		// LOOKUP THE PATRON
 		List<String> validTypes = Arrays.asList("barcode","externalsystemid","username");
-		boolean isValidType = validTypes.stream().anyMatch(type::contains);
-		if (!isValidType) {
+		if (!validTypes.contains(type)) {
 			throw new Exception("invalid patron lookup type provided: " + type);
 		}
 		value = StringUtil.cqlEncode(value);
