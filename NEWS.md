@@ -1,5 +1,6 @@
 ## 1.13.0 2023-02-23
  * [MODNCIP-49](https://issues.folio.org/browse/MODNCIP-49) -CQL and URL injection
+ * Updated logging - common logging
 ## 1.12.2 2022-12-01
  * [MODNCIP-46](https://issues.folio.org/browse/MODNCIP-46) - Replace slf4j-log4j12 by log4j-slf4j-impl fixing vulns
 ## 1.12.1 2022-11-22
