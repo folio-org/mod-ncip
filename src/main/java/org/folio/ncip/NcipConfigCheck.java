@@ -2,7 +2,6 @@ package org.folio.ncip;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Iterator;
 import org.apache.http.HttpEntity;
@@ -89,7 +88,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 logger.info(" using lookup value ");
 			 logger.info(value);
 			 if (value.contains("/")) value = '"' + value + '"';
-			 url = url.replace("{lookup}", URLEncoder.encode(value));
+			 url = url.replace("{lookup}", StringUtil.cqlEncode(value));
 			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + value);
 			 
 
