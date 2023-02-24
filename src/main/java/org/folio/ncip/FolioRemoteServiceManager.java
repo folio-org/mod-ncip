@@ -3,8 +3,6 @@ package org.folio.ncip;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -692,7 +690,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				//LOOKUP LOCATION DOESN'T WORK UNLESS THE LOCATION CODE
 				//IS SURROUNDED BY QUOTES 
 				if (lookupValue.contains("/")) lookupValue = '"' + lookupValue + '"';
-				url = url.replace("{lookup}", URLEncoder.encode(lookupValue));
+				url = url.replace("{lookup}", StringUtil.cqlEncode(lookupValue));
 				
 				final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 				int timeout = Integer.parseInt(timeoutString);
@@ -786,7 +784,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String query = "(" + type + "==" + value + "&limit=1";
-		String userApiUri = baseUrl + "/users?query=" + StringUtil.urlEncode(query);
+		String userApiUri = baseUrl + "/users?query=" + PercentCodec.encode(query.toString());
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
