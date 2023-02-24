@@ -40,6 +40,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.folio.util.StringUtil;
+import org.folio.util.PercentCodec;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -416,9 +418,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
-		String pickuLocationUrl = baseUrl + "/service-points?query=(code==" + URLEncoder.encode(pickUpLocationCode)
-				+ "+AND+pickupLocation==true)";
-		String servicePointResponse = callApiGet(pickuLocationUrl);
+		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + " AND pickupLocation==true";
+		String pickupLocationUrl = baseUrl + "/service-points?query=" + PercentCodec.encode(query);
+		String servicePointResponse = callApiGet(pickupLocationUrl);
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
 			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
