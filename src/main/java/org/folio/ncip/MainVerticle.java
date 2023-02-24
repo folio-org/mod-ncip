@@ -2,8 +2,6 @@ package org.folio.ncip;
 
 
 import org.apache.log4j.Logger;
-import org.slf4j.MDC;
-
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.core.AbstractVerticle;
