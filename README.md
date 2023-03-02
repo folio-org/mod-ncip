@@ -334,4 +334,3 @@ and the [Docker image](https://hub.docker.com/r/folioorg/mod-ncip/).
 Other [modules](https://dev.folio.org/source-code/#server-side) are described,
 with further FOLIO Developer documentation at [dev.folio.org](https://dev.folio.org/)
 
-test
