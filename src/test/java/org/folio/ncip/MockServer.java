@@ -3,7 +3,8 @@ package org.folio.ncip;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import org.apache.log4j.Logger;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +42,7 @@ public class MockServer {
 	  private  ServiceContext serviceContext;
 	  private static FolioNcipHelper folioNcipHelper;
 	
-	  private static final Logger logger = Logger.getLogger(MockServer.class);
+	 private static final Logger logger = LoggerFactory.getLogger(MockServer.class);
 	 
 
 	

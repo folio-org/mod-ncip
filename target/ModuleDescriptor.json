@@ -1,0 +1,143 @@
+{
+"id": "mod-ncip-1.13.1-SNAPSHOT",
+  "name": "NCIP",
+   "provides": [
+    {
+      "id": "ncip",
+      "version": "1.0",
+       "handlers": [
+        {
+          "methods": [ "POST" ],
+          "pathPattern": "/ncip",
+          "permissionsRequired": ["ncip.post"],
+          "modulePermissions": [
+            "users.collection.get",
+            "automated-patron-blocks.collection.get",
+            "addresstypes.collection.get",
+            "circulation.requests.item.post",
+            "ui-circulation.settings.overdue-fines-policies",
+            "ui-circulation.settings.lost-item-fees-policies",
+            "inventory-storage.all",
+            "inventory-storage.items.collection.get",
+            "inventory-storage.service-points.collection.get",
+            "inventory-storage.instance-types.collection.get",
+            "inventory-storage.identifier-types.collection.get",
+            "inventory-storage.material-types.collection.get",
+            "inventory-storage.loan-types.collection.get",
+            "inventory-storage.locations.collection.get",
+            "configuration.entries.collection.get",
+            "configuration.entries.item.get",
+            "usergroups.item.get",
+            "manualblocks.collection.get",
+            "accounts.collection.get",
+            "circulation.check-out-by-barcode.post",
+            "circulation.check-in-by-barcode.post",
+            "circulation.loans.collection.get",
+            "inventory.instances.item.post",
+            "inventory-storage.holdings.item.delete",
+            "inventory.items.item.delete",
+            "inventory.instances.item.delete",
+            "inventory-storage.holdings.item.post",
+            "inventory-storage.service-points-users.collection.get",
+            "inventory.items.item.post",
+            "inventory-storage.service-points.item.get"
+        ]
+        },
+        {
+          "methods": [ "GET" ],
+          "pathPattern": "/ncipconfigcheck",
+          "permissionsRequired": ["ncip.ncipconfigcheck.get"],
+          "modulePermissions": [
+            "inventory-storage.all",
+            "inventory-storage.service-points.collection.get",
+            "inventory-storage.instance-types.collection.get",
+            "inventory-storage.identifier-types.collection.get",
+            "inventory-storage.material-types.collection.get",
+            "configuration.entries.collection.get",
+            "configuration.entries.item.get",
+            "inventory-storage.loan-types.collection.get"
+          ]
+         
+        }
+      ]
+    }
+  ],
+   "requires": [
+      {
+        "id":"instance-types",
+        "version" : "2.0"
+      },
+      {
+      "id": "configuration",
+      "version": "2.0"
+      },
+      {
+        "id":"identifier-types",
+        "version" : "1.2"
+      },
+      {
+        "id":"material-types",
+        "version":"2.2"
+      },
+      {
+        "id":"locations",
+        "version":"3.0"
+      },
+      {
+        "id":"service-points",
+        "version":"3.2"
+      },
+      {
+        "id":"loan-types",
+        "version":"2.2"
+      },
+      {
+        "id":"holdings-storage",
+        "version":"4.0 5.0 6.0"
+      },
+      {
+        "id":"inventory",
+        "version":"10.2 11.0 12.0 13.0"
+      },
+      {
+        "id":"circulation",
+        "version":"12.0 13.0"
+      }
+  ],
+  "permissionSets": [
+    {
+      "permissionName": "ncip.post",
+      "displayName": "NCIP Request",
+      "description": "Post NCIP request"
+    },
+    {
+      "permissionName": "ncip.ncipconfigcheck.get",
+      "displayName": "NCIP - configuration check",
+      "description": "Check NCIP configuraitons"
+    },
+    {
+      "permissionName": "ncip.all",
+      "displayName": "NCIP - all permissions",
+      "description": "Entire set of permissions needed to use NCIP",
+      "subPermissions": [
+        "ncip.post",
+        "ncip.ncipconfigcheck.get"
+      ]
+    }
+  ],
+  "launchDescriptor": {
+    "dockerImage": "mod-ncip:1.13.1-SNAPSHOT",
+    "dockerPull": false,
+    "dockerArgs": {
+      "HostConfig": {
+        "Memory": 357913941,
+        "PortBindings": { "8081/tcp": [ { "HostPort": "%p" } ] }
+      }
+    },
+    "env": [
+      { "name": "JAVA_OPTIONS",
+        "value": "-XX:MaxRAMPercentage=66.0"
+      }
+    ]
+  }
+}

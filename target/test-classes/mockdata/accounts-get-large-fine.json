@@ -1,0 +1,37 @@
+{
+  "accounts" : [ {
+    "amount" : 650.5,
+    "remaining" : 650.5,
+    "status" : {
+      "name" : "Open"
+    },
+    "paymentStatus" : {
+      "name" : "Outstanding"
+    },
+    "feeFineType" : "LOST",
+    "feeFineOwner" : "LIBRARY",
+    "title" : "TEST ONE",
+    "barcode" : "LEH-20191003227",
+    "materialType" : "PALCI",
+    "location" : "PALCI Shelf",
+    "metadata" : {
+      "createdDate" : "2019-10-08T18:10:33.171+0000",
+      "createdByUserId" : "99999999-9999-1999-8999-999999999901",
+      "updatedDate" : "2019-10-08T18:10:33.171+0000",
+      "updatedByUserId" : "99999999-9999-1999-8999-999999999901"
+    },
+    "loanId" : "0",
+    "userId" : "3eca41e7-c93b-47fa-a975-1fa77966a6af",
+    "itemId" : "1c9b504b-4cc5-43c9-9035-fad3f8720ffd",
+    "materialTypeId" : "4e5f8d5d-b170-4a20-a763-a87fcdb0bb32",
+    "feeFineId" : "e75d7c95-3e41-4397-b398-44b8cee569b8",
+    "ownerId" : "2c222765-5f66-4da2-9d7b-1152edeedc6f",
+    "id" : "b90c1144-49ef-4498-9d3d-b1be7369f344"
+  } ],
+  "totalRecords" : 1,
+  "resultInfo" : {
+    "totalRecords" : 1,
+    "facets" : [ ],
+    "diagnostics" : [ ]
+  }
+}

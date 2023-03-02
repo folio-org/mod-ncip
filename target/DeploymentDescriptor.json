@@ -1,0 +1,7 @@
+{
+  "srvcId": "mod-ncip-1.13.1-SNAPSHOT",
+  "nodeId": "localhost",
+  "descriptor": {
+    "exec": "java -jar -jar  -Dport=%p -Dhttp.port=%p -Dlog_level=debug ../mod-ncip/target/mod-ncip-fat.jar"
+  }
+}

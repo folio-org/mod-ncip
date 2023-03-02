@@ -1,0 +1,21 @@
+{
+  "locations" : [ {
+    "id" : "801f9b00-af0b-407c-9db1-f6aac50e9e56",
+    "name" : "PALCI Shelf",
+    "code" : "PALCI_LEHIGH",
+    "discoveryDisplayName" : "Location for items borrowed via PALCI program",
+    "isActive" : true,
+    "institutionId" : "6d64513d-d08f-478a-8ea8-6bbba2e33a87",
+    "campusId" : "c8496aaf-282b-406f-9cf5-61fc3722dab9",
+    "libraryId" : "e7b93edb-8c33-4fb7-9671-045524c11f31",
+    "primaryServicePoint" : "79faacf1-4ba4-42c7-8b2a-566b259e4641",
+    "servicePointIds" : [ "79faacf1-4ba4-42c7-8b2a-566b259e4641", "29faacf1-4ba4-42c7-8b2a-566b259e4641", "79faacf2-4ba4-42c7-8b2a-566b259e4641" ],
+    "metadata" : {
+      "createdDate" : "2019-10-03T18:51:28.900+0000",
+      "createdByUserId" : "99999999-9999-1999-8999-999999999901",
+      "updatedDate" : "2019-10-03T18:51:28.900+0000",
+      "updatedByUserId" : "99999999-9999-1999-8999-999999999901"
+    }
+  } ],
+  "totalRecords" : 1
+}

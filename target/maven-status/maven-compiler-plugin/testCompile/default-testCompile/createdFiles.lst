@@ -1,0 +1,13 @@
+org\folio\ncip\MockServer.class
+org\folio\ncip\MainVerticleTest.class
+org\folio\ncip\NcipTestSuite.class
+org\folio\ncip\services\CheckinItemServiceTest.class
+org\folio\ncip\Utils.class
+org\folio\ncip\NCIPTest.class
+org\folio\ncip\RunTests.class
+org\folio\ncip\LookupUser.class
+org\folio\ncip\services\CheckoutItemServiceTest.class
+org\folio\ncip\services\LookupUserServiceTests.class
+org\folio\ncip\TestBase.class
+org\folio\ncip\services\AcceptItemServiceTests.class
+org\folio\ncip\TestConstants.class

@@ -1,0 +1,11 @@
+org\folio\ncip\FolioRemoteServiceManager.class
+org\folio\ncip\services\FolioCheckOutItemService.class
+org\folio\ncip\services\FolioLookupUserService.class
+org\folio\ncip\FolioNcipHelper.class
+org\folio\ncip\NcipConfigCheck.class
+org\folio\ncip\services\FolioCheckInItemService.class
+org\folio\ncip\MainVerticle.class
+org\folio\ncip\FolioNcipException.class
+org\folio\ncip\Constants.class
+org\folio\ncip\services\FolioNcipService.class
+org\folio\ncip\services\FolioAcceptItemService.class

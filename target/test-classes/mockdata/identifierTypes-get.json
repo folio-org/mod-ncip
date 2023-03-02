@@ -1,0 +1,14 @@
+{
+  "identifierTypes" : [ {
+    "id" : "b414359d-8108-4760-9e5e-6ae2e8fee7f8",
+    "name" : "PALCI Request ID",
+    "source" : "local",
+    "metadata" : {
+      "createdDate" : "2019-10-03T18:51:32.755+0000",
+      "createdByUserId" : "99999999-9999-1999-8999-999999999901",
+      "updatedDate" : "2019-10-03T18:51:32.755+0000",
+      "updatedByUserId" : "99999999-9999-1999-8999-999999999901"
+    }
+  } ],
+  "totalRecords" : 1
+}
