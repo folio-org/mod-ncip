@@ -2,7 +2,6 @@ package org.folio.ncip;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Iterator;
 import org.apache.http.HttpEntity;
@@ -14,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.folio.util.StringUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,6 +22,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import org.folio.util.PercentCodec;
 
 
 /*
@@ -54,8 +55,8 @@ public class NcipConfigCheck extends FolioNcipHelper {
 		
 		
 		String okapiBaseEndpoint = routingContext.request().getHeader(Constants.X_OKAPI_URL);
-		String conifgQuery = URLEncoder.encode("(module==NCIP and configName<>rules and configName<>toolkit)");
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=query=" + conifgQuery + "&limit=200";
+		String configQuery = "(module==NCIP and configName<>rules and configName<>toolkit)";
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=" + PercentCodec.encode(configQuery) + "&limit=200";
 		String response = callApiGet(configEndpoint, routingContext.request().headers());
 		JsonObject jsonObject = new JsonObject(response);
 		JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
@@ -87,7 +88,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 logger.info(" using lookup value ");
 			 logger.info(value);
 			 if (value.contains("/")) value = '"' + value + '"';
-			 url = url.replace("{lookup}", URLEncoder.encode(value));
+			 url = url.replace("{lookup}", StringUtil.cqlEncode(value));
 			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + value);
 			 
 

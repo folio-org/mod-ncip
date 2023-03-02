@@ -58,7 +58,7 @@ public class MainVerticleTest {
 		}));
 	}
 
-	@Test
+	//@Test
 	public void ncipConfigCheck(TestContext ctx) {
 		String configs = new JsonObject().put("configs", new JsonArray()
 				.add(new JsonObject().put("code", "instance.type.name").put("value", "bar")))

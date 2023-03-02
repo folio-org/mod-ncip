@@ -30,6 +30,8 @@ import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import static org.junit.Assert.fail;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import org.folio.okapi.common.XOkapiHeaders;
+import org.folio.okapi.common.logging.FolioLoggingContext;
 
 public class MockServer {
 	
@@ -204,6 +206,14 @@ public class MockServer {
 		  
 		  
 		  protected void ncip(RoutingContext ctx) {
+			  
+		    String requestId = ctx.request().headers().get(XOkapiHeaders.REQUEST_ID);
+		    String userId = ctx.request().headers().get(XOkapiHeaders.USER_ID);
+		    String tenant = ctx.request().headers().get(XOkapiHeaders.TENANT);
+		    FolioLoggingContext.put(FolioLoggingContext.REQUEST_ID_LOGGING_VAR_NAME, requestId);
+		    FolioLoggingContext.put(FolioLoggingContext.MODULE_ID_LOGGING_VAR_NAME, "mod-ncip");
+		    FolioLoggingContext.put(FolioLoggingContext.TENANT_ID_LOGGING_VAR_NAME, tenant);
+		    FolioLoggingContext.put(FolioLoggingContext.USER_ID_LOGGING_VAR_NAME, userId);
 				 
 			   vertx.executeBlocking(promise -> {
 				   InputStream responseMsgInputStream = null;

@@ -14,6 +14,9 @@ import io.vertx.core.Promise;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import org.folio.okapi.common.XOkapiHeaders;
+import org.folio.okapi.common.logging.FolioLoggingContext;
+
 import static org.folio.ncip.Constants.SYS_PORT;
 import static org.folio.ncip.Constants.DEFAULT_PORT;
 
@@ -84,7 +87,14 @@ public class MainVerticle extends AbstractVerticle {
 
 
 	protected void handleNcip(RoutingContext ctx) {
-
+	    String requestId = ctx.request().headers().get(XOkapiHeaders.REQUEST_ID);
+	    String userId = ctx.request().headers().get(XOkapiHeaders.USER_ID);
+	    String tenant = ctx.request().headers().get(XOkapiHeaders.TENANT);
+	    FolioLoggingContext.put(FolioLoggingContext.REQUEST_ID_LOGGING_VAR_NAME, requestId);
+	    FolioLoggingContext.put(FolioLoggingContext.MODULE_ID_LOGGING_VAR_NAME, "mod-ncip");
+	    FolioLoggingContext.put(FolioLoggingContext.TENANT_ID_LOGGING_VAR_NAME, tenant);
+	    FolioLoggingContext.put(FolioLoggingContext.USER_ID_LOGGING_VAR_NAME, userId);
+	    	    
 		vertx.executeBlocking(promise -> {
 			try (InputStream responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
 					Scanner scanner = new Scanner(responseMsgInputStream,"UTF-8").useDelimiter("\\A")) {

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.folio</groupId>
 	<artifactId>mod-ncip</artifactId>
-	<version>1.13.0-SNAPSHOT</version>
+	<version>1.13.1-SNAPSHOT</version>
 	<name>NCIP</name>
 	<description>NCIP responder for FOLIO (internal module)</description>
 
@@ -15,7 +15,7 @@
 	</licenses>
 
 	<properties>
-		<vertx.version>4.3.1</vertx.version>
+		<vertx.version>4.3.8</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
@@ -143,8 +143,16 @@
 			<artifactId>jcl-over-slf4j</artifactId>
 			<version>1.7.36</version>
 		</dependency>
-
-
+		<dependency>
+			<groupId>org.folio</groupId>
+			<artifactId>util</artifactId>
+			<version>35.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.folio.okapi</groupId>
+			<artifactId>okapi-common</artifactId>
+			<version>5.0.0</version>
+		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -302,7 +310,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
