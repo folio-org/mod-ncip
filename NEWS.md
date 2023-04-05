@@ -1,3 +1,5 @@
+## 1.13.1 2023-04-05
+* [MODNCIP-55](https://issues.folio.org/browse/MODNCIP-55)
 ## 1.13.0 2023-02-23
  * [MODNCIP-49](https://issues.folio.org/browse/MODNCIP-49) -CQL and URL injection
  * Updated logging - common logging
