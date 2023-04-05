@@ -690,7 +690,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				//LOOKUP LOCATION DOESN'T WORK UNLESS THE LOCATION CODE
 				//IS SURROUNDED BY QUOTES 
 				if (lookupValue.contains("/")) lookupValue = '"' + lookupValue + '"';
-				url = url.replace("{lookup}", StringUtil.cqlEncode(lookupValue));
+				url = url.replace("{lookup}", lookupValue);
 				
 				final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 				int timeout = Integer.parseInt(timeoutString);
