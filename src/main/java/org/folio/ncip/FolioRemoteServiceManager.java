@@ -783,7 +783,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String query = "(" + type + "==" + value + "&limit=1";
+		String query = "(" + type + "==" + value + ")&limit=1";
 		String userApiUri = baseUrl + "/users?query=" + PercentCodec.encode(query.toString());
 		String response = callApiGet(userApiUri);
 
