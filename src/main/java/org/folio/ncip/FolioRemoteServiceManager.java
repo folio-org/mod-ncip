@@ -781,7 +781,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		if (!validTypes.contains(type)) {
 			throw new Exception("invalid patron lookup type provided: " + type);
 		}
-		if (value != null && value.equalsIgnoreCase("externalSystemId")) value= "externalSystemId";
+		if (type != null && value.equalsIgnoreCase("externalSystemId")) type = "externalSystemId";
 		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String query = "(" + type + "==" + value + ")";
