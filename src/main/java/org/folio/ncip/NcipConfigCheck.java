@@ -88,7 +88,7 @@ public class NcipConfigCheck extends FolioNcipHelper {
 			 logger.info(" using lookup value ");
 			 logger.info(value);
 			 if (value.contains("/")) value = '"' + value + '"';
-			 url = url.replace("{lookup}", StringUtil.cqlEncode(value));
+			 url = url.replace("{lookup}", PercentCodec.encode(value));
 			 logger.info("WILL LOOKUP " + lookup + " WITH URL " + url + " USING VALUE " + value);
 			 
 
