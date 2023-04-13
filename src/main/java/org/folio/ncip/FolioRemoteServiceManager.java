@@ -691,6 +691,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				//IS SURROUNDED BY QUOTES 
 				if (lookupValue.contains("/")) lookupValue = '"' + lookupValue + '"';
 				url = url.replace("{lookup}", PercentCodec.encode(lookupValue));
+
 				
 				final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 				int timeout = Integer.parseInt(timeoutString);
@@ -781,11 +782,13 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		if (!validTypes.contains(type)) {
 			throw new Exception("invalid patron lookup type provided: " + type);
 		}
+
 		if (type != null && type.equalsIgnoreCase("externalSystemId")) type = "externalSystemId";
 		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String query = "(" + type + "==" + value + ")";
 		String userApiUri = baseUrl + "/users?query=" + PercentCodec.encode(query.toString()) + "&limit=1";
+
 		String response = callApiGet(userApiUri);
 
 		// WAS THE PATRON FOUND?
