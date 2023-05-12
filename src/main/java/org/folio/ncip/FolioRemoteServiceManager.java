@@ -498,7 +498,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put("requestType", "Page");
 			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
 			// SEE NOTES.TXT
-			request.put("fulfilmentPreference", "Hold Shelf");
+			request.put("fulfillmentPreference", "Hold Shelf");
 			String uid = user.getString("id");
 			request.put("requesterId", uid);
 			request.put("itemId", itemUuid.toString());

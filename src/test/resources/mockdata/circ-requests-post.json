@@ -26,7 +26,7 @@
     "barcode" : "8377630",
     "patronGroupId" : "dac3aab4-7a86-422b-b5fc-6fbf7afd7aeb"
   },
-  "fulfilmentPreference" : "Hold Shelf",
+  "fulfillmentPreference" : "Hold Shelf",
   "pickupServicePointId" : "29faacf1-4ba4-42c7-8b2a-566b259e4641",
   "metadata" : {
     "createdDate" : "2019-10-03T19:21:59.707+0000",
