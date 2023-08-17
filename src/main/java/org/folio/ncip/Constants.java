@@ -29,7 +29,7 @@ public class Constants {
 	public static final String CHECK_OUT_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
 	public static final String UNKNOWN_DATA_ELEMENT = "--";
 	public static final String CHECK_IN_PROBLEM = "Problem performing check in";
-	public static final String FATAL_ERROR_OCCURED = "An error occured processing this request.  Unable to construct a proper NCIP response with problem element";
+	public static final String FATAL_ERROR_OCCURED = "An error occurred processing this request.  Unable to construct a proper NCIP response with problem element";
 	public static final String USER_ID_MISSING = "User id missing";
 	public static final String USER_ID_IS_INVALID  = "User id is invalid";
 	public static final String ITEM_ID_IS_MISSING = "Item id missing";
