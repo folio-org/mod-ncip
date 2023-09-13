@@ -1,6 +1,7 @@
 ## 1.14.0-SNAPSHOT 2023-XX-XX
  * [MODNCIP-59](https://issues.folio.org/browse/MODNCIP-59) Update to Java 17 mod-ncip
  * [MODNCIP-61](https://issues.folio.org/browse/MODNCIP-61) config option for ElectronicAddressType
+ * [MODNCIP-60](https://issues.folio.org/browse/MODNCIP-60) RequestItemService placeholder
 ## 1.13.1 2023-04-05
 * [MODNCIP-55](https://issues.folio.org/browse/MODNCIP-55)- alternate user lookup service fix
 ## 1.13.0 2023-02-23
