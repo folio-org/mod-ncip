@@ -1,0 +1,27 @@
+<NCIPMessage version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
+    <RequestItem>
+        <InitiationHeader>
+            <FromAgencyId>
+                <AgencyId>Relais</AgencyId>
+            </FromAgencyId>
+            <ToAgencyId>
+                <AgencyId>Lehigh University</AgencyId>
+            </ToAgencyId>
+        </InitiationHeader>
+        <UserId>
+            <UserIdentifierValue>8377630</UserIdentifierValue>
+        </UserId>
+        <BibliographicId>
+            <BibliographicRecordId>
+                <BibliographicRecordIdentifier>(OCLC)17373-train20072_c2db</BibliographicRecordIdentifier>
+                <BibliographicRecordIdentifierCode>OCLC</BibliographicRecordIdentifierCode>
+            </BibliographicRecordId>
+        </BibliographicId>
+        <RequestId>
+            <RequestIdentifierValue>requestId1</RequestIdentifierValue>
+        </RequestId>
+        <RequestType>Loan</RequestType>
+        <RequestScopeType>Bibliographic Item</RequestScopeType>
+        <NeedBeforeDate>2024-07-22T00:00:00</NeedBeforeDate>
+    </RequestItem>
+</NCIPMessage>
