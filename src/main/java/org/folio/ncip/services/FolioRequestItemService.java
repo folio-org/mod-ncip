@@ -13,7 +13,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 
 public class FolioRequestItemService extends FolioNcipService implements RequestItemService {
 
-	private static final Logger logger = Logger.getLogger(FolioCheckInItemService.class);
+	private static final Logger logger = Logger.getLogger(FolioRequestItemService.class);
 	
 
 	@Override
