@@ -14,7 +14,7 @@ import io.restassured.RestAssured;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  LookupUser.class,
+  LookupUser.class,RequestItem.class
 })
 public class NcipTestSuite {
 

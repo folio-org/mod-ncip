@@ -39,17 +39,5 @@ public class RequestItemServiceTests {
 
 	}
 	
-	@Test
-	public void testRetrieveUserId() throws Exception {
-		FolioRequestItemService folioRequestItemService = new FolioRequestItemService();
-		Method retrieveUserId = folioRequestItemService.getClass().getDeclaredMethod("retrieveUserId", RequestItemInitiationData.class);
-		retrieveUserId.setAccessible(true);
-		RequestItemInitiationData requestItemInitiationData = new RequestItemInitiationData();
-		UserId userId = new UserId();
-		userId.setUserIdentifierValue("abc123");
-		requestItemInitiationData.setUserId(userId);
-		UserId userIdResult = (UserId) retrieveUserId.invoke(folioRequestItemService, requestItemInitiationData);
-		assertEquals(userIdResult.getUserIdentifierValue(),"abc123");
-	}
 
 }
