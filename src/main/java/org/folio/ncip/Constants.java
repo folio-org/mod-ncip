@@ -66,6 +66,7 @@ public class Constants {
 	public static final String RESPONSE_INCLUDES_PHYSICAL_ADDRESS = "response.includes.physical.address";
 	public static final String OK_CONFIG = "user.priv.ok.status"; 
 	public static final String BLOCKED_CONFIG = "user.priv.blocked.status";
+	public static final String EMAIL_STRING = "user.email.type";
 	
 	
 	//ENDPOINTS
