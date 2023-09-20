@@ -254,7 +254,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	  
 	   private ArrayList<UserAddressInformation> retrieveAddress(JsonObject jsonObject,String agencyId) {
 	    	ArrayList<UserAddressInformation> list = new ArrayList<UserAddressInformation>();
-	    	list.add(retrieveEmail(jsonObject));
+	    	list.add(retrieveEmail(jsonObject,agencyId.toLowerCase()));
 	    	list.add(retrieveTelephoneNumber(jsonObject,"phone"));
 	    	list.add(retrieveTelephoneNumber(jsonObject,"mobilePhone"));
 	    	JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL);
@@ -291,13 +291,19 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	else return null;
 	    }
 	    
-	    private UserAddressInformation retrieveEmail(JsonObject jsonObject) {
+	    private UserAddressInformation retrieveEmail(JsonObject jsonObject, String agencyId) {
+	    	
+	    	String emailString = "electronic mail address";
+	    	if (ncipProperties != null) {
+	    		String emailStringConfigValue = ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.EMAIL_STRING);
+	    		if (emailStringConfigValue != null) emailString = emailStringConfigValue;
+	   		}
 	 
 		    JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL); 
 	    	String emailAddress = personal.getString("email"); //TODO constants
 	    	ElectronicAddress email = new ElectronicAddress();
 	    	email.setElectronicAddressData(emailAddress);
-	    	email.setElectronicAddressType(new ElectronicAddressType("electronic mail address")); //TODO CONSTANT
+	    	email.setElectronicAddressType(new ElectronicAddressType(emailString)); //TODO CONSTANT
 	    	UserAddressInformation uai = new UserAddressInformation();
 	    	uai.setUserAddressRoleType(new UserAddressRoleType("OTH")); //TODO CONSTANT
 	    	uai.setElectronicAddress(email);

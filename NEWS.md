@@ -1,3 +1,5 @@
+## 1.13.2 2023-09-20
+* [MODNCIP-61](https://issues.folio.org/browse/MODNCIP-61) config option for ElectronicAddressType
 ## 1.13.1 2023-04-05
 * [MODNCIP-55](https://issues.folio.org/browse/MODNCIP-55)- alternate user lookup service fix
 ## 1.13.0 2023-02-23
