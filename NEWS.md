@@ -1,3 +1,5 @@
+## 1.14.1-SNAPSHOT 2023-10-04
+ * Fix circulation interface version
 ## 1.14.0-SNAPSHOT 2023-10-04
  * [MODNCIP-59](https://issues.folio.org/browse/MODNCIP-59) Update to Java 17 mod-ncip
  * [MODNCIP-61](https://issues.folio.org/browse/MODNCIP-61) config option for ElectronicAddressType
