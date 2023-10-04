@@ -348,7 +348,7 @@ public class FolioNcipHelper {
 			logger.info("GET:");
 			logger.info(uriString);
 			logger.info(responseCode);
-			logger.info(responseString);
+			//logger.info(responseString);
 
 			if (responseCode > 399) {
 				String responseBody = processErrorResponse(responseString);
