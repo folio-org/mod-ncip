@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.folio</groupId>
 	<artifactId>mod-ncip</artifactId>
-	<version>1.14.2-SNAPSHOT</version>
+	<version>1.14.3-SNAPSHOT</version>
 	<name>NCIP</name>
 	<description>NCIP responder for FOLIO (internal module)</description>
 
@@ -15,7 +15,7 @@
 	</licenses>
 
 	<properties>
-		<vertx.version>4.3.8</vertx.version>
+		<vertx.version>4.4.5</vertx.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
@@ -23,6 +23,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.apache.logging.log4j</groupId>
+				<artifactId>log4j-bom</artifactId>
+				<version>2.20.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<dependency>
 				<groupId>io.vertx</groupId>
 				<artifactId>vertx-stack-depchain</artifactId>
@@ -38,6 +45,11 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.13</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.16.0</version>
 		</dependency>
 		<!--ncip toolkit dependencies start -->
 		<dependency>
@@ -59,42 +71,42 @@
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-jar</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ilsdiv1_0_bc</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ncipv2_01</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ilsdiv1_0</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-ncipv2_02</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-wclv1_0</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>common</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>service</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -126,17 +138,17 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>2.19.0</version>
+			<version>2.20.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.19.0</version>
+			<version>2.20.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.19.0</version>
+			<version>2.20.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -151,7 +163,7 @@
 		<dependency>
 			<groupId>org.folio.okapi</groupId>
 			<artifactId>okapi-common</artifactId>
-			<version>5.0.0</version>
+			<version>5.1.1</version>
 		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
