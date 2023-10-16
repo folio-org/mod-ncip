@@ -1,4 +1,4 @@
-## 1.14.2 2023-10-16
+## 1.14.3 2023-10-16
  * [MODNCIP-62](https://issues.folio.org/browse/MODNCIP-62) Upgrade dependencies (Spring, Vert.x, ...) for Poppy
 ## 1.14.1 2023-10-04
  * Fix circulation interface version
