@@ -297,9 +297,9 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 	    	if (ncipProperties != null) {
 	    		String emailStringConfigValue = ncipProperties.getProperty(agencyId.toLowerCase() + "." + Constants.EMAIL_STRING);
 	    		if (emailStringConfigValue != null) emailString = emailStringConfigValue;
-	   		}
+	   	}
 
-		    JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL); 
+		JsonObject personal = jsonObject.getJsonObject(Constants.PERSONAL); 
 	    	String emailAddress = personal.getString("email"); //TODO constants
 	    	ElectronicAddress email = new ElectronicAddress();
 	    	email.setElectronicAddressData(emailAddress);

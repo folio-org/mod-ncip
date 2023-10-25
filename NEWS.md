@@ -1,3 +1,5 @@
+## 1.14.4 2023-10-25
+ * [MODNCIP-63](https://issues.folio.org/browse/MODNCIP-63) Give user.email.type a default value
 ## 1.14.3 2023-10-16
  * [MODNCIP-62](https://issues.folio.org/browse/MODNCIP-62) Upgrade dependencies (Spring, Vert.x, ...) for Poppy
 ## 1.14.1 2023-10-04
