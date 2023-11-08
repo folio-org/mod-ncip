@@ -150,6 +150,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP          | Relais      	| response.includes.physical.address 	| false               |
 | NCIP          | Relais      	| user.priv.ok.status 	| OK               |
 | NCIP          | Relais      	| user.priv.blocked.status 	| BLOCKED               |
+| NCIP          | Relais      	| user.email.type 	| mailto               |
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
