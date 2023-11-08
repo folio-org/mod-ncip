@@ -2,10 +2,10 @@
     <RequestItem>
         <InitiationHeader>
             <FromAgencyId>
-                <AgencyId>ILLIAD SYSTEM</AgencyId>
+                <AgencyId>Relais</AgencyId>
             </FromAgencyId>
             <ToAgencyId>
-                <AgencyId>60UNIV_INST</AgencyId>
+                <AgencyId>LEHI</AgencyId>
             </ToAgencyId>
             <ApplicationProfileType>ILLIAD</ApplicationProfileType>
         </InitiationHeader>
