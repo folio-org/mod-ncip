@@ -244,6 +244,12 @@ Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
 
+##### Request Item
+There is a placeholder for the RequestItem service.  It will return an empty response.
+
+Sample XML Request:
+https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/RequestItem.xml
+
 ### About the Extensible Catalog NCIP Toolkit
 
 The eXtensible Catalog (XC) NCIP Toolkit was developed as a stand-alone Web application that would receive NCIP requests, communicate with your ILS (via a ‘connector’) and send back an XML response.
