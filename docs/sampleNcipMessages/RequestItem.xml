@@ -1,0 +1,19 @@
+<NCIPMessage version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
+    <RequestItem>
+        <InitiationHeader>
+            <FromAgencyId>
+                <AgencyId>ILLIAD SYSTEM</AgencyId>
+            </FromAgencyId>
+            <ToAgencyId>
+                <AgencyId>60UNIV_INST</AgencyId>
+            </ToAgencyId>
+            <ApplicationProfileType>ILLIAD</ApplicationProfileType>
+        </InitiationHeader>
+        <UserId>
+            <UserIdentifierValue>100002</UserIdentifierValue>
+        </UserId>
+        <RequestId>
+            <RequestIdentifierValue>requestId1</RequestIdentifierValue>
+        </RequestId>
+    </RequestItem>
+</NCIPMessage>
