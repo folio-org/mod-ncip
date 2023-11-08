@@ -150,6 +150,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP          | Relais      	| response.includes.physical.address 	| false               |
 | NCIP          | Relais      	| user.priv.ok.status 	| OK               |
 | NCIP          | Relais      	| user.priv.blocked.status 	| BLOCKED               |
+| NCIP          | Relais      	| user.email.type 	| mailto               |
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
@@ -243,6 +244,12 @@ The checkin item service is called when an item is checked in.  This service can
 Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
+
+##### Request Item
+There is a placeholder for the RequestItem service.  It will return an empty response.
+
+Sample XML Request:
+https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/RequestItem.xml
 
 ### About the Extensible Catalog NCIP Toolkit
 
