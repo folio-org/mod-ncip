@@ -240,6 +240,8 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		    JsonObject personal = jsonObject.getJsonObject("personal"); //TODO constants
 	    	String firstName = personal.getString("firstName");
 	    	String lastName = personal.getString("lastName");
+	    	if (personal.getString("preferredFirstName") != null && !personal.getString("preferredFirstName").isEmpty()) 
+	    		firstName = personal.getString("preferredFirstName");
 	    	NameInformation nameInformation = new NameInformation();
 	    	PersonalNameInformation personalNameInformation = new PersonalNameInformation();
 	    	StructuredPersonalUserName structuredPersonalUserName = new StructuredPersonalUserName();
