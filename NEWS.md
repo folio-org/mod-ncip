@@ -1,3 +1,5 @@
+## 1.14.5 2024-04-04
+ * [MODNCIP-65](https://folio-org.atlassian.net/browse/MODNCIP-65) if preferredFirstName is present use in lookupUserResponse
 ## 1.14.4 2023-10-25
  * [MODNCIP-63](https://issues.folio.org/browse/MODNCIP-63) Give user.email.type a default value
 ## 1.14.3 2023-10-16

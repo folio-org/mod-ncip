@@ -22,6 +22,7 @@ public class Constants {
 	public static final String USERID = "Userid";
 	public static final String USER_NOT_FOUND = "Did not find a user with that id";
 	public static final String PERSONAL = "personal";
+	public static final String PREFERRED_FIRST_NAME = "preferredFirstName";
 	public static final String CAMPUS = "CAMPUS";
 	public static final String OTHER = "OTH";
 	public static final String USER_PROBLEM_ELEMENT = "AuthenticationInput or UserId";
