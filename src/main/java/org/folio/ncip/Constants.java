@@ -39,6 +39,9 @@ public class Constants {
 	public static final String REQUEST_ID_MISSING = "Request ID Missing";
 	public static final String FROM_AGENCY_MISSING = "Could not determine FromAgency";
 	public static final String COULD_NOT_DETERMINE_USER = "User id missing from request or user id provided in authentication input does not exist";
+	public static final String REQUEST_ITEM_PROBLEM = "Problem performing RequestItem";
+	public static final String REQUEST_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
+	public static final String REQUEST_ITEM_MISSING_PROBLEM = "Problem occurred while fetching item";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
@@ -60,6 +63,8 @@ public class Constants {
 	public static final String INITIALIZED_PROPERTY = ".ncip.initialized";
 	public static final String SCHEME = "Scheme";
 	public static final String ITEM_BARCODE = "Item Barcode";
+	public static final String PAGE = "Page";
+	public static final String ITEM = "Item";
 	public static final String USER_BARCODE = "User Barcode";
 	public static final String REQUEST_ID = "Request Id";
 	public static final String CONFIGS = "configs";
@@ -76,6 +81,7 @@ public class Constants {
 	public static final String INSTANCE_URL = "/inventory/instances";
 	public static final String HOLDINGS_URL = "/holdings-storage/holdings";
 	public static final String ITEM_URL = "/inventory/items";
+	public static final String ITEM_SEARCH_URL = "/inventory/items?limit=1&query=hrid%3D%3D%22$hrid$%22";
 	public static final String REQUEST_URL = "/circulation/requests";
 	public static final String ADDRESS_TYPES = "/addresstypes";
 	

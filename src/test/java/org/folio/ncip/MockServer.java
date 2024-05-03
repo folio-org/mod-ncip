@@ -103,8 +103,10 @@ public class MockServer {
 			    //router.get("/configurations/entries/maxfineamount").handler(this::getMaxFineAmount);
 			    router.get("/configurations/entries/toolkit").handler(this::getToolkitCofigs);
 			    router.get("/configurations/entries").handler(this::getNcipConfigs);
-			    
-			   
+				router.get("/inventory/items").handler(this::items);
+				router.get("/holdings-storage/holdings/:id").handler(this::holdingsById);
+				router.post("/circulation/requests").handler(this::requestsPost);
+
 			    return router;
 		  }
 
@@ -165,6 +167,24 @@ public class MockServer {
 			  if (query.contains(TestConstants.BLOCKED_PATRON_BARCODE_BY_AUTOMATED)) mockFileName = TestConstants.PATH_TO_MOCK_FILES + "usersByBarcode-get-blocked-fine.json";
 			  String body = readLineByLine(mockFileName);
 			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+
+		  private void items(RoutingContext ctx) {
+			  String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+
+		  private void holdingsById(RoutingContext ctx) {
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "holdingsById-get.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+
+		  private void requestsPost(RoutingContext ctx) {
+			  String mockFileName =  TestConstants.PATH_TO_MOCK_FILES + "requests-post.json";
+			  String body = readLineByLine(mockFileName);
+		  	  serverResponse(ctx, 200, APPLICATION_JSON, body);
 		  }
 		  
 		  private void servicePointUsers(RoutingContext ctx) {
