@@ -3,25 +3,15 @@
  */
 package org.folio.ncip;
 
-import static org.junit.Assert.*;
-
 import java.net.MalformedURLException;
-
-import org.hamcrest.Matchers;
-
 
 import org.junit.Before;
 import org.junit.Test;
 
-import io.restassured.matcher.ResponseAwareMatcher;
 import io.restassured.response.Response;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import com.jayway.restassured.path.xml.XmlPath;
-import com.jayway.restassured.path.xml.XmlPath.CompatibilityMode;
-
-
 
 
 /**
@@ -29,6 +19,7 @@ import com.jayway.restassured.path.xml.XmlPath.CompatibilityMode;
  *
  */
 public class RequestItem extends TestBase {
+	private static final String CREATED_REQUEST_ID = "de627598-d468-41e0-a849-450940478477";
 	
 	/**
 	 * @throws java.lang.Exception
@@ -40,7 +31,10 @@ public class RequestItem extends TestBase {
 	@Test
 	public void callRequestItem() throws MalformedURLException {
 		Response response = postData("src/test/resources/mockdata/ncip-requestitem.xml");
-		System.out.println(response.getBody().prettyPrint());
+		String body = response.getBody().prettyPrint();
+		System.out.println(body);
+		assertEquals(200, response.getStatusCode());
+		assertTrue(body.contains(CREATED_REQUEST_ID));
 	}
 
 }

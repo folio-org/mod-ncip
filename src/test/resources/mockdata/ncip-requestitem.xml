@@ -14,5 +14,13 @@
         <RequestId>
             <RequestIdentifierValue>requestId1</RequestIdentifierValue>
         </RequestId>
+        <ItemId>
+            <ItemIdentifierValue>item1</ItemIdentifierValue>
+        </ItemId>
+        <BibliographicId>
+            <BibliographicRecordId>
+                <BibliographicRecordIdentifier>itemHrid1</BibliographicRecordIdentifier>
+            </BibliographicRecordId>
+        </BibliographicId>
     </RequestItem>
 </NCIPMessage>
