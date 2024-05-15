@@ -18,6 +18,7 @@ import java.util.concurrent.Future;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
 import org.folio.util.PercentCodec;
@@ -44,6 +45,8 @@ import org.apache.http.util.EntityUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+
+import static java.lang.String.*;
 
 public class FolioRemoteServiceManager implements RemoteServiceManager {
 
@@ -546,6 +549,50 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			}
 			throw e;
 		}
+		return returnValues;
+	}
+
+	public JsonObject requestItem(String hrid, UserId userId) throws Exception {
+		JsonObject returnValues = new JsonObject();
+		try {
+			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+			String itemSearchUrl =  baseUrl + Constants.ITEM_SEARCH_URL.replace("$hrid$", hrid);
+			String itemResponseString = callApiGet(itemSearchUrl);
+			JsonObject itemResponse = new JsonObject(itemResponseString);
+
+			Integer totalRecords = itemResponse.getInteger("totalRecords");
+			if (totalRecords == 1) {
+				JsonObject itemObject = itemResponse.getJsonArray("items").getJsonObject(0);
+				String holdingsUrl =  baseUrl + Constants.HOLDINGS_URL +  "/" + itemObject.getString("holdingsRecordId");
+				String holdingResponseString = callApiGet(holdingsUrl);
+				JsonObject holdingResponse = new JsonObject(holdingResponseString);
+
+				JsonObject request = new JsonObject();
+				request.put("requestType", "Page");
+				request.put("fulfillmentPreference", "Delivery");
+				request.put("requesterId", userId.getUserIdentifierValue());
+				request.put("itemId", itemObject.getString("id"));
+				request.put("instanceId", holdingResponse.getString("instanceId"));
+				request.put("requestLevel", "Item");
+				request.put("holdingsRecordId", holdingResponse.getString("id"));
+				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
+
+				String requestUrl = baseUrl + Constants.REQUEST_URL;
+				String requestResponse = callApiPost(requestUrl, request);
+
+				returnValues.put("request", new JsonObject(requestResponse));
+				returnValues.put("item", itemObject);
+				returnValues.put("holding", holdingResponse);
+
+			} else {
+				logger.error("Found total of " + totalRecords + " items by hrid " + hrid);
+				throw new FolioNcipException(Constants.REQUEST_ITEM_MISSING_PROBLEM);
+			}
+		} catch (Exception exception) {
+			logger.error("Failed to Page request", exception);
+			throw  exception;
+		}
+
 		return returnValues;
 	}
 
