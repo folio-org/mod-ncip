@@ -580,10 +580,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				String requestUrl = baseUrl + Constants.REQUEST_URL;
 				String requestResponse = callApiPost(requestUrl, request);
 
-				returnValues.put("request", new JsonObject(requestResponse));
-				returnValues.put("item", itemObject);
-				returnValues.put("holding", holdingResponse);
-
+				returnValues.mergeIn(new JsonObject(requestResponse));
 			} else {
 				logger.error("Found total of " + totalRecords + " items by hrid " + hrid);
 				throw new FolioNcipException(Constants.REQUEST_ITEM_MISSING_PROBLEM);
