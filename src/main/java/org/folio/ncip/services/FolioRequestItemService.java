@@ -59,13 +59,20 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		try {
 			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager)
 					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId);
-			String assignedRequestId = requestItemResponseDetails.getJsonObject("request").getString("id");
-			String barcode = requestItemResponseDetails.getJsonObject("item").getString("barcode");
-			String callNumber = requestItemResponseDetails.getJsonObject("item").getString("callNumber");
-			String locationName = requestItemResponseDetails.getJsonObject("item").getJsonObject("effectiveLocation").getString("name");
+			String assignedRequestId = requestItemResponseDetails.getString("id");
+			String barcode = null;
+			String callNumber = null;
+			String locationName = null;
+			if(requestItemResponseDetails.getJsonObject("item") != null) {
+				JsonObject item = requestItemResponseDetails.getJsonObject("item");
+				barcode = item.getString("barcode");
+				callNumber = item.getString("callNumber");
+				if (item.getJsonObject("location") != null) {
+					locationName = item.getJsonObject("location").getString("name") + " : " + item.getJsonObject("location").getString("libraryName");
+				}
+			}
 			ncipRequestId.setRequestIdentifierValue(assignedRequestId);
 			itemDescription.setCallNumber(callNumber);
-			itemDescription.setCopyNumber(barcode);
 			locationNameInstance.setLocationNameValue(locationName);
 			itemId.setItemIdentifierValue(barcode);
 		}
