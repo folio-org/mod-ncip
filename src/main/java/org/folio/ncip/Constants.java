@@ -82,6 +82,7 @@ public class Constants {
 	public static final String HOLDINGS_URL = "/holdings-storage/holdings";
 	public static final String ITEM_URL = "/inventory/items";
 	public static final String ITEM_SEARCH_URL = "/inventory/items?limit=1&query=hrid%3D%3D%22$hrid$%22";
+	public static final String INSTANCE_SEARCH_URL = "/inventory/instances?limit=1&query=hrid%3D%3D%22$hrid$%22";
 	public static final String REQUEST_URL = "/circulation/requests";
 	public static final String ADDRESS_TYPES = "/addresstypes";
 	

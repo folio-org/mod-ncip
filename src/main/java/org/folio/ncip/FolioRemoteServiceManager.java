@@ -552,29 +552,35 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return returnValues;
 	}
 
-	public JsonObject requestItem(String hrid, UserId userId) throws Exception {
+	public JsonObject requestItem(String hrid, UserId userId, boolean titleRequest, String requestType) throws Exception {
 		JsonObject returnValues = new JsonObject();
 		try {
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-			String itemSearchUrl =  baseUrl + Constants.ITEM_SEARCH_URL.replace("$hrid$", hrid);
-			String itemResponseString = callApiGet(itemSearchUrl);
-			JsonObject itemResponse = new JsonObject(itemResponseString);
+			String searchUrl =  baseUrl + (titleRequest ? Constants.INSTANCE_SEARCH_URL : Constants.ITEM_SEARCH_URL)
+					.replace("$hrid$", hrid);
+			String responseString = callApiGet(searchUrl);
+			JsonObject response = new JsonObject(responseString);
 
-			Integer totalRecords = itemResponse.getInteger("totalRecords");
+			Integer totalRecords = response.getInteger("totalRecords");
 			if (totalRecords == 1) {
-				JsonObject itemObject = itemResponse.getJsonArray("items").getJsonObject(0);
-				String holdingsUrl =  baseUrl + Constants.HOLDINGS_URL +  "/" + itemObject.getString("holdingsRecordId");
-				String holdingResponseString = callApiGet(holdingsUrl);
-				JsonObject holdingResponse = new JsonObject(holdingResponseString);
-
 				JsonObject request = new JsonObject();
-				request.put("requestType", "Page");
+				if (titleRequest) {
+					JsonObject instanceObject = response.getJsonArray("instances").getJsonObject(0);
+					request.put("instanceId", instanceObject.getString("id"));
+					request.put("requestLevel", "Title");
+				} else {
+					JsonObject itemObject = response.getJsonArray("items").getJsonObject(0);
+					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
+					String holdingResponseString = callApiGet(holdingsUrl);
+					JsonObject holdingResponse = new JsonObject(holdingResponseString);
+					request.put("itemId", itemObject.getString("id"));
+					request.put("instanceId", holdingResponse.getString("instanceId"));
+					request.put("holdingsRecordId", holdingResponse.getString("id"));
+					request.put("requestLevel", "Item");
+				}
+				request.put("requestType", requestType);
 				request.put("fulfillmentPreference", "Delivery");
 				request.put("requesterId", userId.getUserIdentifierValue());
-				request.put("itemId", itemObject.getString("id"));
-				request.put("instanceId", holdingResponse.getString("instanceId"));
-				request.put("requestLevel", "Item");
-				request.put("holdingsRecordId", holdingResponse.getString("id"));
 				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
 
 				String requestUrl = baseUrl + Constants.REQUEST_URL;
