@@ -104,6 +104,7 @@ public class MockServer {
 			    router.get("/configurations/entries/toolkit").handler(this::getToolkitCofigs);
 			    router.get("/configurations/entries").handler(this::getNcipConfigs);
 				router.get("/inventory/items").handler(this::items);
+			    router.get("/inventory/instances").handler(this::instances);
 				router.get("/holdings-storage/holdings/:id").handler(this::holdingsById);
 				router.post("/circulation/requests").handler(this::requestsPost);
 
@@ -171,6 +172,12 @@ public class MockServer {
 
 		  private void items(RoutingContext ctx) {
 			  String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
+			  String body = readLineByLine(mockFileName);
+			  serverResponse(ctx,200,APPLICATION_JSON,body);
+		  }
+
+		  private void instances(RoutingContext ctx) {
+		  	  String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "instancesByHrid-get.json";
 			  String body = readLineByLine(mockFileName);
 			  serverResponse(ctx,200,APPLICATION_JSON,body);
 		  }

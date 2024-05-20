@@ -28,10 +28,15 @@ import org.folio.ncip.FolioRemoteServiceManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FolioRequestItemService extends FolioNcipService implements RequestItemService {
 
 	private static final Logger logger = Logger.getLogger(FolioRequestItemService.class);
+
+	private static final Map<String, String> REQUEST_TYPE = Map.of("page", "Page",
+			"hold", "Hold",
+			"recall", "Recall");
 
 	@Override
 	public RequestItemResponseData performService(RequestItemInitiationData initData, ServiceContext serviceContext,
@@ -45,6 +50,7 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		try {
 			validateUserId(userId);
 			validateBibliographicIdIsPresent(bibliographicId);
+			initData.getRequestType().getValue();
 		}
 		catch(Exception exception) {
 			logger.error("Failed validating userId and itemId. " + exception.getLocalizedMessage());
@@ -52,13 +58,16 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 					exception.getMessage(),exception.getMessage()));
 		}
 
+
+		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains("title");
+		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(), "Page");
 		ItemId itemId = new ItemId();
 		RequestId ncipRequestId = new RequestId();
 		ItemDescription itemDescription = new ItemDescription();
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
 		try {
 			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager)
-					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId);
+					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId, titleRequest, requestType);
 			String assignedRequestId = requestItemResponseDetails.getString("id");
 			String barcode = null;
 			String callNumber = null;

@@ -17,8 +17,8 @@
         <ItemId>
             <ItemIdentifierValue>item1</ItemIdentifierValue>
         </ItemId>
-        <RequestType>Loan</RequestType>
-        <RequestScopeType>Bibliographic Item</RequestScopeType>
+        <RequestType>Page</RequestType>
+        <RequestScopeType>Item</RequestScopeType>
         <BibliographicId>
             <BibliographicRecordId>
                 <BibliographicRecordIdentifier>itemHrid1</BibliographicRecordIdentifier>
