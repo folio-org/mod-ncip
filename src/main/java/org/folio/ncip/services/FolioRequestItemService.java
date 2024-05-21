@@ -10,6 +10,7 @@ import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.LocationName;
 import org.extensiblecatalog.ncip.v2.service.LocationNameInstance;
+import org.extensiblecatalog.ncip.v2.service.LocationType;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
@@ -26,6 +27,7 @@ import org.folio.ncip.Constants;
 import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +95,12 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		ItemIdentifierType itemIdentifierType = new ItemIdentifierType(Constants.SCHEME, Constants.ITEM_BARCODE);
 		RequestIdentifierType requestIdentifierType = new RequestIdentifierType(Constants.SCHEME,Constants.REQUEST_ID);
 		Location location = new Location();
+		LocationType locationType = new LocationType(Constants.SCHEME, Constants.ITEM);
 		LocationName locationName = new LocationName();
+		locationNameInstance.setLocationNameLevel(BigDecimal.ONE);
 		locationName.setLocationNameInstances(List.of(locationNameInstance));
 		location.setLocationName(locationName);
+		location.setLocationType(locationType);
 		ItemOptionalFields itemOptionalFields = new ItemOptionalFields();
 		itemOptionalFields.setItemDescription(itemDescription);
 		itemOptionalFields.setLocations(List.of(location));
