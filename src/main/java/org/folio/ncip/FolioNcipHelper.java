@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
@@ -308,7 +310,15 @@ public class FolioNcipHelper {
 				logger.fatal(e.getLocalizedMessage());
 			}
 
+			StringWriter writer = new StringWriter();
+			properties.list(new PrintWriter(writer));
+			logger.info("Tenant: " + tenant + " properties are " + writer.getBuffer().toString());
+
 			ncipProperties.put(tenant, properties);
+
+			StringWriter writer2 = new StringWriter();
+			ncipProperties.list(new PrintWriter(writer2));
+			logger.info("NCIP properties are " + writer2.getBuffer().toString());
 
 	}
 
