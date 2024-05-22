@@ -150,9 +150,7 @@ public class FolioNcipHelper {
 
 			folioRemoteServiceManager = new FolioRemoteServiceManager();
 			folioRemoteServiceManager.setOkapiHeaders(context.request().headers());
-			Properties tenantProperties = (Properties) ncipProperties.get(tenant);
-			printProperties(tenantProperties, tenant);
-			folioRemoteServiceManager.setNcipProperties(tenantProperties);
+			folioRemoteServiceManager.setNcipProperties((Properties) ncipProperties.get(tenant));
 
 			// MESSAGEHANDLER IS A DYNAMIC TYPE BASED ON INCOMING XML
 			// E.G. INCOMING XML = LookupUserRequest, then messageHandler WILL BE
@@ -312,21 +310,8 @@ public class FolioNcipHelper {
 				logger.fatal(e.getLocalizedMessage());
 			}
 
-			printProperties(properties, tenant);
-
 			ncipProperties.put(tenant, properties);
-
 			logger.info("Has tenant properties " + (ncipProperties.get(tenant) != null));
-	}
-
-	private void printProperties(Properties properties, String tenant) {
-		if(properties != null) {
-			StringWriter writer = new StringWriter();
-			properties.list(new PrintWriter(writer));
-			logger.info("Tenant: " + tenant + " properties are " + writer.getBuffer().toString());
-		} else {
-			logger.info("Tenant: " + tenant + " does not have properties");
-		}
 	}
 
 
