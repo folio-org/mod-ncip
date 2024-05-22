@@ -150,7 +150,9 @@ public class FolioNcipHelper {
 
 			folioRemoteServiceManager = new FolioRemoteServiceManager();
 			folioRemoteServiceManager.setOkapiHeaders(context.request().headers());
-			folioRemoteServiceManager.setNcipProperties((Properties) ncipProperties.get(tenant));
+			Properties tenantProperties = (Properties) ncipProperties.get(tenant);
+			printProperties(tenantProperties, tenant);
+			folioRemoteServiceManager.setNcipProperties(tenantProperties);
 
 			// MESSAGEHANDLER IS A DYNAMIC TYPE BASED ON INCOMING XML
 			// E.G. INCOMING XML = LookupUserRequest, then messageHandler WILL BE
@@ -310,16 +312,21 @@ public class FolioNcipHelper {
 				logger.fatal(e.getLocalizedMessage());
 			}
 
-			StringWriter writer = new StringWriter();
-			properties.list(new PrintWriter(writer));
-			logger.info("Tenant: " + tenant + " properties are " + writer.getBuffer().toString());
+			printProperties(properties, tenant);
 
 			ncipProperties.put(tenant, properties);
 
-			StringWriter writer2 = new StringWriter();
-			ncipProperties.list(new PrintWriter(writer2));
-			logger.info("NCIP properties are " + writer2.getBuffer().toString());
+			logger.info("Has tenant properties " + (ncipProperties.get(tenant) != null));
+	}
 
+	private void printProperties(Properties properties, String tenant) {
+		if(properties != null) {
+			StringWriter writer = new StringWriter();
+			properties.list(new PrintWriter(writer));
+			logger.info("Tenant: " + tenant + " properties are " + writer.getBuffer().toString());
+		} else {
+			logger.info("Tenant: " + tenant + " does not have properties");
+		}
 	}
 
 
