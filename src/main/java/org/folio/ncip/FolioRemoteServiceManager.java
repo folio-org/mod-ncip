@@ -554,6 +554,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	public JsonObject requestItem(String hrid, UserId userId, boolean titleRequest, String requestType) throws Exception {
 		JsonObject returnValues = new JsonObject();
+		JsonObject user = lookupPatronRecord(userId);
+		if (user == null)
+			throw new FolioNcipException(Constants.USER_NOT_FOUND);
 		try {
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 			String searchUrl =  baseUrl + (titleRequest ? Constants.INSTANCE_SEARCH_URL : Constants.ITEM_SEARCH_URL)
@@ -580,7 +583,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				}
 				request.put("requestType", requestType);
 				request.put("fulfillmentPreference", "Delivery");
-				request.put("requesterId", userId.getUserIdentifierValue());
+				request.put("requesterId", user.getString("id"));
 				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
 
 				String requestUrl = baseUrl + Constants.REQUEST_URL;
