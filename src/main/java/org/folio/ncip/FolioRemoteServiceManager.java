@@ -423,12 +423,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
-		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + " AND pickupLocation==true";
-		String pickupLocationUrl = baseUrl + "/service-points?query=" + PercentCodec.encode(query);
-		String servicePointResponse = callApiGet(pickupLocationUrl);
-		JsonObject servicePoints = new JsonObject(servicePointResponse);
-		if (servicePoints.getJsonArray("servicepoints").size() == 0)
-			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
+		String sPointId = getServicePointId(pickUpLocationCode, baseUrl);
 
 		// GENERATE UUIDS FOR OBJECTS
 		UUID instanceUuid = UUID.randomUUID();
@@ -508,7 +503,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put("instanceId", holdings.getString("instanceId"));
 			request.put("requestLevel", "Item");
 			request.put("holdingsRecordId", holdingsUuid.toString());
-			String sPointId = servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
 			request.put("pickupServicePointId", sPointId);
 			DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 			ZonedDateTime now = ZonedDateTime.now();
@@ -552,7 +546,18 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return returnValues;
 	}
 
-	public JsonObject requestItem(String hrid, UserId userId, boolean titleRequest, String requestType) throws Exception {
+	private String getServicePointId(String pickUpLocationCode, String baseUrl) throws Exception {
+		String query = "code==" + StringUtil.cqlEncode(pickUpLocationCode) + " AND pickupLocation==true";
+		String pickupLocationUrl = baseUrl + "/service-points?query=" + PercentCodec.encode(query);
+		String servicePointResponse = callApiGet(pickupLocationUrl);
+		JsonObject servicePoints = new JsonObject(servicePointResponse);
+		if (servicePoints.getJsonArray("servicepoints").size() == 0)
+			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
+		return servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
+	}
+
+	public JsonObject requestItem(String hrid, UserId userId, boolean titleRequest, String requestType,
+								  String pickUpLocationCode) throws Exception {
 		JsonObject returnValues = new JsonObject();
 		JsonObject user = lookupPatronRecord(userId);
 		if (user == null)
@@ -566,6 +571,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 			Integer totalRecords = response.getInteger("totalRecords");
 			if (totalRecords == 1) {
+
 				JsonObject request = new JsonObject();
 				if (titleRequest) {
 					JsonObject instanceObject = response.getJsonArray("instances").getJsonObject(0);
@@ -585,6 +591,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				request.put("fulfillmentPreference", "Delivery");
 				request.put("requesterId", user.getString("id"));
 				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
+				if (pickUpLocationCode != null) {
+					String servicePointId = getServicePointId(pickUpLocationCode, baseUrl);
+					request.put("pickupServicePointId", servicePointId);
+				}
 
 				String requestUrl = baseUrl + Constants.REQUEST_URL;
 				String requestResponse = callApiPost(requestUrl, request);
