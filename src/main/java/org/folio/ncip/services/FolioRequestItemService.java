@@ -62,13 +62,8 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		}
 
 		String pickUpLocationCode = null;
-		if (initData.getItemOptionalFields() != null && initData.getItemOptionalFields().getLocations() != null &&
-				!initData.getItemOptionalFields().getLocations().isEmpty() && initData.getItemOptionalFields().getLocation(0) != null &&
-				initData.getItemOptionalFields().getLocation(0).getLocationName() != null &&
-				initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstances() != null &&
-				!initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstances().isEmpty() &&
-				StringUtils.isNotBlank(initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstance(0).getLocationNameValue())) {
-			pickUpLocationCode = initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstance(0).getLocationNameValue();
+		if (initData.getPickupLocation() != null && StringUtils.isNotBlank(initData.getPickupLocation().getValue())) {
+			pickUpLocationCode = initData.getPickupLocation().getValue();
 
 		}
 
