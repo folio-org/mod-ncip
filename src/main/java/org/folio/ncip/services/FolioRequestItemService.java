@@ -1,6 +1,7 @@
 package org.folio.ncip.services;
 
 import io.vertx.core.json.JsonObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
@@ -60,6 +61,16 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 					exception.getMessage(),exception.getMessage()));
 		}
 
+		String pickUpLocationCode = null;
+		if (initData.getItemOptionalFields() != null && initData.getItemOptionalFields().getLocations() != null &&
+				!initData.getItemOptionalFields().getLocations().isEmpty() && initData.getItemOptionalFields().getLocation(0) != null &&
+				initData.getItemOptionalFields().getLocation(0).getLocationName() != null &&
+				initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstances() != null &&
+				!initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstances().isEmpty() &&
+				StringUtils.isNotBlank(initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstance(0).getLocationNameValue())) {
+			pickUpLocationCode = initData.getItemOptionalFields().getLocation(0).getLocationName().getLocationNameInstance(0).getLocationNameValue();
+
+		}
 
 		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains("title");
 		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(), "Page");
@@ -69,7 +80,7 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
 		try {
 			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager)
-					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId, titleRequest, requestType);
+					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId, titleRequest, requestType, pickUpLocationCode);
 			String assignedRequestId = requestItemResponseDetails.getString("id");
 			String barcode = null;
 			String callNumber = null;

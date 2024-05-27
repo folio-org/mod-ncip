@@ -97,6 +97,7 @@ public class MockServer {
 			    router.get("/groups/:id").handler(this::groupLookup);
 			    router.get("/users").handler(this::users);
 			    router.get("/service-points-users").handler(this::servicePointUsers);
+			    router.get("/service-points").handler(this::servicePointUsers);
 			    router.get("/manualblocks").handler(this::manualBlocks);
 			    router.get("/automated-patron-blocks/:id").handler(this::automatedBlocks);
 			    //router.get("/configurations/entries/maxloancount").handler(this::getMaxLoanCount);
