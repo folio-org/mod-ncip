@@ -24,14 +24,6 @@
                 <BibliographicRecordIdentifier>instanceHrid1</BibliographicRecordIdentifier>
             </BibliographicRecordId>
         </BibliographicId>
-        <ItemOptionalFields>
-            <Location>
-                <LocationName>
-                    <LocationNameInstance>
-                        <LocationNameValue>FAIRCHILD</LocationNameValue>
-                    </LocationNameInstance>
-                </LocationName>
-            </Location>
-        </ItemOptionalFields>
+        <PickupLocation>FAIRCHILD</PickupLocation>
     </RequestItem>
 </NCIPMessage>
