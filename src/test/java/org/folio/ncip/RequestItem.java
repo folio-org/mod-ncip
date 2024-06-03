@@ -23,6 +23,7 @@ public class RequestItem extends TestBase {
 	private static final String ITEM_IDENTIFIER = "<ns1:ItemIdentifierValue>0000005</ns1:ItemIdentifierValue>";
 	private static final String CALL_NUMBER = "<ns1:CallNumber>58.95</ns1:CallNumber>";
 	private static final String LOCATION = "Annex : Datalogisk Institut";
+	private static final String REQUESTER_ID = "764fe3bf-e09b-4fcc-b4a9-c78aab6995f1";
 	
 	/**
 	 * @throws java.lang.Exception
@@ -41,6 +42,7 @@ public class RequestItem extends TestBase {
 		assertTrue(body.contains(ITEM_IDENTIFIER));
 		assertTrue(body.contains(CALL_NUMBER));
 		assertTrue(body.contains(LOCATION));
+		assertTrue(body.contains(REQUESTER_ID));
 	}
 
 
@@ -55,5 +57,6 @@ public class RequestItem extends TestBase {
 		assertTrue(body.contains(ITEM_IDENTIFIER));
 		assertTrue(body.contains(CALL_NUMBER));
 		assertTrue(body.contains(LOCATION));
+		assertTrue(body.contains(REQUESTER_ID));
 	}
 }
