@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
@@ -19,6 +21,7 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
 
@@ -113,9 +116,12 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		responseData.setDateDue(calendar);
 		responseData.setItemId(iId);
 		responseData.setUserId(uId);
-		ItemOptionalFields o = new ItemOptionalFields();
-		o.setHoldQueue(loanUuid);
-		responseData.setItemOptionalFields(o);
+		UserId loanId = new UserId();
+		loanId.setUserIdentifierValue(loanUuid);
+		loanId.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME, "loanUuid"));
+		UserOptionalFields userOptionalFields = new UserOptionalFields();
+		userOptionalFields.setUserIds(List.of(loanId));
+		responseData.setUserOptionalFields(userOptionalFields);
 		
 		return responseData;
 	 }
