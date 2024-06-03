@@ -12,6 +12,7 @@ import org.extensiblecatalog.ncip.v2.service.CheckOutItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.CheckOutItemService;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
@@ -37,6 +38,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		ItemId itemId = initData.getItemId();
 		UserId userId = retrieveUserId(initData);
 		String dueDate = null;
+		String loanUuid = null;
         try {
         	validateUserId(userId);
         	validateItemId(itemId);
@@ -79,6 +81,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	//THE SERVICE MANAGER CALLS THE OKAPI APIs
         	 JsonObject checkOutItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).checkOut(initData,requesterAgencyId.toLowerCase());
         	 dueDate = checkOutItemResponseDetails.getString("dueDate");
+			 loanUuid = checkOutItemResponseDetails.getString("id");
         	 //DUE DATE PARSE STARTED FAILING 11-2020
          	 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -110,6 +113,9 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		responseData.setDateDue(calendar);
 		responseData.setItemId(iId);
 		responseData.setUserId(uId);
+		ItemOptionalFields o = new ItemOptionalFields();
+		o.setHoldQueue(loanUuid);
+		responseData.setItemOptionalFields(o);
 		
 		return responseData;
 	 }
