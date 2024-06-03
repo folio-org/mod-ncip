@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
@@ -12,12 +14,14 @@ import org.extensiblecatalog.ncip.v2.service.CheckOutItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.CheckOutItemService;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.ItemOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
 
@@ -37,6 +41,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		ItemId itemId = initData.getItemId();
 		UserId userId = retrieveUserId(initData);
 		String dueDate = null;
+		String loanUuid = null;
         try {
         	validateUserId(userId);
         	validateItemId(itemId);
@@ -79,6 +84,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	//THE SERVICE MANAGER CALLS THE OKAPI APIs
         	 JsonObject checkOutItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).checkOut(initData,requesterAgencyId.toLowerCase());
         	 dueDate = checkOutItemResponseDetails.getString("dueDate");
+			 loanUuid = checkOutItemResponseDetails.getString("id");
         	 //DUE DATE PARSE STARTED FAILING 11-2020
          	 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -110,6 +116,12 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		responseData.setDateDue(calendar);
 		responseData.setItemId(iId);
 		responseData.setUserId(uId);
+		UserId loanId = new UserId();
+		loanId.setUserIdentifierValue(loanUuid);
+		loanId.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME, "loanUuid"));
+		UserOptionalFields userOptionalFields = new UserOptionalFields();
+		userOptionalFields.setUserIds(List.of(loanId));
+		responseData.setUserOptionalFields(userOptionalFields);
 		
 		return responseData;
 	 }

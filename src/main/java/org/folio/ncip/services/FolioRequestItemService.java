@@ -24,6 +24,8 @@ import org.extensiblecatalog.ncip.v2.service.RequestScopeType;
 import org.extensiblecatalog.ncip.v2.service.RequestType;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
@@ -73,10 +75,12 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		RequestId ncipRequestId = new RequestId();
 		ItemDescription itemDescription = new ItemDescription();
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
+		UserId optionalUserId = new UserId();
 		try {
 			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager)
 					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId, titleRequest, requestType, pickUpLocationCode);
 			String assignedRequestId = requestItemResponseDetails.getString("id");
+			String requesterId = requestItemResponseDetails.getString("requesterId");
 			String barcode = null;
 			String callNumber = null;
 			String locationName = null;
@@ -92,6 +96,7 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 			itemDescription.setCallNumber(callNumber);
 			locationNameInstance.setLocationNameValue(locationName);
 			itemId.setItemIdentifierValue(barcode);
+			optionalUserId.setUserIdentifierValue(requesterId);
 		}
 		catch(Exception exception) {
 			logger.error("Failed to Page RequestItem " + exception.getLocalizedMessage());
@@ -112,6 +117,11 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		itemOptionalFields.setLocations(List.of(location));
 		itemId.setItemIdentifierType(itemIdentifierType);
 		ncipRequestId.setRequestIdentifierType(requestIdentifierType);
+
+		optionalUserId.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME,"uuid"));
+		UserOptionalFields userOptionalFields = new UserOptionalFields();
+		userOptionalFields.setUserIds(List.of(optionalUserId));
+
 		RequestItemResponseData requestItemResponseData = new RequestItemResponseData();
 		requestItemResponseData.setItemId(itemId);
 		requestItemResponseData.setRequestId(ncipRequestId);
@@ -119,6 +129,7 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		requestItemResponseData.setItemOptionalFields(itemOptionalFields);
 		requestItemResponseData.setRequestType(new RequestType(Constants.SCHEME, Constants.PAGE));
 		requestItemResponseData.setRequestScopeType(new RequestScopeType(Constants.SCHEME, Constants.ITEM));
+		requestItemResponseData.setUserOptionalFields(userOptionalFields);
 		return requestItemResponseData;
 	}
 
