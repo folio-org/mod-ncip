@@ -511,8 +511,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			url = baseUrl + Constants.REQUEST_URL;
 			String requestRespone = callApiPost(url, request);
 
-			returnValues.mergeIn(new JsonObject(requestRespone)).mergeIn(new JsonObject(itemResponse))
-					.mergeIn(new JsonObject(holdingsResponse));
+			returnValues.mergeIn(new JsonObject(requestRespone)).put("item", new JsonObject(itemResponse))
+					.put("holdings", new JsonObject(holdingsResponse));
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
