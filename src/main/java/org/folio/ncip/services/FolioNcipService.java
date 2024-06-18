@@ -3,6 +3,7 @@ package org.folio.ncip.services;
 import java.util.regex.Pattern;
 
 import org.extensiblecatalog.ncip.v2.service.ItemId;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioNcipException;
@@ -58,6 +59,12 @@ public class FolioNcipService {
 				|| itemId.getItemIdentifierValue().length() > 100) {
 			FolioNcipException exception = new FolioNcipException("Item id is invalid");
 			throw exception;
+		}
+	}
+
+	protected void validateRequestIdIsPresent(RequestId requestId) throws FolioNcipException {
+		if (requestId == null || requestId.getRequestIdentifierValue() == null) {
+			throw new FolioNcipException(Constants.REQUEST_ID_MISSING);
 		}
 	}
 }

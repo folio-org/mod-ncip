@@ -42,6 +42,7 @@ public class Constants {
 	public static final String REQUEST_ITEM_PROBLEM = "Problem performing RequestItem";
 	public static final String REQUEST_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
 	public static final String REQUEST_ITEM_MISSING_PROBLEM = "Problem occurred while fetching item";
+	public static final String CANCEL_REQUEST_ITEM_PROBLEM = "Problem performing CancelRequestItem";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
@@ -73,6 +74,8 @@ public class Constants {
 	public static final String OK_CONFIG = "user.priv.ok.status"; 
 	public static final String BLOCKED_CONFIG = "user.priv.blocked.status";
 	public static final String EMAIL_STRING = "user.email.type";
+	public static final String REQUEST_CANCELLED_STATUS = "Closed - Cancelled";
+	public static final String REQUEST_CANCEL_ADDITIONAL_INFO = "NCIP cancel";
 	
 	
 	//ENDPOINTS
