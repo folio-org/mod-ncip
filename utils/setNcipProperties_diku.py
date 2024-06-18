@@ -175,3 +175,13 @@ print(the_data)
 response = requests.post(url + "/configurations/entries",the_data,headers=headers)
 print(response)
 
+configuration = {}
+configuration['configName'] = "ReShare" #AGENCY ID
+configuration['code'] = "cancel.request.reason.name"
+configuration['value'] = "Item Not Available"
+configuration['module'] = "NCIP"
+the_data = json.dumps(configuration)
+print(the_data)
+response = requests.post(url + "/configurations/entries",the_data,headers=headers)
+print(response)
+
