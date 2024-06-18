@@ -1,3 +1,6 @@
+## 1.15.0 2024-06-10
+ * [MODNCIP-69](https://folio-org.atlassian.net/browse/MODNCIP-69) API version update (mod-inventory-storage)
+ * [MODNCIP-67](https://folio-org.atlassian.net/browse/MODNCIP-67) mod-ncip v1.14.X asserts compatibility with circulation interface v12 and 13 but actually requires v14
 ## 1.14.5 2024-04-04
  * [MODNCIP-65](https://folio-org.atlassian.net/browse/MODNCIP-65) if preferredFirstName is present use in lookupUserResponse
 ## 1.14.4 2023-10-25
