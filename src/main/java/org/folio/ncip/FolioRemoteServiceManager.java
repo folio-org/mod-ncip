@@ -192,6 +192,60 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	}
 
+	public String callApiPut(String uriString, JsonObject body) throws Exception{
+		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
+		int timeout = Integer.parseInt(timeoutString);
+		logger.info("Using timeout: " + timeout);
+		RequestConfig config = RequestConfig.custom()
+				.setConnectTimeout(timeout)
+				.setSocketTimeout(timeout)
+				.build();
+		CloseableHttpClient client = HttpClients.custom().build();
+		HttpUriRequest request = RequestBuilder.put()
+				.setConfig(config)
+				.setUri(uriString)
+				.setEntity(new StringEntity(body.toString(),"UTF-8"))
+				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
+				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
+				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
+				.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
+				.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN))
+				.build();
+
+		HttpResponse response;
+		HttpEntity entity;
+		String responseString;
+		int responseCode;
+		try {
+			response = client.execute(request);
+			entity = response.getEntity();
+			responseString = EntityUtils.toString(entity, "UTF-8");
+			responseCode = response.getStatusLine().getStatusCode();
+		}
+		catch(Exception e) {
+			logger.fatal("callApiPut failed");
+			logger.fatal(uriString);
+			logger.fatal(body);
+			logger.fatal(e.getMessage());
+			throw e;
+		}
+		finally {
+			client.close();
+		}
+
+		logger.info("PUT:");
+		logger.info(body.toString());
+		logger.info(uriString);
+		logger.info(responseCode);
+		logger.info(responseString);
+
+		if (responseCode > 399) {
+			String responseBody = processErrorResponse(responseString);
+			throw new Exception(responseBody);
+		}
+		return responseString;
+	}
+
 	public HttpResponse callApiDelete(String uriString) throws Exception, IOException, InterruptedException {
 
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
@@ -875,6 +929,43 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String id = user.getString("id");
 		user = gatherPatronData(user, id);
 		return user;
+	}
+
+	public JsonObject cancelRequestItem(String requestId, UserId userId, String agencyId) throws Exception {
+
+		if (ncipProperties == null) {
+			throw new Exception("NCIP Properties have not been initialized.");
+		}
+
+		JsonObject user = lookupPatronRecord(userId);
+		if (user == null) {
+			throw new FolioNcipException(Constants.USER_NOT_FOUND);
+		}
+
+		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
+		LocalDateTime now = LocalDateTime.now();
+		String date = dtf.format(now);
+
+		initProperties(agencyId, baseUrl);
+
+		String reasonId = ncipProperties.getProperty(agencyId + ".cancel.request.reason.id");
+
+		String url = baseUrl + Constants.REQUEST_URL + "/" + requestId;
+		try {
+			JsonObject requestResponse = new JsonObject(callApiGet(url));
+			requestResponse.put("status", Constants.REQUEST_CANCELLED_STATUS);
+			requestResponse.put("cancelledByUserId", user.getString("id"));
+			requestResponse.put("cancellationReasonId", reasonId);
+			requestResponse.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_ADDITIONAL_INFO);
+			requestResponse.put("cancelledDate", date);
+
+			return new JsonObject(callApiPut(url, requestResponse));
+		}
+		catch(Exception e) {
+			logger.error("Exception occurred during cancel request item");
+			throw e;
+		}
 	}
 
 }
