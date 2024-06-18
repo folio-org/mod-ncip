@@ -15,10 +15,11 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
-import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
 import org.folio.util.PercentCodec;
@@ -45,8 +46,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-
-import static java.lang.String.*;
 
 public class FolioRemoteServiceManager implements RemoteServiceManager {
 
@@ -196,6 +195,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 		int timeout = Integer.parseInt(timeoutString);
 		logger.info("Using timeout: " + timeout);
+		String stringBody = body.toString();
+		logger.info("With body: " + stringBody);
 		RequestConfig config = RequestConfig.custom()
 				.setConnectTimeout(timeout)
 				.setSocketTimeout(timeout)
@@ -204,7 +205,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		HttpUriRequest request = RequestBuilder.put()
 				.setConfig(config)
 				.setUri(uriString)
-				.setEntity(new StringEntity(body.toString(),"UTF-8"))
+				.setEntity(new StringEntity(stringBody, ContentType.APPLICATION_JSON))
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
 				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
 				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
@@ -234,7 +235,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 
 		logger.info("PUT:");
-		logger.info(body.toString());
+		logger.info(body);
 		logger.info(uriString);
 		logger.info(responseCode);
 		logger.info(responseString);
