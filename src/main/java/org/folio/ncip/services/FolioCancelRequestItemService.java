@@ -1,9 +1,11 @@
 package org.folio.ncip.services;
 
+import io.vertx.core.json.JsonObject;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.CancelRequestItemService;
+import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
@@ -52,17 +54,27 @@ public class FolioCancelRequestItemService extends FolioNcipService implements C
             return addProblem(responseData, problem);
         }
 
+        String itemIdString = null;
         try {
-            ((FolioRemoteServiceManager)remoteServiceManager)
+            JsonObject cancelResponse =((FolioRemoteServiceManager)remoteServiceManager)
                     .cancelRequestItem(requestId.getRequestIdentifierValue(), userId, requesterAgencyId.toLowerCase());
+            JsonObject item = cancelResponse.getJsonObject("item");
+            if (item != null) {
+                itemIdString = item.getString("barcode");
+            } else {
+                itemIdString = cancelResponse.getString("itemId");
+            }
         } catch(Exception  e) {
             Problem problem = new Problem(new ProblemType(Constants.CANCEL_REQUEST_ITEM_PROBLEM), Constants.UNKNOWN_DATA_ELEMENT,
                     Constants.CANCEL_REQUEST_ITEM_PROBLEM, e.getMessage());
             return addProblem(responseData, problem);
         }
 
+        ItemId itemId = new ItemId();
+        itemId.setItemIdentifierValue(itemIdString);
         responseData.setRequestId(requestId);
         responseData.setUserId(userId);
+        responseData.setItemId(itemId);
         return responseData;
     }
 
