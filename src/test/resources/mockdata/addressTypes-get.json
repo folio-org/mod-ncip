@@ -1,0 +1,71 @@
+{
+  "addressTypes": [
+    {
+      "addressType": "Home",
+      "desc": "Home Address",
+      "id": "93d3d88d-499b-45d0-9bc7-ac73c3a19880",
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:41.415+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:06:48.888+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    },
+    {
+      "addressType": "Order",
+      "desc": "Order Address",
+      "id": "46ff3f08-8f41-485c-98d8-701ba8404f4f",
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:41.416+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:06:48.875+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    },
+    {
+      "addressType": "Claim",
+      "desc": "Claim Address",
+      "id": "b6f4d1c6-0dfa-463c-9534-f49c4f0ae090",
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:41.419+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:06:48.873+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    },
+    {
+      "addressType": "Returns",
+      "desc": "Returns Address",
+      "id": "c42be2ab-c3fd-486c-a1fe-9e5ea0f16198",
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:41.417+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:06:48.878+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    },
+    {
+      "addressType": "Work",
+      "desc": "Work Address",
+      "id": "1c4b225f-f669-4e9b-afcd-ebc0e273a34e",
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:41.431+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:06:48.876+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    },
+    {
+      "addressType": "Payment",
+      "desc": "Payment Address",
+      "id": "a3c3d60b-df9e-41d9-b7f5-983008bc1a45",
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:41.416+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:06:48.877+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    }
+  ],
+  "totalRecords": 6
+}

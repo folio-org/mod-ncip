@@ -61,6 +61,8 @@ public class FolioCancelRequestItemService extends FolioNcipService implements C
             return addProblem(responseData, problem);
         }
 
+        responseData.setRequestId(requestId);
+        responseData.setUserId(userId);
         return responseData;
     }
 
