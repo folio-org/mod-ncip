@@ -191,12 +191,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	}
 
-	public String callApiPut(String uriString, JsonObject body) throws Exception{
+	public void callApiPut(String uriString, JsonObject body) throws Exception{
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 		int timeout = Integer.parseInt(timeoutString);
 		logger.info("Using timeout: " + timeout);
-		String stringBody = body.toString();
-		logger.info("With body: " + stringBody);
 		RequestConfig config = RequestConfig.custom()
 				.setConnectTimeout(timeout)
 				.setSocketTimeout(timeout)
@@ -205,7 +203,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		HttpUriRequest request = RequestBuilder.put()
 				.setConfig(config)
 				.setUri(uriString)
-				.setEntity(new StringEntity(stringBody, ContentType.APPLICATION_JSON))
+				.setEntity(new StringEntity(body.toString(), ContentType.APPLICATION_JSON))
 				.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
 				.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN).setVersion(HttpVersion.HTTP_1_1)
 				.setHeader(Constants.CONTENT_TYPE_TEXT, Constants.CONTENT_JSON)
@@ -215,12 +213,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		HttpResponse response;
 		HttpEntity entity;
-		String responseString;
 		int responseCode;
 		try {
 			response = client.execute(request);
 			entity = response.getEntity();
-			responseString = EntityUtils.toString(entity, "UTF-8");
 			responseCode = response.getStatusLine().getStatusCode();
 		}
 		catch(Exception e) {
@@ -238,13 +234,15 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		logger.info(body);
 		logger.info(uriString);
 		logger.info(responseCode);
-		logger.info(responseString);
 
 		if (responseCode > 399) {
-			String responseBody = processErrorResponse(responseString);
-			throw new Exception(responseBody);
+			if (entity != null) {
+				String responseBody = processErrorResponse(EntityUtils.toString(entity, "UTF-8"));
+				throw new Exception(responseBody);
+			} else {
+				throw new Exception("Failed to update record");
+			}
 		}
-		return responseString;
 	}
 
 	public HttpResponse callApiDelete(String uriString) throws Exception, IOException, InterruptedException {
@@ -960,8 +958,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			requestResponse.put("cancellationReasonId", reasonId);
 			requestResponse.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_ADDITIONAL_INFO);
 			requestResponse.put("cancelledDate", date);
+			callApiPut(url, requestResponse);
 
-			return new JsonObject(callApiPut(url, requestResponse));
+			return requestResponse;
 		}
 		catch(Exception e) {
 			logger.error("Exception occurred during cancel request item");

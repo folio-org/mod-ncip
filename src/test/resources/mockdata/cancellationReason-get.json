@@ -1,0 +1,17 @@
+{
+  "cancellationReasons": [
+    {
+      "id": "ff474f60-d9ce-4bd8-8659-eb51af825a56",
+      "name": "Item Not Available",
+      "description": "Item is no longer available",
+      "requiresAdditionalInformation": false,
+      "metadata": {
+        "createdDate": "2024-03-13T00:03:47.185+00:00",
+        "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+        "updatedDate": "2024-05-16T14:07:02.468+00:00",
+        "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+      }
+    }
+  ],
+  "totalRecords": 1
+}
