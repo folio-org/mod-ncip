@@ -119,6 +119,7 @@ public class MockServer {
         router.get("/holdings-sources").handler(this::holdingsSources);
         router.get("/cancellation-reason-storage/cancellation-reasons").handler(this::cancellationReason);
         router.get("/circulation/requests/:id").handler(this::getCirculationRequestById);
+        router.get("/circulation/requests").handler(this::getCirculationRequestList);
         router.put("/circulation/requests/:id").handler(this::putCirculationRequestById);
 
 
@@ -266,6 +267,12 @@ public class MockServer {
 
     private void getCirculationRequestById(RoutingContext ctx) {
         String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "circulationRequest-get.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void getCirculationRequestList(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "circulationRequestList-get.json";
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
     }
