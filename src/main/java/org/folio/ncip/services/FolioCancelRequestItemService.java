@@ -49,7 +49,7 @@ public class FolioCancelRequestItemService extends FolioNcipService implements C
             }
         } catch (Exception e) {
             LOGGER.error("Could not determine agency id from initiation header.");
-            Problem problem = new Problem(new ProblemType(Constants.CHECK_IN_PROBLEM), Constants.AGENCY_ID,
+            Problem problem = new Problem(new ProblemType(Constants.CANCEL_REQUEST_ITEM_PROBLEM), Constants.AGENCY_ID,
                     Constants.FROM_AGENCY_MISSING, e.getMessage());
             return addProblem(responseData, problem);
         }

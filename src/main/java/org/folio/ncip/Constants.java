@@ -43,6 +43,7 @@ public class Constants {
 	public static final String REQUEST_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
 	public static final String REQUEST_ITEM_MISSING_PROBLEM = "Problem occurred while fetching item";
 	public static final String CANCEL_REQUEST_ITEM_PROBLEM = "Problem performing CancelRequestItem";
+	public static final String DELETE_ITEM_PROBLEM = "Problem performing DeleteItem";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
@@ -76,6 +77,7 @@ public class Constants {
 	public static final String EMAIL_STRING = "user.email.type";
 	public static final String REQUEST_CANCELLED_STATUS = "Closed - Cancelled";
 	public static final String REQUEST_CANCEL_ADDITIONAL_INFO = "NCIP cancel";
+	public static final String REQUEST_CANCEL_PATRON_ADDITIONAL_INFO = "Patron did not pickup item";
 	
 	
 	//ENDPOINTS
@@ -87,6 +89,8 @@ public class Constants {
 	public static final String ITEM_SEARCH_URL = "/inventory/items?limit=1&query=hrid%3D%3D%22$hrid$%22";
 	public static final String INSTANCE_SEARCH_URL = "/inventory/instances?limit=1&query=hrid%3D%3D%22$hrid$%22";
 	public static final String REQUEST_URL = "/circulation/requests";
+	public static final String OPEN_REQUEST_BY_ITEM_ID_URL = "/circulation/requests?limit=100&query=%28status%3D%3D%28%22Open%20-%20Awaiting%20pickup%22%20or%20%22Open%20-%20Awaiting%20delivery%22%20or%20%22Open%20-%20In%20transit%22%20or%20%22Open%20-%20Not%20yet%20filled%22%29%29%20and%20itemId%3D%3D";
+	public static final String ITEM_SEARCH_BY_BARCODE_URL = "/inventory/items?limit=1&query=barcode%3D%3D%22$barcode$%22";
 	public static final String ADDRESS_TYPES = "/addresstypes";
 	
 	

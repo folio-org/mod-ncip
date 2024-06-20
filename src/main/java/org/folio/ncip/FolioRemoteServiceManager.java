@@ -367,9 +367,6 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		UUID id = UUID.randomUUID();
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
-		LocalDateTime now = LocalDateTime.now();
-		String loanDate = dtf.format(now);
 		String itemBarcode = initData.getItemId().getItemIdentifierValue();
 
 		// LOOKUP USER & CHECK FOR BLOCKS
@@ -425,7 +422,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			//A CHECKIN FOR CONVENIENCE
 			logger.error("exception occured during checkout item");
 			logger.error("attempting a checkin...in case the checkout actually worked");
-			String returnDate = dtf.format(now);
+			String returnDate = getDateTimeNowString();
 			jsonObject.put("checkInDate", returnDate);
 			Thread.sleep(4000);
 			try {
@@ -569,34 +566,38 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
-			String deleteInstanceUrl = baseUrl + Constants.INSTANCE_URL + "/" + instanceUuid.toString();
-			String deleteHoldingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + holdingsUuid.toString();
-			String deleteItemUrl = baseUrl + Constants.ITEM_URL + "/" + itemUuid.toString();
-
-			// TRY TO DELETE THE ITEM (IT MAY OR MAYNOT HAVE BEEN CREATED
-			try {
-				callApiDelete(deleteItemUrl);
-			} catch (Exception itemError) {
-				logger.error("unable to back out item: " + itemUuid.toString());
-				logger.error(itemError.getMessage());
-			}
-			// TRY TO DELETE HOLDINGS
-			try {
-				callApiDelete(deleteHoldingsUrl);
-			} catch (Exception holdingsError) {
-				logger.error("unable to back out holdings record: " + holdingsUuid);
-				logger.error(holdingsError.getMessage());
-			}
-			// TRY TO DELETE INSTANCE
-			try {
-				callApiDelete(deleteInstanceUrl);
-			} catch (Exception instanceError) {
-				logger.error("unable to back out instance record: " + instanceUuid);
-				logger.error(instanceError.getMessage());
-			}
+			deleteItemAndRelatedRecords(baseUrl, instanceUuid.toString(), holdingsUuid.toString(), itemUuid.toString());
 			throw e;
 		}
 		return returnValues;
+	}
+
+	private void deleteItemAndRelatedRecords(String baseUrl, String instanceUuid, String holdingsUuid, String itemUuid){
+		String deleteInstanceUrl = baseUrl + Constants.INSTANCE_URL + "/" + instanceUuid;
+		String deleteHoldingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + holdingsUuid;
+		String deleteItemUrl = baseUrl + Constants.ITEM_URL + "/" + itemUuid;
+
+		// Try to delete the item ( it may or may not have been created)
+		try {
+			callApiDelete(deleteItemUrl);
+		} catch (Exception itemError) {
+			logger.error("Unable to back out item: {}", itemUuid);
+			logger.error(itemError.getMessage());
+		}
+		// Try to delete holdings
+		try {
+			callApiDelete(deleteHoldingsUrl);
+		} catch (Exception holdingsError) {
+			logger.error("Unable to back out holdings record: {}", holdingsUuid);
+			logger.error(holdingsError.getMessage());
+		}
+		// Try to delete instance
+		try {
+			callApiDelete(deleteInstanceUrl);
+		} catch (Exception instanceError) {
+			logger.error("Unable to back out instance record: {}", instanceUuid);
+			logger.error(instanceError.getMessage());
+		}
 	}
 
 	private String getServicePointId(String pickUpLocationCode, String baseUrl) throws Exception {
@@ -942,9 +943,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
-		LocalDateTime now = LocalDateTime.now();
-		String date = dtf.format(now);
+		String date = getDateTimeNowString();
 
 		initProperties(agencyId, baseUrl);
 
@@ -961,11 +960,68 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			callApiPut(url, requestResponse);
 
 			return requestResponse;
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			logger.error("Exception occurred during cancel request item");
 			throw e;
 		}
 	}
 
+	private String getDateTimeNowString(){
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
+		LocalDateTime now = LocalDateTime.now();
+		return dtf.format(now);
+	}
+
+	public void deleteItem(String itemId, String agencyId) throws Exception {
+		try {
+			// Find item to delete
+			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+			String searchUrl = baseUrl + Constants.ITEM_SEARCH_BY_BARCODE_URL.replace("$barcode$", itemId);
+			String itemResponseString = callApiGet(searchUrl);
+
+			JsonObject itemResponse = new JsonObject(itemResponseString);
+			Integer totalRecords = itemResponse.getInteger("totalRecords");
+			if (totalRecords == 1) { // There is item
+				JsonObject itemObject = itemResponse.getJsonArray("items").getJsonObject(0);
+				String itemUuid = itemObject.getString("id");
+				String holdingsRecordId = itemObject.getString("holdingsRecordId");
+
+				// Search open requests
+				String requestResponseString = callApiGet(baseUrl + Constants.OPEN_REQUEST_BY_ITEM_ID_URL + itemUuid);
+				JsonObject requestResponse = new JsonObject(requestResponseString);
+				if (requestResponse.getInteger("totalRecords") > 0) {
+					// Need to close open requests
+					if (ncipProperties == null) {
+						throw new Exception("NCIP Properties have not been initialized.");
+					}
+					initProperties(agencyId, baseUrl);
+					String reasonId = ncipProperties.getProperty(agencyId + ".cancel.request.reason.patron.id");
+
+					JsonArray requests = requestResponse.getJsonArray("requests");
+					requests.forEach(r -> {
+						JsonObject requestObject = (JsonObject) r;
+						try {
+							String url = baseUrl + Constants.REQUEST_URL + "/" + requestObject.getString("id");
+							requestObject.put("status", Constants.REQUEST_CANCELLED_STATUS);
+							requestObject.put("cancellationReasonId", reasonId);
+							requestObject.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_PATRON_ADDITIONAL_INFO);
+							requestObject.put("cancelledDate", getDateTimeNowString());
+							callApiPut(url, requestResponse);
+						} catch (Exception e){
+							logger.error("Could not cancel request {}", requestObject.getString("id"));
+						}
+					});
+				}
+
+				String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
+				String holdingResponseString = callApiGet(holdingsUrl);
+				JsonObject holdingResponse = new JsonObject(holdingResponseString);
+
+				deleteItemAndRelatedRecords(baseUrl, holdingResponse.getString("instanceId"), holdingsRecordId, itemUuid);
+			}
+		} catch (Exception exception) {
+			logger.error("Exception occurred during delete item");
+			throw exception;
+		}
+	}
 }
