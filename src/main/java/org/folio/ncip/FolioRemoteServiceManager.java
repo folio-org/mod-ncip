@@ -1006,7 +1006,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 							requestObject.put("cancellationReasonId", reasonId);
 							requestObject.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_PATRON_ADDITIONAL_INFO);
 							requestObject.put("cancelledDate", getDateTimeNowString());
-							callApiPut(url, requestResponse);
+							callApiPut(url, requestObject);
 						} catch (Exception e){
 							logger.error("Could not cancel request {}", requestObject.getString("id"));
 						}
