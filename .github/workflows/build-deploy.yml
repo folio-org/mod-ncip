@@ -7,6 +7,7 @@ on:
   workflow_dispatch: 
   
 env:
+  PUBLISH_BRANCH: 'development'
   K8S_NAMESPACE: 'reshare'
   K8S_DEPLOYMENT: 'mod-ncip-1-14-5'
   REGISTRY: ghcr.io
@@ -71,6 +72,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Deploy latest to K8s
+        if: ${{ env.CURRENT_BRANCH == env.PUBLISH_BRANCH }} 
         uses: actions-hub/kubectl@v1.21.2
         env:
           KUBE_CONFIG: ${{ secrets.RESHARE_DEV_SA_KUBECONFIG }}
