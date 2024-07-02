@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
@@ -134,7 +135,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	}
 
 	public String callApiPost(String uriString, JsonObject body) 
-		throws Exception, IOException, InterruptedException {
+		throws FolioNcipException, IOException {
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 		int timeout = Integer.parseInt(timeoutString);
 		logger.info("Using timeout: " + timeout);
@@ -164,7 +165,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			responseString = EntityUtils.toString(entity, "UTF-8");
 			responseCode = response.getStatusLine().getStatusCode();
 		}
-		catch(Exception e) {
+		catch(IOException e) {
 			String responseBody = e.getLocalizedMessage();
 			logger.fatal("callApiPost failed");
 			logger.fatal(uriString);
@@ -184,7 +185,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		if (responseCode > 399) {
 			String responseBody = processErrorResponse(responseString);
-			throw new Exception(responseBody);
+			throw new FolioNcipException(responseBody);
 		}
 
 		return responseString;
@@ -929,6 +930,20 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String id = user.getString("id");
 		user = gatherPatronData(user, id);
 		return user;
+	}
+
+	public void checkUserPin(String userId, String pin) throws FolioNcipException {
+		try {
+			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+			String pinApiUri = baseUrl + Constants.PATRON_PIN_VERIFY;
+			JsonObject request = new JsonObject();
+			request.put("id", userId);
+			request.put("pin", pin);
+			callApiPost(pinApiUri, request);
+		} catch (IOException | FolioNcipException e) {
+			logger.error(new ParameterizedMessage("Could not check user {} pin", userId), e);
+			throw new FolioNcipException("PIN check failed");
+		}
 	}
 
 	public JsonObject cancelRequestItem(String requestId, UserId userId, String agencyId) throws Exception {

@@ -39,6 +39,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import org.folio.okapi.common.XOkapiHeaders;
 import org.folio.okapi.common.logging.FolioLoggingContext;
 
+import javax.ws.rs.core.MediaType;
+
 public class MockServer {
 
 
@@ -121,7 +123,7 @@ public class MockServer {
         router.get("/circulation/requests/:id").handler(this::getCirculationRequestById);
         router.get("/circulation/requests").handler(this::getCirculationRequestList);
         router.put("/circulation/requests/:id").handler(this::putCirculationRequestById);
-
+        router.post("/patron-pin/verify").handler(this::verifyPing);
 
         return router;
     }
@@ -279,6 +281,14 @@ public class MockServer {
 
     private void putCirculationRequestById(RoutingContext ctx) {
         ctx.response().setStatusCode(204).end();
+    }
+
+    private void verifyPing(RoutingContext ctx) {
+        String body = ctx.body().asString();
+        ctx.response()
+                .setStatusCode(body.contains("5678") ? 422 : 200)
+                .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+                .end();
     }
 
     private void serverResponse(RoutingContext ctx, int statusCode, String contentType, String body) {

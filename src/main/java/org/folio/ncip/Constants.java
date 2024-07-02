@@ -78,6 +78,7 @@ public class Constants {
 	public static final String REQUEST_CANCELLED_STATUS = "Closed - Cancelled";
 	public static final String REQUEST_CANCEL_ADDITIONAL_INFO = "NCIP cancel";
 	public static final String REQUEST_CANCEL_PATRON_ADDITIONAL_INFO = "Patron did not pickup item";
+	public static final String AUTH_TYPE_PIN = "pin";
 	
 	
 	//ENDPOINTS
@@ -92,6 +93,7 @@ public class Constants {
 	public static final String OPEN_REQUEST_BY_ITEM_ID_URL = "/circulation/requests?limit=100&query=%28status%3D%3D%28%22Open%20-%20Awaiting%20pickup%22%20or%20%22Open%20-%20Awaiting%20delivery%22%20or%20%22Open%20-%20In%20transit%22%20or%20%22Open%20-%20Not%20yet%20filled%22%29%29%20and%20itemId%3D%3D";
 	public static final String ITEM_SEARCH_BY_BARCODE_URL = "/inventory/items?limit=1&query=barcode%3D%3D%22$barcode$%22";
 	public static final String ADDRESS_TYPES = "/addresstypes";
+	public static final String PATRON_PIN_VERIFY = "/patron-pin/verify";
 	
 	
 	public static final String DEFAULT_TIMEOUT = "30000";

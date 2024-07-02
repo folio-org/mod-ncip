@@ -75,8 +75,18 @@ public class LookupUser extends TestBase {
 		response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserOptionalFields.UserPrivilege[2].UserPrivilegeStatus.UserPrivilegeStatusType", Matchers.equalTo(TestConstants.BLOCKED));
 		System.out.println(response.getBody().prettyPrint());
 	}
-	
 
+	@Test
+	public void callLookupUserCheckPin() throws MalformedURLException {
+		Response response = postData("src/test/resources/mockdata/ncip-lookupUserCheckPin.xml");
+		response.then().assertThat().body("NCIPMessage.LookupUserResponse.UserId.UserIdentifierValue", Matchers.equalTo(TestConstants.GOOD_PATRON_BARCODE));
+		System.out.println(response.getBody().prettyPrint());
+	}
 
-
+	@Test
+	public void callLookupUserCheckPinFailed() throws MalformedURLException {
+		Response response = postData("src/test/resources/mockdata/ncip-lookupUserCheckPinFailed.xml");
+		response.then().assertThat().body("NCIPMessage.LookupUserResponse.Problem.ProblemValue", Matchers.equalTo(TestConstants.PROBLEM_PIN_CHECK_FAILED));
+		System.out.println(response.getBody().prettyPrint());
+	}
 }
