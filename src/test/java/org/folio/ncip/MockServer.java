@@ -109,8 +109,11 @@ public class MockServer {
         router.get("/configurations/entries/toolkit").handler(this::getToolkitCofigs);
         router.get("/configurations/entries").handler(this::getNcipConfigs);
         router.get("/inventory/items").handler(this::items);
+        router.post("/inventory/items").handler(this::itemsPost);
         router.get("/inventory/instances").handler(this::instances);
+        router.post("/inventory/instances").handler(this::instancePost);
         router.get("/holdings-storage/holdings/:id").handler(this::holdingsById);
+        router.post("/holdings-storage/holdings").handler(this::holdingsById);
         router.post("/circulation/requests").handler(this::requestsPost);
         router.get("/addresstypes").handler(this::addressTypes);
         router.get("/instance-types").handler(this::instanceTypes);
@@ -124,6 +127,9 @@ public class MockServer {
         router.get("/circulation/requests").handler(this::getCirculationRequestList);
         router.put("/circulation/requests/:id").handler(this::putCirculationRequestById);
         router.post("/patron-pin/verify").handler(this::verifyPing);
+        router.get("/owners").handler(this::getFeeOwner);
+        router.get("/feefines").handler(this::findFee);
+        router.post("/accounts").handler(this::postAccounts);
 
         return router;
     }
@@ -153,7 +159,12 @@ public class MockServer {
     }
 
     private void groupLookup(RoutingContext ctx) {
-        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "groups-get.json";
+        String mockFileName;
+        if (ctx.request().path().contains("dac3aab4-7a86-422b-b5fc-6fbf7afd7aea")) {
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "groups-getStaff.json";
+        } else {
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "groups-get.json";
+        }
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
     }
@@ -195,8 +206,20 @@ public class MockServer {
         serverResponse(ctx, 200, APPLICATION_JSON, body);
     }
 
+    private void itemsPost(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "items-post.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
     private void instances(RoutingContext ctx) {
         String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "instancesByHrid-get.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void instancePost(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "instances-post.json";
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
     }
@@ -289,6 +312,30 @@ public class MockServer {
                 .setStatusCode(body.contains("5678") ? 422 : 200)
                 .putHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
                 .end();
+    }
+
+    private void getFeeOwner(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "feeOwners-get.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void findFee(RoutingContext ctx) {
+        String query = ctx.request().getParam("query");
+        String mockFileName;
+        if (query.contains("staff")) {
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "feefines-getEmpty.json";
+        } else {
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "feefines-get.json";
+        }
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void postAccounts(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "accounts-post.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
     }
 
     private void serverResponse(RoutingContext ctx, int statusCode, String contentType, String body) {

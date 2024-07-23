@@ -26,6 +26,8 @@ import org.extensiblecatalog.ncip.v2.common.ServiceValidatorFactory;
 import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.FiscalActionType;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionType;
 import org.extensiblecatalog.ncip.v2.service.LocationType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
@@ -98,12 +100,15 @@ public class FolioNcipHelper {
 
 	private void setUpMapping(){
 		SchemeValuePair.allowNullScheme(RequestType.class.getName(), RequestScopeType.class.getName(),
-				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(), PickupLocation.class.getName());
+				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(), PickupLocation.class.getName(),
+				FiscalActionType.class.getName(), FiscalTransactionType.class.getName());
 		SchemeValuePair.mapBehavior(RequestType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 		SchemeValuePair.mapBehavior(RequestScopeType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 		SchemeValuePair.mapBehavior(BibliographicRecordIdentifierCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 		SchemeValuePair.mapBehavior(LocationType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 		SchemeValuePair.mapBehavior(PickupLocation.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(FiscalActionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(FiscalTransactionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 	}
 
 	public InputStream ncipProcess(RoutingContext context) throws Exception {

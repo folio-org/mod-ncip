@@ -1,0 +1,12 @@
+{
+  "group": "staff",
+  "desc": "Staff Member",
+  "id": "3684a786-6671-4268-8ed0-9db82ebca60b",
+  "expirationOffsetInDays": 730,
+  "metadata": {
+    "createdDate": "2024-03-13T00:03:41.447+00:00",
+    "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+    "updatedDate": "2024-05-16T14:06:48.906+00:00",
+    "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+  }
+}

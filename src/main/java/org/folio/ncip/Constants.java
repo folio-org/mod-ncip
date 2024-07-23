@@ -94,9 +94,15 @@ public class Constants {
 	public static final String ITEM_SEARCH_BY_BARCODE_URL = "/inventory/items?limit=1&query=barcode%3D%3D%22$barcode$%22";
 	public static final String ADDRESS_TYPES = "/addresstypes";
 	public static final String PATRON_PIN_VERIFY = "/patron-pin/verify";
-	
+	public static final String FEE_OWNER_URL = "/owners?query=owner=%22Reshare-ILL%22&limit=1";
+	public static final String FEE_FINE_BY_OWNER_AND_TYPE = "/feefines?query=ownerId==$ownerId$%20and%20feeFineType=%22$feeType$%22&limit=1";
+	public static final String PATRON_GROUP_BY_ID = "/groups/";
+	public static final String ACCOUNT_URL = "/accounts";
 	
 	public static final String DEFAULT_TIMEOUT = "30000";
 	public static final String SERVICE_MGR_TIMEOUT = "service_manager_timeout_ms";
+	public static final String CHARGE_DEFAULT_PATRON_FEE = "charge-default-patron-fee";
+	public static final String DEFAULT_PAYMENT_STATUS = "Outstanding";
+	public static final String DEFAULT_FEE_STATUS = "Open";
 
 }

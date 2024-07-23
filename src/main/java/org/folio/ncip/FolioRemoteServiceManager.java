@@ -564,6 +564,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 			returnValues.mergeIn(new JsonObject(requestRespone)).put("item", new JsonObject(itemResponse))
 					.put("holdings", new JsonObject(holdingsResponse));
+
+			addDefaultPatronFee(initData, user.getString("id"), user.getString("patronGroup"), baseUrl);
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
@@ -571,6 +573,50 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			throw e;
 		}
 		return returnValues;
+	}
+
+	protected void addDefaultPatronFee(AcceptItemInitiationData initData, String userId, String patronGroupId, String baseUrl) throws Exception {
+		if (initData.getFiscalTransactionInformation() != null && initData.getFiscalTransactionInformation().getFiscalActionType() != null &&
+				Constants.CHARGE_DEFAULT_PATRON_FEE.equalsIgnoreCase(initData.getFiscalTransactionInformation().getFiscalActionType().getValue())) {
+			try {
+				JsonObject owner = new JsonObject(callApiGet(baseUrl + Constants.FEE_OWNER_URL));
+				JsonArray ownersArray = owner.getJsonArray("owners");
+				if (ownersArray.isEmpty()) {
+					throw new FolioNcipException("Failed to find fee owner Reshare-ILL");
+				}
+				String ownerId = ownersArray.getJsonObject(0).getString("id");
+				String patronGroup = new JsonObject(callApiGet(baseUrl +  Constants.PATRON_GROUP_BY_ID + patronGroupId))
+						.getString("group");
+				if (patronGroup == null) {
+					throw new FolioNcipException("Failed to find patron group " + patronGroupId);
+				}
+				JsonObject fees = new JsonObject(callApiGet(baseUrl + Constants.FEE_FINE_BY_OWNER_AND_TYPE
+						.replace("$ownerId$", ownerId).replace("$feeType$", patronGroup)));
+				if (fees.getJsonArray("feefines").isEmpty()) {
+					throw new FolioNcipException("Failed to find fee type " + patronGroup);
+				}
+				JsonObject fee = fees.getJsonArray("feefines").getJsonObject(0);
+				JsonObject charge = new JsonObject();
+				charge.put("ownerId", ownerId);
+				charge.put("feeFineId", fee.getString("id"));
+				charge.put("amount", fee.getValue("defaultAmount"));
+				JsonObject paymentStatus = new JsonObject();
+				paymentStatus.put("name", Constants.DEFAULT_PAYMENT_STATUS);
+				charge.put("paymentStatus", paymentStatus);
+				JsonObject status = new JsonObject();
+				status.put("name", Constants.DEFAULT_FEE_STATUS);
+				charge.put("status", status);
+				charge.put("remaining", fee.getValue("defaultAmount"));
+				charge.put("feeFineType", fee.getString("feeFineType"));
+				charge.put("feeFineOwner", ownersArray.getJsonObject(0).getString("owner"));
+				charge.put("userId", userId);
+				charge.put("id", UUID.randomUUID().toString());
+				callApiPost(baseUrl + Constants.ACCOUNT_URL, charge);
+			} catch (Exception e) {
+				logger.error("Failed to add default patron fee", e);
+				throw e;
+			}
+		}
 	}
 
 	private void deleteItemAndRelatedRecords(String baseUrl, String instanceUuid, String holdingsUuid, String itemUuid){

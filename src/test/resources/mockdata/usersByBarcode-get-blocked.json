@@ -5,7 +5,7 @@
     "barcode" : "5551213",
     "active" : true,
     "type" : "patron",
-    "patronGroup" : "dac3aab4-7a86-422b-b5fc-6fbf7afd7aeb",
+    "patronGroup" : "dac3aab4-7a86-422b-b5fc-6fbf7afd7aea",
     "meta" : {
       "creation_date" : "2016-11-05T0723",
       "last_login_date" : ""
