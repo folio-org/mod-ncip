@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public class FolioCancelRequestItemService extends FolioNcipService implements CancelRequestItemService {
 
-    private static final Logger LOGGER = Logger.getLogger(FolioCheckInItemService.class);
+    private static final Logger LOGGER = Logger.getLogger(FolioCancelRequestItemService.class);
 
     @Override
     public CancelRequestItemResponseData performService(CancelRequestItemInitiationData cancelRequestItemInitiationData,

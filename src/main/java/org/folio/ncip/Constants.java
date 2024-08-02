@@ -44,6 +44,7 @@ public class Constants {
 	public static final String REQUEST_ITEM_MISSING_PROBLEM = "Problem occurred while fetching item";
 	public static final String CANCEL_REQUEST_ITEM_PROBLEM = "Problem performing CancelRequestItem";
 	public static final String DELETE_ITEM_PROBLEM = "Problem performing DeleteItem";
+	public static final String CREATE_USER_FISCAL_TRANSACTION_PROBLEM = "Problem performing CreateUserFiscalTransaction";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
@@ -79,6 +80,7 @@ public class Constants {
 	public static final String REQUEST_CANCEL_ADDITIONAL_INFO = "NCIP cancel";
 	public static final String REQUEST_CANCEL_PATRON_ADDITIONAL_INFO = "Patron did not pickup item";
 	public static final String AUTH_TYPE_PIN = "pin";
+	public static final String PATRON_GROUP = "patronGroup";
 	
 	
 	//ENDPOINTS

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+    <ns1:CreateUserFiscalTransaction>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId>Relais</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId>Lehigh University</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:UserId>
+            <ns1:AgencyId>LEH</ns1:AgencyId>
+            <ns1:UserIdentifierValue>8377631</ns1:UserIdentifierValue>
+        </ns1:UserId>
+        <ns1:FiscalTransactionInformation>
+            <ns1:FiscalActionType>charge-default-patron-fee</ns1:FiscalActionType>
+            <ns1:FiscalTransactionType>ILL-fee</ns1:FiscalTransactionType>
+            <ns1:Amount>
+                <ns1:MonetaryValue>0</ns1:MonetaryValue>
+            </ns1:Amount>
+        </ns1:FiscalTransactionInformation>
+    </ns1:CreateUserFiscalTransaction>
+</ns1:NCIPMessage>

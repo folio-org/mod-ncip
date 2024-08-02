@@ -20,6 +20,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ParameterizedMessage;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
@@ -565,7 +566,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			returnValues.mergeIn(new JsonObject(requestRespone)).put("item", new JsonObject(itemResponse))
 					.put("holdings", new JsonObject(holdingsResponse));
 
-			addDefaultPatronFee(initData, user.getString("id"), user.getString("patronGroup"), baseUrl);
+			addDefaultPatronFee(initData.getFiscalTransactionInformation(), user.getString("id"), user.getString(Constants.PATRON_GROUP), baseUrl);
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
@@ -575,9 +576,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return returnValues;
 	}
 
-	protected void addDefaultPatronFee(AcceptItemInitiationData initData, String userId, String patronGroupId, String baseUrl) throws Exception {
-		if (initData.getFiscalTransactionInformation() != null && initData.getFiscalTransactionInformation().getFiscalActionType() != null &&
-				Constants.CHARGE_DEFAULT_PATRON_FEE.equalsIgnoreCase(initData.getFiscalTransactionInformation().getFiscalActionType().getValue())) {
+	protected void addDefaultPatronFee(FiscalTransactionInformation fiscalTransactionInformation, String userId, String patronGroupId, String baseUrl) throws Exception {
+		if (fiscalTransactionInformation != null && fiscalTransactionInformation.getFiscalActionType() != null &&
+				Constants.CHARGE_DEFAULT_PATRON_FEE.equalsIgnoreCase(fiscalTransactionInformation.getFiscalActionType().getValue())) {
 			try {
 				JsonObject owner = new JsonObject(callApiGet(baseUrl + Constants.FEE_OWNER_URL));
 				JsonArray ownersArray = owner.getJsonArray("owners");
@@ -736,7 +737,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public JsonObject gatherPatronData(JsonObject user, String userId) throws Exception {
 
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-		String groupId = user.getString("patronGroup");
+		String groupId = user.getString(Constants.PATRON_GROUP);
 		final String userIdQuery = "query=(" + PercentCodec.encode("userId==" + StringUtil.cqlEncode(userId) + ")");
 		final long LONG_DELAY_MS = 10000;
 
@@ -1082,6 +1083,17 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			}
 		} catch (Exception exception) {
 			logger.error("Exception occurred during delete item");
+			throw exception;
+		}
+	}
+
+	public void createUserFiscalTransaction(UserId userId, FiscalTransactionInformation fiscalTransactionInformation) throws Exception {
+		try {
+			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+			JsonObject user = lookupPatronRecord(userId);
+			addDefaultPatronFee(fiscalTransactionInformation, user.getString("id"), user.getString(Constants.PATRON_GROUP), baseUrl);
+		} catch (Exception exception) {
+			logger.error("Exception occurred during CreateUserFiscalTransaction");
 			throw exception;
 		}
 	}
