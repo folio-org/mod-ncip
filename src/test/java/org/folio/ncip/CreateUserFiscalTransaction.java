@@ -10,7 +10,8 @@ import static org.junit.Assert.assertTrue;
 
 public class CreateUserFiscalTransaction extends TestBase {
 
-    private static final String USER_ID = "8377631";
+    private static final String USER_ID = "d4a845bd-a326-4916-9cb4-6a5ac1a86155";
+    private static final String FEE_ID = "628e0831-30b0-415f-8b21-944950624926";
     private static final String PROBLEM = "Problem";
 
     @Test
@@ -19,6 +20,7 @@ public class CreateUserFiscalTransaction extends TestBase {
         String body = response.getBody().prettyPrint();
         assertEquals(200, response.getStatusCode());
         assertTrue(body.contains(USER_ID));
+        assertTrue(body.contains(FEE_ID));
     }
 
     @Test

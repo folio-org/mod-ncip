@@ -576,7 +576,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return returnValues;
 	}
 
-	protected void addDefaultPatronFee(FiscalTransactionInformation fiscalTransactionInformation, String userId, String patronGroupId, String baseUrl) throws Exception {
+	protected JsonObject addDefaultPatronFee(FiscalTransactionInformation fiscalTransactionInformation, String userId, String patronGroupId, String baseUrl) throws Exception {
+		JsonObject result = new JsonObject();
 		if (fiscalTransactionInformation != null && fiscalTransactionInformation.getFiscalActionType() != null &&
 				Constants.CHARGE_DEFAULT_PATRON_FEE.equalsIgnoreCase(fiscalTransactionInformation.getFiscalActionType().getValue())) {
 			try {
@@ -612,12 +613,13 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				charge.put("feeFineOwner", ownersArray.getJsonObject(0).getString("owner"));
 				charge.put("userId", userId);
 				charge.put("id", UUID.randomUUID().toString());
-				callApiPost(baseUrl + Constants.ACCOUNT_URL, charge);
+				return new JsonObject(callApiPost(baseUrl + Constants.ACCOUNT_URL, charge));
 			} catch (Exception e) {
 				logger.error("Failed to add default patron fee", e);
 				throw e;
 			}
 		}
+		return result;
 	}
 
 	private void deleteItemAndRelatedRecords(String baseUrl, String instanceUuid, String holdingsUuid, String itemUuid){
@@ -1087,11 +1089,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 	}
 
-	public void createUserFiscalTransaction(UserId userId, FiscalTransactionInformation fiscalTransactionInformation) throws Exception {
+	public JsonObject createUserFiscalTransaction(UserId userId, FiscalTransactionInformation fiscalTransactionInformation) throws Exception {
 		try {
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 			JsonObject user = lookupPatronRecord(userId);
-			addDefaultPatronFee(fiscalTransactionInformation, user.getString("id"), user.getString(Constants.PATRON_GROUP), baseUrl);
+			return addDefaultPatronFee(fiscalTransactionInformation, user.getString("id"), user.getString(Constants.PATRON_GROUP), baseUrl);
 		} catch (Exception exception) {
 			logger.error("Exception occurred during CreateUserFiscalTransaction");
 			throw exception;
