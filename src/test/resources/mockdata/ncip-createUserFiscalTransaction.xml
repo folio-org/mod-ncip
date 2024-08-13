@@ -19,6 +19,12 @@
             <ns1:Amount>
                 <ns1:MonetaryValue>0</ns1:MonetaryValue>
             </ns1:Amount>
+            <ns1:ItemDetails>
+                <ns1:ItemId>
+                    <ns1:ItemIdentifierValue>i-123</ns1:ItemIdentifierValue>
+                </ns1:ItemId>
+                <ns1:BibliographicDescription></ns1:BibliographicDescription>
+            </ns1:ItemDetails>
         </ns1:FiscalTransactionInformation>
     </ns1:CreateUserFiscalTransaction>
 </ns1:NCIPMessage>

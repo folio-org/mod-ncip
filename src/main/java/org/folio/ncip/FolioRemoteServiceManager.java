@@ -613,6 +613,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				charge.put("feeFineOwner", ownersArray.getJsonObject(0).getString("owner"));
 				charge.put("userId", userId);
 				charge.put("id", UUID.randomUUID().toString());
+				if (fiscalTransactionInformation.getItemDetails() != null && fiscalTransactionInformation.getItemDetails().getItemId() != null &&
+						fiscalTransactionInformation.getItemDetails().getItemId().getItemIdentifierValue() != null) {
+					charge.put("barcode", fiscalTransactionInformation.getItemDetails().getItemId().getItemIdentifierValue());
+				}
 				return new JsonObject(callApiPost(baseUrl + Constants.ACCOUNT_URL, charge));
 			} catch (Exception e) {
 				logger.error("Failed to add default patron fee", e);
