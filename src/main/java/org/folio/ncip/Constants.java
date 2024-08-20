@@ -3,6 +3,7 @@ package org.folio.ncip;
 public class Constants {
 	public static final String BLOCKED = "BLOCKED";
 	public static final String OK = "OK";
+	public static final String ID = "id";
 	public static final String AUTH_UID = "Username";
 	public static final String AUTH_BARCODE = "Barcode Id";
 	public static final String ACTIVE = "ACTIVE";
@@ -100,11 +101,18 @@ public class Constants {
 	public static final String FEE_FINE_BY_OWNER_AND_TYPE = "/feefines?query=ownerId==$ownerId$%20and%20feeFineType=%22$feeType$%22&limit=1";
 	public static final String PATRON_GROUP_BY_ID = "/groups/";
 	public static final String ACCOUNT_URL = "/accounts";
+	public static final String NOTES_URL = "/notes";
+	public static final String ADD_STAFF_INFO_URL = "/circulation/loans/%s/add-info";
 	
 	public static final String DEFAULT_TIMEOUT = "30000";
 	public static final String SERVICE_MGR_TIMEOUT = "service_manager_timeout_ms";
 	public static final String CHARGE_DEFAULT_PATRON_FEE = "charge-default-patron-fee";
 	public static final String DEFAULT_PAYMENT_STATUS = "Outstanding";
 	public static final String DEFAULT_FEE_STATUS = "Open";
+	public static final String BOOLEAN_TRUE = "true";
+	public static final String NOTE_DOMAIN_REQUESTS = "requests";
+	public static final String NOTE_TITLE_TEMPLATE = "ILL Request id: %s";
+	public static final String NOTE_LINK_TYPE_REQUEST = "request";
+	public static final String STAFF_INFO_TYPE = "staffInfoAdded";
 
 }

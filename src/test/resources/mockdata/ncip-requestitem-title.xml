@@ -2,7 +2,7 @@
     <RequestItem>
         <InitiationHeader>
             <FromAgencyId>
-                <AgencyId>Relais</AgencyId>
+                <AgencyId>relais</AgencyId>
             </FromAgencyId>
             <ToAgencyId>
                 <AgencyId>Lehigh University</AgencyId>

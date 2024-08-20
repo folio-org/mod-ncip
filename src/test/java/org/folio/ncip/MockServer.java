@@ -130,6 +130,8 @@ public class MockServer {
         router.get("/owners").handler(this::getFeeOwner);
         router.get("/feefines").handler(this::findFee);
         router.post("/accounts").handler(this::postAccounts);
+        router.get("/note-types").handler(this::getNoteTypes);
+        router.post("/circulation/check-out-by-barcode").handler(this::postLoan);
 
         return router;
     }
@@ -334,6 +336,18 @@ public class MockServer {
 
     private void postAccounts(RoutingContext ctx) {
         String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "accounts-post.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void getNoteTypes(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "noteTypes-get.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void postLoan(RoutingContext ctx) {
+        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "loan-get.json";
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
     }

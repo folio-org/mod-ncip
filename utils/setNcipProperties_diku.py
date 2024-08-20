@@ -195,3 +195,23 @@ print(the_data)
 response = requests.post(url + "/configurations/entries",the_data,headers=headers)
 print(response)
 
+configuration = {}
+configuration['configName'] = "ReShare" #AGENCY ID
+configuration['code'] = "request.note.name"
+configuration['value'] = "ILL note"
+configuration['module'] = "NCIP"
+the_data = json.dumps(configuration)
+print(the_data)
+response = requests.post(url + "/configurations/entries",the_data,headers=headers)
+print(response)
+
+configuration = {}
+configuration['configName'] = "ReShare" #AGENCY ID
+configuration['code'] = "request.note.enabled"
+configuration['value'] = "false"
+configuration['module'] = "NCIP"
+the_data = json.dumps(configuration)
+print(the_data)
+response = requests.post(url + "/configurations/entries",the_data,headers=headers)
+print(response)
+

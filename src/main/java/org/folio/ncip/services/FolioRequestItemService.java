@@ -1,7 +1,6 @@
 package org.folio.ncip.services;
 
 import io.vertx.core.json.JsonObject;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
@@ -33,15 +32,10 @@ import org.folio.ncip.FolioRemoteServiceManager;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class FolioRequestItemService extends FolioNcipService implements RequestItemService {
 
 	private static final Logger logger = Logger.getLogger(FolioRequestItemService.class);
-
-	private static final Map<String, String> REQUEST_TYPE = Map.of("page", "Page",
-			"hold", "Hold",
-			"recall", "Recall");
 
 	@Override
 	public RequestItemResponseData performService(RequestItemInitiationData initData, ServiceContext serviceContext,
@@ -56,6 +50,7 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 			validateUserId(userId);
 			validateBibliographicIdIsPresent(bibliographicId);
 			initData.getRequestType().getValue();
+			validateRequestIdIsPresent(initData.getRequestId());
 		}
 		catch(Exception exception) {
 			logger.error("Failed validating userId and itemId. " + exception.getLocalizedMessage());
@@ -63,22 +58,13 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 					exception.getMessage(),exception.getMessage()));
 		}
 
-		String pickUpLocationCode = null;
-		if (initData.getPickupLocation() != null && StringUtils.isNotBlank(initData.getPickupLocation().getValue())) {
-			pickUpLocationCode = initData.getPickupLocation().getValue();
-
-		}
-
-		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains("title");
-		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(), "Page");
 		ItemId itemId = new ItemId();
 		RequestId ncipRequestId = new RequestId();
 		ItemDescription itemDescription = new ItemDescription();
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
 		UserId optionalUserId = new UserId();
 		try {
-			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager)
-					.requestItem(bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier(), userId, titleRequest, requestType, pickUpLocationCode);
+			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).requestItem(initData);
 			String assignedRequestId = requestItemResponseDetails.getString("id");
 			String requesterId = requestItemResponseDetails.getString("requesterId");
 			String barcode = null;

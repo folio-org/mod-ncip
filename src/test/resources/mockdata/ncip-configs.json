@@ -182,6 +182,34 @@
         "updatedDate": "2020-03-06T20:24:55.479+0000",
         "updatedByUserId": "99999999-9999-1999-8999-999999999901"
       }
+    },
+    {
+      "id": "a07bc5a3-7e26-485d-a09a-e72ea4dbdbe7",
+      "module": "NCIP",
+      "configName": "Relais",
+      "code": "request.note.name",
+      "enabled": true,
+      "value": "ILL Note",
+      "metadata": {
+        "createdDate": "2020-03-06T20:24:55.479+0000",
+        "createdByUserId": "99999999-9999-1999-8999-999999999901",
+        "updatedDate": "2020-03-06T20:24:55.479+0000",
+        "updatedByUserId": "99999999-9999-1999-8999-999999999901"
+      }
+    },
+    {
+      "id": "a07bc5a3-7e26-485d-a09a-e72ea4dbdbe8",
+      "module": "NCIP",
+      "configName": "Relais",
+      "code": "request.note.enabled",
+      "enabled": true,
+      "value": "true",
+      "metadata": {
+        "createdDate": "2020-03-06T20:24:55.479+0000",
+        "createdByUserId": "99999999-9999-1999-8999-999999999901",
+        "updatedDate": "2020-03-06T20:24:55.479+0000",
+        "updatedByUserId": "99999999-9999-1999-8999-999999999901"
+      }
     }
   ],
   "totalRecords": 14,

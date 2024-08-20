@@ -45,6 +45,8 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * (15) user.email.type (optional - will default to "electronic mail address" For LookupUser response)
     * (16) cancel.request.reason.name Reason for request cancellation when different item is checkout (Settings -> Circulation -> Request cancellation reasons)
     * (17) cancel.request.reason.patron.name Reason for request cancellation when patron did not checkout item (Settings -> Circulation -> Request cancellation reasons)
+    * (18) request.note.name Request note name. Default value "ILL note"
+    * (19) request.note.enabled Request note enabled. Will add ILL request ID to loan and ILS request. Default value "false"
 
 Notes 
 * You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
@@ -137,23 +139,25 @@ There are three types of settings that can exist in mod-configuration for the NC
 
 #### NCIP Properties 
 
-| MODULE        | configName (the AgencyID)   | code                                 | value  (examples) |   
-| ------------- |:-------------:|:-------------------------------------|------------------:|		
-| NCIP          | Relais 		| instance.type.name 			               | RESHARE             |	
-| NCIP          | Relais     	| instance.source 				                 | RESHARE             |	
-| NCIP          | Relais      	| item.material.type.name 		           | RESHARE             |	
-| NCIP          | Relais 		| item.perm.loan.type.name 		          | RESHARE             |	
-| NCIP          | Relais     	| item.status.name   			               | Available         |
-| NCIP          | Relais      	| item.perm.location.code 		           | RESHARE_DATALOGISK      |	
-| NCIP          | Relais 		| holdings.perm.location.code 	        | RESHARE_DATALOGISK      |	
-| NCIP          | Relais     	| instance.custom.identifier.name      | ReShare Request ID |		
-| NCIP          | Relais      	| checkout.service.point.code	         | online               |		
-| NCIP          | Relais      	| checkin.service.point.code 	         | online               |		
-| NCIP          | Relais      	| response.includes.physical.address 	 | false               |
-| NCIP          | Relais      	| user.priv.ok.status 	                | OK               |
-| NCIP          | Relais      	| user.priv.blocked.status 	           | BLOCKED               |
-| NCIP          | Relais      	| cancel.request.reason.name	          | Item Not Available               |		
-| NCIP          | Relais      	| cancel.request.reason.patron.name	   | Item Not Available               |		
+| MODULE    | configName (the AgencyID) | code                               |  value  (examples) |   
+|-----------|:-------------------------:|:-----------------------------------|-------------------:|		
+| NCIP      |          Relais           | instance.type.name                 |            RESHARE |	
+| NCIP      |          Relais           | instance.source                    |            RESHARE |	
+| NCIP      |          Relais           | item.material.type.name            |            RESHARE |	
+| NCIP      |          Relais           | item.perm.loan.type.name           |            RESHARE |	
+| NCIP      |          Relais           | item.status.name                   |          Available |
+| NCIP      |          Relais           | item.perm.location.code            | RESHARE_DATALOGISK |	
+| NCIP      |          Relais           | holdings.perm.location.code        | RESHARE_DATALOGISK |	
+| NCIP      |          Relais           | instance.custom.identifier.nam     | ReShare Request ID |		
+| NCIP      |          Relais           | checkout.service.point.code        |             online |		
+| NCIP      |          Relais           | checkin.service.point.code         |             online |		
+| NCIP      |          Relais           | response.includes.physical.address |              false |
+| NCIP      |          Relais           | user.priv.ok.status                |                 OK |
+| NCIP      |          Relais           | user.priv.blocked.status           |            BLOCKED |
+| NCIP      |          Relais           | cancel.request.reason.name         | Item Not Available |		
+| NCIP      |          Relais           | cancel.request.reason.patron.name  | Item Not Available |		
+| NCIP      |          Relais           | request.note.name                  |           ILL note |		
+| NCIP      |          Relais           | request.note.enabled               |              false |		
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:

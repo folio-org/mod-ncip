@@ -1,0 +1,18 @@
+{
+  "noteTypes": [
+    {
+      "id": "2dc9d2a3-0247-4c19-bdea-604dc5fecc30",
+      "name": "ILL note",
+      "usage": {
+        "isAssigned": false
+      },
+      "metadata": {
+        "createdDate": "2024-08-20T07:36:44.931073Z",
+        "createdByUserId": "7d265701-9b80-5501-bc85-0758b4667022",
+        "updatedDate": "2024-08-20T07:36:44.931073Z",
+        "updatedByUserId": "7d265701-9b80-5501-bc85-0758b4667022"
+      }
+    }
+  ],
+  "totalRecords": 1
+}

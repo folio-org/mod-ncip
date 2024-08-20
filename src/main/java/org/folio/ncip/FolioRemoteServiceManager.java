@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CompletionService;
@@ -16,12 +17,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
+import org.extensiblecatalog.ncip.v2.service.RequestId;
+import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.folio.util.StringUtil;
 import org.folio.util.PercentCodec;
@@ -53,7 +57,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		
 	private static final Logger logger = LogManager.getLogger(FolioRemoteServiceManager.class);
-	
+	private static final Map<String, String> REQUEST_TYPE = Map.of("page", "Page",
+			"hold", "Hold",
+			"recall", "Recall");
 	
 	private MultiMap okapiHeaders;
 	private Properties ncipProperties;
@@ -347,7 +353,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		jsonObject.put("servicePointId", servicePoint);
 		jsonObject.put("checkInDate", returnDate);
 		jsonObject.put("itemBarcode", itemBarcode);
-		jsonObject.put("id", id.toString());
+		jsonObject.put(Constants.ID, id.toString());
 
 		String url = baseUrl + Constants.CHECK_IN_BY_BARCODE;
 		String checkInResponse = callApiPost(url, jsonObject);
@@ -378,7 +384,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		if (user == null)
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
 
-		user = gatherPatronData(user, user.getString("id"));
+		user = gatherPatronData(user, user.getString(Constants.ID));
 
 		// DO MANUAL BLOCKS EXIST?
 		JsonArray blocks = user.getJsonArray("manualblocks");
@@ -406,7 +412,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.put("itemBarcode", itemBarcode);
 		jsonObject.put("userBarcode", user.getString("barcode"));
-		jsonObject.put("id", id.toString());
+		jsonObject.put(Constants.ID, id.toString());
 		//jsonObject.put("loanDate", loanDate); //use default - current date/time
 		jsonObject.put("servicePointId", servicePoint);
 
@@ -414,6 +420,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			String checkoutResponse = callApiPost(url, jsonObject);
 			JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
+			addStaffInfoIfNeeded(agencyId, initData.getRequestId(), checkoutResponseAsJson.getString(Constants.ID), baseUrl);
 			return checkoutResponseAsJson;
 		}
 		catch(Exception e) {
@@ -435,6 +442,22 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				logger.error(checkinError.getMessage());
 			}
 			throw e;
+		}
+	}
+
+	private void addStaffInfoIfNeeded(String agencyId, RequestId requestId, String loanUuid, String baseUrl){
+		String noteEnabled = ncipProperties.getProperty(agencyId + ".request.note.enabled");
+		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null &&
+				requestId.getRequestIdentifierValue() != null) {
+			JsonObject staffInfo = new JsonObject();
+			staffInfo.put("action", Constants.STAFF_INFO_TYPE);
+			staffInfo.put("actionComment", String.format(Constants.NOTE_TITLE_TEMPLATE, requestId.getRequestIdentifierValue()));
+			try {
+				callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
+			} catch (Exception e) {
+				logger.error("Unable to add staff info to loan: {}", loanUuid);
+				logger.error(e.getMessage());
+			}
 		}
 	}
 
@@ -488,7 +511,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JsonObject instance = new JsonObject();
 		instance.put("title", retreiveItemTitle(initData));
 		instance.put("instanceTypeId", ncipProperties.get(requesterAgencyId + ".instance.type.id"));
-		instance.put("id", instanceUuid.toString());
+		instance.put(Constants.ID, instanceUuid.toString());
 		instance.put("source", ncipProperties.get(requesterAgencyId + ".instance.source"));
 		instance.put("discoverySuppress", true);
 		JsonArray identifiersArray = new JsonArray();
@@ -506,7 +529,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			// CALL HOLDINGS API:
 			JsonObject holdings = new JsonObject();
 			String holdingsPermLocation = ncipProperties.getProperty(requesterAgencyId + ".holdings.perm.location.id");
-			holdings.put("id", holdingsUuid.toString());
+			holdings.put(Constants.ID, holdingsUuid.toString());
 			holdings.put("sourceId", ncipProperties.get(requesterAgencyId + ".holdings.source.id"));
 			holdings.put("instanceId", instanceUuid.toString());
 			holdings.put("discoverySuppress", true);
@@ -520,19 +543,19 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String itemLocation = ncipProperties.getProperty(requesterAgencyId + ".item.perm.location.id");
 			ItemId itemId = initData.getItemId();
 			JsonObject item = new JsonObject();
-			item.put("id", itemUuid.toString());
+			item.put(Constants.ID, itemUuid.toString());
 			item.put("holdingsRecordId", holdingsUuid.toString());
 			item.put("discoverySuppress", true);
 			item.put("itemLevelCallNumber", itemId.getItemIdentifierValue());
 			// PLACE HOLD DOES NOT WORK UNLESS THE ITEM HAS A PERM LOCATION
 			JsonObject permLocation = new JsonObject();
-			permLocation.put("id", itemLocation);
+			permLocation.put(Constants.ID, itemLocation);
 			JsonObject materialType = new JsonObject();
-			materialType.put("id", ncipProperties.getProperty(requesterAgencyId + ".item.material.type.id"));
+			materialType.put(Constants.ID, ncipProperties.getProperty(requesterAgencyId + ".item.material.type.id"));
 			JsonObject status = new JsonObject();
 			status.put("name", itemStatusName);
 			JsonObject permLoanType = new JsonObject();
-			permLoanType.put("id", ncipProperties.getProperty(requesterAgencyId + ".item.perm.loan.type.id"));
+			permLoanType.put(Constants.ID, ncipProperties.getProperty(requesterAgencyId + ".item.perm.loan.type.id"));
 
 			item.put("status", status);
 			item.put("materialType", materialType);
@@ -549,7 +572,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
 			// SEE NOTES.TXT
 			request.put("fulfillmentPreference", "Hold Shelf");
-			String uid = user.getString("id");
+			String uid = user.getString(Constants.ID);
 			request.put("requesterId", uid);
 			request.put("itemId", itemUuid.toString());
 			request.put("instanceId", holdings.getString("instanceId"));
@@ -566,7 +589,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			returnValues.mergeIn(new JsonObject(requestRespone)).put("item", new JsonObject(itemResponse))
 					.put("holdings", new JsonObject(holdingsResponse));
 
-			addDefaultPatronFee(initData.getFiscalTransactionInformation(), user.getString("id"), user.getString(Constants.PATRON_GROUP), baseUrl);
+			addDefaultPatronFee(initData.getFiscalTransactionInformation(), user.getString(Constants.ID), user.getString(Constants.PATRON_GROUP), baseUrl);
+			addNoteIfNeeded(requesterAgencyId, returnValues.getString(Constants.ID), initData.getRequestId().getRequestIdentifierValue(), baseUrl, false);
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
@@ -586,7 +610,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				if (ownersArray.isEmpty()) {
 					throw new FolioNcipException("Failed to find fee owner Reshare-ILL");
 				}
-				String ownerId = ownersArray.getJsonObject(0).getString("id");
+				String ownerId = ownersArray.getJsonObject(0).getString(Constants.ID);
 				String patronGroup = new JsonObject(callApiGet(baseUrl +  Constants.PATRON_GROUP_BY_ID + patronGroupId))
 						.getString("group");
 				if (patronGroup == null) {
@@ -600,7 +624,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				JsonObject fee = fees.getJsonArray("feefines").getJsonObject(0);
 				JsonObject charge = new JsonObject();
 				charge.put("ownerId", ownerId);
-				charge.put("feeFineId", fee.getString("id"));
+				charge.put("feeFineId", fee.getString(Constants.ID));
 				charge.put("amount", fee.getValue("defaultAmount"));
 				JsonObject paymentStatus = new JsonObject();
 				paymentStatus.put("name", Constants.DEFAULT_PAYMENT_STATUS);
@@ -612,7 +636,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				charge.put("feeFineType", fee.getString("feeFineType"));
 				charge.put("feeFineOwner", ownersArray.getJsonObject(0).getString("owner"));
 				charge.put("userId", userId);
-				charge.put("id", UUID.randomUUID().toString());
+				charge.put(Constants.ID, UUID.randomUUID().toString());
 				if (fiscalTransactionInformation.getItemDetails() != null && fiscalTransactionInformation.getItemDetails().getItemId() != null &&
 						fiscalTransactionInformation.getItemDetails().getItemId().getItemIdentifierValue() != null) {
 					charge.put("barcode", fiscalTransactionInformation.getItemDetails().getItemId().getItemIdentifierValue());
@@ -661,13 +685,20 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JsonObject servicePoints = new JsonObject(servicePointResponse);
 		if (servicePoints.getJsonArray("servicepoints").size() == 0)
 			throw new FolioNcipException("pickup location code note found: " + pickUpLocationCode);
-		return servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString("id");
+		return servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString(Constants.ID);
 	}
+	public JsonObject requestItem(RequestItemInitiationData initData) throws Exception {
+		String hrid = initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier();
+		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains("title");
+		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(), "Page");
+		String pickUpLocationCode = null;
+		if (initData.getPickupLocation() != null && StringUtils.isNotBlank(initData.getPickupLocation().getValue())) {
+			pickUpLocationCode = initData.getPickupLocation().getValue();
 
-	public JsonObject requestItem(String hrid, UserId userId, boolean titleRequest, String requestType,
-								  String pickUpLocationCode) throws Exception {
+		}
+
 		JsonObject returnValues = new JsonObject();
-		JsonObject user = lookupPatronRecord(userId);
+		JsonObject user = lookupPatronRecord(initData.getUserId());
 		if (user == null)
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
 		try {
@@ -683,21 +714,21 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				JsonObject request = new JsonObject();
 				if (titleRequest) {
 					JsonObject instanceObject = response.getJsonArray("instances").getJsonObject(0);
-					request.put("instanceId", instanceObject.getString("id"));
+					request.put("instanceId", instanceObject.getString(Constants.ID));
 					request.put("requestLevel", "Title");
 				} else {
 					JsonObject itemObject = response.getJsonArray("items").getJsonObject(0);
 					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
 					String holdingResponseString = callApiGet(holdingsUrl);
 					JsonObject holdingResponse = new JsonObject(holdingResponseString);
-					request.put("itemId", itemObject.getString("id"));
+					request.put("itemId", itemObject.getString(Constants.ID));
 					request.put("instanceId", holdingResponse.getString("instanceId"));
-					request.put("holdingsRecordId", holdingResponse.getString("id"));
+					request.put("holdingsRecordId", holdingResponse.getString(Constants.ID));
 					request.put("requestLevel", "Item");
 				}
 				request.put("requestType", requestType);
 				request.put("fulfillmentPreference", "Delivery");
-				request.put("requesterId", user.getString("id"));
+				request.put("requesterId", user.getString(Constants.ID));
 				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
 				if (pickUpLocationCode != null) {
 					String servicePointId = getServicePointId(pickUpLocationCode, baseUrl);
@@ -708,6 +739,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				String requestResponse = callApiPost(requestUrl, request);
 
 				returnValues.mergeIn(new JsonObject(requestResponse));
+				addNoteIfNeeded(initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(),
+						returnValues.getString(Constants.ID), initData.getRequestId().getRequestIdentifierValue(), baseUrl, true);
 			} else {
 				logger.error("Found total of " + totalRecords + " items by hrid " + hrid);
 				throw new FolioNcipException(Constants.REQUEST_ITEM_MISSING_PROBLEM);
@@ -718,6 +751,33 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 
 		return returnValues;
+	}
+
+	private void addNoteIfNeeded(String agencyId, String requestUuid, String illRequestId, String baseUrl, boolean initProperties) {
+		try {
+			agencyId = agencyId == null ? agencyId : agencyId.toLowerCase();
+			if (initProperties) {
+				initProperties(agencyId, baseUrl);
+			}
+
+			String noteEnabled = ncipProperties.getProperty(agencyId + ".request.note.enabled");
+			if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled)) {
+				JsonObject note = new JsonObject();
+				note.put("domain", Constants.NOTE_DOMAIN_REQUESTS);
+				note.put("typeId", ncipProperties.getProperty(agencyId + ".request.note.id"));
+				note.put("title", String.format(Constants.NOTE_TITLE_TEMPLATE, illRequestId));
+				JsonArray links = new JsonArray();
+				JsonObject link = new JsonObject();
+				link.put("type", Constants.NOTE_LINK_TYPE_REQUEST);
+				link.put(Constants.ID, requestUuid);
+				links.add(link);
+				note.put("links", links);
+				callApiPost(baseUrl + Constants.NOTES_URL, note);
+			}
+		} catch (Exception e) {
+			logger.error("Failed to add request note to request: {}", requestUuid);
+			logger.error(e.getMessage());
+		}
 	}
 
 	private String retreiveItemTitle(AcceptItemInitiationData initData) {
@@ -839,7 +899,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			while (i.hasNext()) {
 				JSONObject setting = (JSONObject) i.next();
 				String lookup = (String) setting.get("lookup");
-				String id = (String) setting.get("id");
+				String id = (String) setting.get(Constants.ID);
 				String url = (String) setting.get("url");
 				String returnArray = (String) setting.get("returnArray");
 				String identifier = (String) setting.get("identifier");
@@ -980,7 +1040,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		JsonObject user = lookupPatronRecord(userid);
 		if (user == null)
 			return user;
-		String id = user.getString("id");
+		String id = user.getString(Constants.ID);
 		user = gatherPatronData(user, id);
 		return user;
 	}
@@ -990,7 +1050,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 			String pinApiUri = baseUrl + Constants.PATRON_PIN_VERIFY;
 			JsonObject request = new JsonObject();
-			request.put("id", userId);
+			request.put(Constants.ID, userId);
 			request.put("pin", pin);
 			callApiPost(pinApiUri, request);
 		} catch (IOException | FolioNcipException e) {
@@ -1021,7 +1081,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			JsonObject requestResponse = new JsonObject(callApiGet(url));
 			requestResponse.put("status", Constants.REQUEST_CANCELLED_STATUS);
-			requestResponse.put("cancelledByUserId", user.getString("id"));
+			requestResponse.put("cancelledByUserId", user.getString(Constants.ID));
 			requestResponse.put("cancellationReasonId", reasonId);
 			requestResponse.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_ADDITIONAL_INFO);
 			requestResponse.put("cancelledDate", date);
@@ -1051,7 +1111,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			Integer totalRecords = itemResponse.getInteger("totalRecords");
 			if (totalRecords == 1) { // There is item
 				JsonObject itemObject = itemResponse.getJsonArray("items").getJsonObject(0);
-				String itemUuid = itemObject.getString("id");
+				String itemUuid = itemObject.getString(Constants.ID);
 				String holdingsRecordId = itemObject.getString("holdingsRecordId");
 
 				// Search open requests
@@ -1069,14 +1129,14 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					requests.forEach(r -> {
 						JsonObject requestObject = (JsonObject) r;
 						try {
-							String url = baseUrl + Constants.REQUEST_URL + "/" + requestObject.getString("id");
+							String url = baseUrl + Constants.REQUEST_URL + "/" + requestObject.getString(Constants.ID);
 							requestObject.put("status", Constants.REQUEST_CANCELLED_STATUS);
 							requestObject.put("cancellationReasonId", reasonId);
 							requestObject.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_PATRON_ADDITIONAL_INFO);
 							requestObject.put("cancelledDate", getDateTimeNowString());
 							callApiPut(url, requestObject);
 						} catch (Exception e){
-							logger.error("Could not cancel request {}", requestObject.getString("id"));
+							logger.error("Could not cancel request {}", requestObject.getString(Constants.ID));
 						}
 					});
 				}
@@ -1097,7 +1157,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 			JsonObject user = lookupPatronRecord(userId);
-			return addDefaultPatronFee(fiscalTransactionInformation, user.getString("id"), user.getString(Constants.PATRON_GROUP), baseUrl);
+			return addDefaultPatronFee(fiscalTransactionInformation, user.getString(Constants.ID), user.getString(Constants.PATRON_GROUP), baseUrl);
 		} catch (Exception exception) {
 			logger.error("Exception occurred during CreateUserFiscalTransaction");
 			throw exception;
