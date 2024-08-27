@@ -46,7 +46,8 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * (16) cancel.request.reason.name Reason for request cancellation when different item is checkout (Settings -> Circulation -> Request cancellation reasons)
     * (17) cancel.request.reason.patron.name Reason for request cancellation when patron did not checkout item (Settings -> Circulation -> Request cancellation reasons)
     * (18) request.note.name Request note name. Default value "ILL note"
-    * (19) request.note.enabled Request note enabled. Will add ILL request ID to loan and ILS request. Default value "false"
+    * (19) request.note.enabled Request note enabled. Will add ILL request ID to loan and ILS request. Default value `false`
+    * (20) item.soft.delete DeleteItem will use soft delete or delete entities. Default value `true`
 
 Notes 
 * You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
@@ -158,6 +159,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP      |          Relais           | cancel.request.reason.patron.name  | Item Not Available |		
 | NCIP      |          Relais           | request.note.name                  |           ILL note |		
 | NCIP      |          Relais           | request.note.enabled               |              false |		
+| NCIP      |          Relais           | item.soft.delete                   |               true |		
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:

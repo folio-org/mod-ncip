@@ -1114,15 +1114,16 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				String itemUuid = itemObject.getString(Constants.ID);
 				String holdingsRecordId = itemObject.getString("holdingsRecordId");
 
+				if (ncipProperties == null) {
+					throw new Exception("NCIP Properties have not been initialized.");
+				}
+				initProperties(agencyId, baseUrl);
+
 				// Search open requests
 				String requestResponseString = callApiGet(baseUrl + Constants.OPEN_REQUEST_BY_ITEM_ID_URL + itemUuid);
 				JsonObject requestResponse = new JsonObject(requestResponseString);
 				if (requestResponse.getInteger("totalRecords") > 0) {
 					// Need to close open requests
-					if (ncipProperties == null) {
-						throw new Exception("NCIP Properties have not been initialized.");
-					}
-					initProperties(agencyId, baseUrl);
 					String reasonId = ncipProperties.getProperty(agencyId + ".cancel.request.reason.patron.id");
 
 					JsonArray requests = requestResponse.getJsonArray("requests");
@@ -1141,11 +1142,18 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					});
 				}
 
-				String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
-				String holdingResponseString = callApiGet(holdingsUrl);
-				JsonObject holdingResponse = new JsonObject(holdingResponseString);
+				String softDeleteEnabled = ncipProperties.getProperty(agencyId + ".item.soft.delete");
+				if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(softDeleteEnabled)) {
+					// Update item to Unavailable
+					itemObject.getJsonObject("status").put("name", Constants.ITEM_STATUS_UNAVAILABLE);
+					callApiPut(baseUrl + Constants.ITEM_URL + "/" + itemUuid, itemObject);
+				} else {
+					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
+					String holdingResponseString = callApiGet(holdingsUrl);
+					JsonObject holdingResponse = new JsonObject(holdingResponseString);
 
-				deleteItemAndRelatedRecords(baseUrl, holdingResponse.getString("instanceId"), holdingsRecordId, itemUuid);
+					deleteItemAndRelatedRecords(baseUrl, holdingResponse.getString("instanceId"), holdingsRecordId, itemUuid);
+				}
 			}
 		} catch (Exception exception) {
 			logger.error("Exception occurred during delete item");
