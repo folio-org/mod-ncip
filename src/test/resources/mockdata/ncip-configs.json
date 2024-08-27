@@ -217,7 +217,7 @@
       "configName": "Relais",
       "code": "item.soft.delete",
       "enabled": true,
-      "value": "true",
+      "value": "false",
       "metadata": {
         "createdDate": "2020-03-06T20:24:55.479+0000",
         "createdByUserId": "99999999-9999-1999-8999-999999999901",
