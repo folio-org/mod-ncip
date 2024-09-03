@@ -22,7 +22,7 @@ public class RequestItem extends TestBase {
 	private static final String CREATED_REQUEST_ID = "de627598-d468-41e0-a849-450940478477";
 	private static final String ITEM_IDENTIFIER = "<ns1:ItemIdentifierValue>0000005</ns1:ItemIdentifierValue>";
 	private static final String CALL_NUMBER = "<ns1:CallNumber>58.95</ns1:CallNumber>";
-	private static final String LOCATION = "Annex : Datalogisk Institut";
+	private static final String LOCATION = "Annex";
 	private static final String REQUESTER_ID = "764fe3bf-e09b-4fcc-b4a9-c78aab6995f1";
 	
 	/**
