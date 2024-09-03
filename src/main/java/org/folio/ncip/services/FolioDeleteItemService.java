@@ -1,8 +1,6 @@
 package org.folio.ncip.services;
 
-import io.vertx.core.json.JsonObject;
 import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.service.CancelRequestItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.DeleteItemInitiationData;
 import org.extensiblecatalog.ncip.v2.service.DeleteItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
@@ -12,6 +10,7 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ValidationException;
+import org.extensiblecatalog.ncip.v2.service.DeleteItemService;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
 

@@ -19,7 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<org.extensiblecatalog.ncip.v2.version>1.3.0-i</org.extensiblecatalog.ncip.v2.version>
+		<org.extensiblecatalog.ncip.v2.version>4.1.0</org.extensiblecatalog.ncip.v2.version>
 	</properties>
 
 	<dependencyManagement>
@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
 			<artifactId>binding-jar</artifactId>
-			<version>4.0.0</version>
+			<version>${org.extensiblecatalog.ncip.v2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.extensiblecatalog.ncip.v2</groupId>
@@ -211,11 +211,6 @@
 			<id>folio-nexus</id>
 			<name>FOLIO Maven repository</name>
 			<url>https://repository.folio.org/repository/maven-folio</url>
-		</repository>
-		<repository>
-			<id>indexdata-repo</id>
-			<name>Indexdata reposilite</name>
-			<url>https://reposilite.reshare.indexdata.com/releases</url>
 		</repository>
 	</repositories>
 

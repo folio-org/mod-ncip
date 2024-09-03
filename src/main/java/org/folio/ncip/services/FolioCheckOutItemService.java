@@ -22,6 +22,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.Version2ItemIdentifierType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
 
@@ -116,12 +117,10 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		responseData.setDateDue(calendar);
 		responseData.setItemId(iId);
 		responseData.setUserId(uId);
-		UserId loanId = new UserId();
-		loanId.setUserIdentifierValue(loanUuid);
-		loanId.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME, "loanUuid"));
-		UserOptionalFields userOptionalFields = new UserOptionalFields();
-		userOptionalFields.setUserIds(List.of(loanId));
-		responseData.setUserOptionalFields(userOptionalFields);
+		ItemId loanId = new ItemId();
+		loanId.setItemIdentifierValue(loanUuid);
+		loanId.setItemIdentifierType(Version2ItemIdentifierType.UUID);
+		responseData.setLoanUuid(loanId);
 		
 		return responseData;
 	 }

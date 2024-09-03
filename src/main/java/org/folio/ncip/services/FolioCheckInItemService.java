@@ -20,6 +20,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
+import org.extensiblecatalog.ncip.v2.service.Version2ItemIdentifierType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
 
@@ -92,17 +93,15 @@ public class FolioCheckInItemService extends FolioNcipService implements CheckIn
 				String loanUuid = checkInResponseDetails.getJsonObject("loan").getString("id");
 				String userUuid = checkInResponseDetails.getJsonObject("loan").getString("userId");
 
-				UserId loanId = new UserId();
-				loanId.setUserIdentifierValue(loanUuid);
-				loanId.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME, "loanUuid"));
+				ItemId loanId = new ItemId();
+				loanId.setItemIdentifierValue(loanUuid);
+				loanId.setItemIdentifierType(Version2ItemIdentifierType.UUID);
+				checkInItemResponseData.setLoanUuid(loanId);
 
-				UserId userId = new UserId();
-				userId.setUserIdentifierValue(userUuid);
-				userId.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME, "userUuid"));
-
-				UserOptionalFields userOptionalFields = new UserOptionalFields();
-				userOptionalFields.setUserIds(List.of(loanId, userId));
-				checkInItemResponseData.setUserOptionalFields(userOptionalFields);
+				UserId userUuidObject = new UserId();
+				userUuidObject.setUserIdentifierValue(userUuid);
+				userUuidObject.setUserIdentifierType(new UserIdentifierType(Constants.SCHEME, "userUuid"));
+				checkInItemResponseData.setUserUuid(userUuidObject);
 			}
 			
 			checkInItemResponseData.setItemId(iId);
