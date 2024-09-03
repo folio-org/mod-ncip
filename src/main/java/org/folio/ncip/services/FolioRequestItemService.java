@@ -62,6 +62,7 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		RequestId ncipRequestId = new RequestId();
 		ItemDescription itemDescription = new ItemDescription();
 		LocationNameInstance locationNameInstance = new LocationNameInstance();
+		LocationNameInstance libraryNameInstance = new LocationNameInstance();
 		UserId optionalUserId = new UserId();
 		try {
 			JsonObject requestItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).requestItem(initData);
@@ -70,17 +71,20 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 			String barcode = null;
 			String callNumber = null;
 			String locationName = null;
+			String libraryName = null;
 			if(requestItemResponseDetails.getJsonObject("item") != null) {
 				JsonObject item = requestItemResponseDetails.getJsonObject("item");
 				barcode = item.getString("barcode");
 				callNumber = item.getString("callNumber");
 				if (item.getJsonObject("location") != null) {
-					locationName = item.getJsonObject("location").getString("name") + " : " + item.getJsonObject("location").getString("libraryName");
+					locationName = item.getJsonObject("location").getString("name");
+				    libraryName = item.getJsonObject("location").getString("libraryName");
 				}
 			}
 			ncipRequestId.setRequestIdentifierValue(assignedRequestId);
 			itemDescription.setCallNumber(callNumber);
 			locationNameInstance.setLocationNameValue(locationName);
+			libraryNameInstance.setLocationNameValue(libraryName);
 			itemId.setItemIdentifierValue(barcode);
 			optionalUserId.setUserIdentifierValue(requesterId);
 		}
@@ -94,8 +98,9 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		Location location = new Location();
 		LocationType locationType = new LocationType(Constants.SCHEME, Constants.ITEM);
 		LocationName locationName = new LocationName();
-		locationNameInstance.setLocationNameLevel(BigDecimal.ONE);
-		locationName.setLocationNameInstances(List.of(locationNameInstance));
+		locationNameInstance.setLocationNameLevel(new BigDecimal(4));
+		libraryNameInstance.setLocationNameLevel(new BigDecimal(3));
+		locationName.setLocationNameInstances(List.of(libraryNameInstance, locationNameInstance));
 		location.setLocationName(locationName);
 		location.setLocationType(locationType);
 		ItemOptionalFields itemOptionalFields = new ItemOptionalFields();
