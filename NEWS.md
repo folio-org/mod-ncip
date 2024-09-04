@@ -1,6 +1,12 @@
-## 1.15.0 2024-06-10
+## 1.15.0 2024-09-04
  * [MODNCIP-69](https://folio-org.atlassian.net/browse/MODNCIP-69) API version update (mod-inventory-storage)
  * [MODNCIP-67](https://folio-org.atlassian.net/browse/MODNCIP-67) mod-ncip v1.14.X asserts compatibility with circulation interface v12 and 13 but actually requires v14
+ * [PR-1709](https://openlibraryfoundation.atlassian.net/browse/PR-1709) Implement NCIP RequestItem function in FOLIO mod-ncip
+ * [PR-1786](https://openlibraryfoundation.atlassian.net/browse/PR-1786) Implement NCIP CancelRequestItem
+ * [PR-1785](https://openlibraryfoundation.atlassian.net/browse/PR-1785) Implement NCIP DeleteItem
+ * [PR-1814](https://openlibraryfoundation.atlassian.net/browse/PR-1814) Check user pin
+ * [PR-1861](https://openlibraryfoundation.atlassian.net/browse/PR-1861) Implement CreateUserFiscalTransaction for charging fees
+ * [PR-1910](https://openlibraryfoundation.atlassian.net/browse/PR-1910) Add item soft delete option
 ## 1.14.5 2024-04-04
  * [MODNCIP-65](https://folio-org.atlassian.net/browse/MODNCIP-65) if preferredFirstName is present use in lookupUserResponse
 ## 1.14.4 2023-10-25
