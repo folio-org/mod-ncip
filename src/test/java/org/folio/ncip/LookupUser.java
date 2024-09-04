@@ -3,8 +3,6 @@
  */
 package org.folio.ncip;
 
-import static org.junit.Assert.*;
-
 import java.net.MalformedURLException;
 
 import org.hamcrest.Matchers;
@@ -13,34 +11,15 @@ import org.hamcrest.Matchers;
 //SOME EXAMPLES:
 //https://github.com/folio-org/mod-invoice/blob/master/src/test/java/org/folio/invoices/events/handlers/InvoiceSummaryTest.java
 
-import org.junit.Before;
 import org.junit.Test;
 
-import io.restassured.matcher.ResponseAwareMatcher;
 import io.restassured.response.Response;
-
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
-import com.jayway.restassured.path.xml.XmlPath;
-import com.jayway.restassured.path.xml.XmlPath.CompatibilityMode;
-
-
-
 
 /**
  * @author 
  *
  */
 public class LookupUser extends TestBase {
-	
-
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-	}
 
 	@Test
 	public void callLookupUserSuccess() throws MalformedURLException {

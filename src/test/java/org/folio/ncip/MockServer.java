@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -30,9 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
-import org.extensiblecatalog.ncip.v2.common.Translator;
-import org.extensiblecatalog.ncip.v2.service.ServiceContext;
-
 import static org.junit.Assert.fail;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -43,11 +39,6 @@ import javax.ws.rs.core.MediaType;
 
 public class MockServer {
 
-
-    private Translator translator; //for toolkit
-    private Properties toolkitProperties;
-    private Properties ncipProperties;
-    private ServiceContext serviceContext;
     private static FolioNcipHelper folioNcipHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(MockServer.class);
@@ -203,9 +194,14 @@ public class MockServer {
     }
 
     private void items(RoutingContext ctx) {
-        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
-        String body = readLineByLine(mockFileName);
-        serverResponse(ctx, 200, APPLICATION_JSON, body);
+        String query = ctx.request().getParam("query");
+        if (query.contains("at-014")) {
+            ctx.response().setStatusCode(500).end();
+        } else {
+            String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
+            String body = readLineByLine(mockFileName);
+            serverResponse(ctx, 200, APPLICATION_JSON, body);
+        }
     }
 
     private void itemsPost(RoutingContext ctx) {
@@ -305,7 +301,11 @@ public class MockServer {
     }
 
     private void putCirculationRequestById(RoutingContext ctx) {
-        ctx.response().setStatusCode(204).end();
+        if (ctx.normalizedPath().contains("5fc504cb-9042-4bfe-a54f-287c56cd7a12")) {
+            ctx.response().setStatusCode(500).end();
+        } else {
+            ctx.response().setStatusCode(204).end();
+        }
     }
 
     private void verifyPing(RoutingContext ctx) {

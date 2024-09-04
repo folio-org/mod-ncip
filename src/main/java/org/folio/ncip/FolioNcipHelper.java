@@ -4,11 +4,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -320,7 +317,7 @@ public class FolioNcipHelper {
 			}
 
 			ncipProperties.put(tenant, properties);
-			logger.info("Has tenant properties " + (ncipProperties.get(tenant) != null));
+			logger.info("Has tenant properties {}", (ncipProperties.get(tenant) != null));
 	}
 
 

@@ -1,7 +1,6 @@
 package org.folio.ncip.services;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
@@ -19,7 +18,6 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
-import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.extensiblecatalog.ncip.v2.service.Version2ItemIdentifierType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;

@@ -4,6 +4,12 @@ public class Constants {
 	public static final String BLOCKED = "BLOCKED";
 	public static final String OK = "OK";
 	public static final String ID = "id";
+	public static final String TITLE = "title";
+	public static final String STATUS = "status";
+	public static final String REQUEST_LEVEL = "requestLevel";
+	public static final String TOTAL_RECORDS = "totalRecords";
+	public static final String HOLDINGS_RECORD_ID = "holdingsRecordId";
+	public static final String LOCATION = "location";
 	public static final String AUTH_UID = "Username";
 	public static final String AUTH_BARCODE = "Barcode Id";
 	public static final String ACTIVE = "ACTIVE";

@@ -5,7 +5,6 @@ package org.folio.ncip;
 
 import java.net.MalformedURLException;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import io.restassured.response.Response;
@@ -24,13 +23,6 @@ public class RequestItem extends TestBase {
 	private static final String CALL_NUMBER = "<ns1:CallNumber>58.95</ns1:CallNumber>";
 	private static final String LOCATION = "Annex";
 	private static final String REQUESTER_ID = "764fe3bf-e09b-4fcc-b4a9-c78aab6995f1";
-	
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-	}
 
 	@Test
 	public void callRequestItem() throws MalformedURLException {

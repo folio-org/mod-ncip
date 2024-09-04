@@ -202,7 +202,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public void callApiPut(String uriString, JsonObject body) throws Exception{
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 		int timeout = Integer.parseInt(timeoutString);
-		logger.info("Using timeout: " + timeout);
+		logger.info("Using timeout: {}", timeout);
 		RequestConfig config = RequestConfig.custom()
 				.setConnectTimeout(timeout)
 				.setSocketTimeout(timeout)
@@ -253,7 +253,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 	}
 
-	public HttpResponse callApiDelete(String uriString) throws Exception, IOException, InterruptedException {
+	public HttpResponse callApiDelete(String uriString) throws Exception {
 
 		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
 		int timeout = Integer.parseInt(timeoutString);
@@ -294,7 +294,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		logger.info(responseCode);
 
 		if (responseCode > 399) {
-			throw new Exception("Response code from delete: " + responseCode);
+			throw new FolioNcipException("Response code from delete: " + responseCode);
 		}
 
 		return response;
@@ -509,7 +509,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 		// BUILD INSTANCE
 		JsonObject instance = new JsonObject();
-		instance.put("title", retreiveItemTitle(initData));
+		instance.put(Constants.TITLE, retreiveItemTitle(initData));
 		instance.put("instanceTypeId", ncipProperties.get(requesterAgencyId + ".instance.type.id"));
 		instance.put(Constants.ID, instanceUuid.toString());
 		instance.put("source", ncipProperties.get(requesterAgencyId + ".instance.source"));
@@ -544,7 +544,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			ItemId itemId = initData.getItemId();
 			JsonObject item = new JsonObject();
 			item.put(Constants.ID, itemUuid.toString());
-			item.put("holdingsRecordId", holdingsUuid.toString());
+			item.put(Constants.HOLDINGS_RECORD_ID, holdingsUuid.toString());
 			item.put("discoverySuppress", true);
 			item.put("itemLevelCallNumber", itemId.getItemIdentifierValue());
 			// PLACE HOLD DOES NOT WORK UNLESS THE ITEM HAS A PERM LOCATION
@@ -557,7 +557,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			JsonObject permLoanType = new JsonObject();
 			permLoanType.put(Constants.ID, ncipProperties.getProperty(requesterAgencyId + ".item.perm.loan.type.id"));
 
-			item.put("status", status);
+			item.put(Constants.STATUS, status);
 			item.put("materialType", materialType);
 			item.put("permanentLoanType", permLoanType);
 			item.put("barcode", itemId.getItemIdentifierValue());
@@ -576,8 +576,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put("requesterId", uid);
 			request.put("itemId", itemUuid.toString());
 			request.put("instanceId", holdings.getString("instanceId"));
-			request.put("requestLevel", "Item");
-			request.put("holdingsRecordId", holdingsUuid.toString());
+			request.put(Constants.REQUEST_LEVEL, "Item");
+			request.put(Constants.HOLDINGS_RECORD_ID, holdingsUuid.toString());
 			request.put("pickupServicePointId", sPointId);
 			DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 			ZonedDateTime now = ZonedDateTime.now();
@@ -631,7 +631,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				charge.put("paymentStatus", paymentStatus);
 				JsonObject status = new JsonObject();
 				status.put("name", Constants.DEFAULT_FEE_STATUS);
-				charge.put("status", status);
+				charge.put(Constants.STATUS, status);
 				charge.put("remaining", fee.getValue("defaultAmount"));
 				charge.put("feeFineType", fee.getString("feeFineType"));
 				charge.put("feeFineOwner", ownersArray.getJsonObject(0).getString("owner"));
@@ -689,7 +689,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	}
 	public JsonObject requestItem(RequestItemInitiationData initData) throws Exception {
 		String hrid = initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier();
-		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains("title");
+		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains(Constants.TITLE);
 		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(), "Page");
 		String pickUpLocationCode = null;
 		if (initData.getPickupLocation() != null && StringUtils.isNotBlank(initData.getPickupLocation().getValue())) {
@@ -708,23 +708,23 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String responseString = callApiGet(searchUrl);
 			JsonObject response = new JsonObject(responseString);
 
-			Integer totalRecords = response.getInteger("totalRecords");
+			Integer totalRecords = response.getInteger(Constants.TOTAL_RECORDS);
 			if (totalRecords == 1) {
 
 				JsonObject request = new JsonObject();
 				if (titleRequest) {
 					JsonObject instanceObject = response.getJsonArray("instances").getJsonObject(0);
 					request.put("instanceId", instanceObject.getString(Constants.ID));
-					request.put("requestLevel", "Title");
+					request.put(Constants.REQUEST_LEVEL, "Title");
 				} else {
 					JsonObject itemObject = response.getJsonArray("items").getJsonObject(0);
-					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
+					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString(Constants.HOLDINGS_RECORD_ID);
 					String holdingResponseString = callApiGet(holdingsUrl);
 					JsonObject holdingResponse = new JsonObject(holdingResponseString);
 					request.put("itemId", itemObject.getString(Constants.ID));
 					request.put("instanceId", holdingResponse.getString("instanceId"));
-					request.put("holdingsRecordId", holdingResponse.getString(Constants.ID));
-					request.put("requestLevel", "Item");
+					request.put(Constants.HOLDINGS_RECORD_ID, holdingResponse.getString(Constants.ID));
+					request.put(Constants.REQUEST_LEVEL, "Item");
 				}
 				request.put("requestType", requestType);
 				request.put("fulfillmentPreference", "Delivery");
@@ -742,7 +742,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				addNoteIfNeeded(initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(),
 						returnValues.getString(Constants.ID), initData.getRequestId().getRequestIdentifierValue(), baseUrl, true);
 			} else {
-				logger.error("Found total of " + totalRecords + " items by hrid " + hrid);
+				logger.error("Found total of {} items by hrid {}", totalRecords, hrid);
 				throw new FolioNcipException(Constants.REQUEST_ITEM_MISSING_PROBLEM);
 			}
 		} catch (Exception exception) {
@@ -765,7 +765,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				JsonObject note = new JsonObject();
 				note.put("domain", Constants.NOTE_DOMAIN_REQUESTS);
 				note.put("typeId", ncipProperties.getProperty(agencyId + ".request.note.id"));
-				note.put("title", String.format(Constants.NOTE_TITLE_TEMPLATE, illRequestId));
+				note.put(Constants.TITLE, String.format(Constants.NOTE_TITLE_TEMPLATE, illRequestId));
 				JsonArray links = new JsonArray();
 				JsonObject link = new JsonObject();
 				link.put("type", Constants.NOTE_LINK_TYPE_REQUEST);
@@ -1062,7 +1062,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	public JsonObject cancelRequestItem(String requestId, UserId userId, String agencyId) throws Exception {
 
 		if (ncipProperties == null) {
-			throw new Exception("NCIP Properties have not been initialized.");
+			throw new FolioNcipException("NCIP Properties have not been initialized.");
 		}
 
 		JsonObject user = lookupPatronRecord(userId);
@@ -1080,7 +1080,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		String url = baseUrl + Constants.REQUEST_URL + "/" + requestId;
 		try {
 			JsonObject requestResponse = new JsonObject(callApiGet(url));
-			requestResponse.put("status", Constants.REQUEST_CANCELLED_STATUS);
+			requestResponse.put(Constants.STATUS, Constants.REQUEST_CANCELLED_STATUS);
 			requestResponse.put("cancelledByUserId", user.getString(Constants.ID));
 			requestResponse.put("cancellationReasonId", reasonId);
 			requestResponse.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_ADDITIONAL_INFO);
@@ -1108,21 +1108,21 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			String itemResponseString = callApiGet(searchUrl);
 
 			JsonObject itemResponse = new JsonObject(itemResponseString);
-			Integer totalRecords = itemResponse.getInteger("totalRecords");
+			Integer totalRecords = itemResponse.getInteger(Constants.TOTAL_RECORDS);
 			if (totalRecords == 1) { // There is item
 				JsonObject itemObject = itemResponse.getJsonArray("items").getJsonObject(0);
 				String itemUuid = itemObject.getString(Constants.ID);
-				String holdingsRecordId = itemObject.getString("holdingsRecordId");
+				String holdingsRecordId = itemObject.getString(Constants.HOLDINGS_RECORD_ID);
 
 				if (ncipProperties == null) {
-					throw new Exception("NCIP Properties have not been initialized.");
+					throw new FolioNcipException("NCIP Properties have not been initialized.");
 				}
 				initProperties(agencyId, baseUrl);
 
 				// Search open requests
 				String requestResponseString = callApiGet(baseUrl + Constants.OPEN_REQUEST_BY_ITEM_ID_URL + itemUuid);
 				JsonObject requestResponse = new JsonObject(requestResponseString);
-				if (requestResponse.getInteger("totalRecords") > 0) {
+				if (requestResponse.getInteger(Constants.TOTAL_RECORDS) > 0) {
 					// Need to close open requests
 					String reasonId = ncipProperties.getProperty(agencyId + ".cancel.request.reason.patron.id");
 
@@ -1131,7 +1131,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 						JsonObject requestObject = (JsonObject) r;
 						try {
 							String url = baseUrl + Constants.REQUEST_URL + "/" + requestObject.getString(Constants.ID);
-							requestObject.put("status", Constants.REQUEST_CANCELLED_STATUS);
+							requestObject.put(Constants.STATUS, Constants.REQUEST_CANCELLED_STATUS);
 							requestObject.put("cancellationReasonId", reasonId);
 							requestObject.put("cancellationAdditionalInformation", Constants.REQUEST_CANCEL_PATRON_ADDITIONAL_INFO);
 							requestObject.put("cancelledDate", getDateTimeNowString());
@@ -1145,10 +1145,10 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				String softDeleteEnabled = ncipProperties.getProperty(agencyId + ".item.soft.delete");
 				if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(softDeleteEnabled)) {
 					// Update item to Unavailable
-					itemObject.getJsonObject("status").put("name", Constants.ITEM_STATUS_UNAVAILABLE);
+					itemObject.getJsonObject(Constants.STATUS).put("name", Constants.ITEM_STATUS_UNAVAILABLE);
 					callApiPut(baseUrl + Constants.ITEM_URL + "/" + itemUuid, itemObject);
 				} else {
-					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString("holdingsRecordId");
+					String holdingsUrl = baseUrl + Constants.HOLDINGS_URL + "/" + itemObject.getString(Constants.HOLDINGS_RECORD_ID);
 					String holdingResponseString = callApiGet(holdingsUrl);
 					JsonObject holdingResponse = new JsonObject(holdingResponseString);
 

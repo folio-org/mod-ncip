@@ -12,6 +12,7 @@ import org.extensiblecatalog.ncip.v2.service.ServiceException;
 import org.extensiblecatalog.ncip.v2.service.ValidationException;
 import org.extensiblecatalog.ncip.v2.service.DeleteItemService;
 import org.folio.ncip.Constants;
+import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
 
 import java.util.ArrayList;
@@ -37,9 +38,9 @@ public class FolioDeleteItemService extends FolioNcipService implements DeleteIt
         try {
             requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
             if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase("")) {
-                throw new Exception("Agency ID could nto be determined");
+                throw new FolioNcipException("Agency ID could nto be determined");
             }
-        } catch (Exception e) {
+        } catch (FolioNcipException e) {
             LOGGER.error("Could not determine agency id from initiation header.");
             Problem problem = new Problem(new ProblemType(Constants.DELETE_ITEM_PROBLEM), Constants.AGENCY_ID,
                     Constants.FROM_AGENCY_MISSING, e.getMessage());
