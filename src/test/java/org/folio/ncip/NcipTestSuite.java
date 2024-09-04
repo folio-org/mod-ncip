@@ -14,15 +14,14 @@ import io.restassured.RestAssured;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  LookupUser.class,RequestItem.class
+  LookupUser.class, RequestItem.class, CancelRequestItem.class, DeleteItem.class, AcceptItem.class, CreateUserFiscalTransaction.class, CheckOutItem.class
 })
 public class NcipTestSuite {
 
-	  private static final int okapiPort = Utils.nextFreePort();
-	  static final int mockPort = Utils.nextFreePort();
+	  private static final int OKAPI_PORT = Utils.nextFreePort();
+	  static final int MOCK_PORT = Utils.nextFreePort();
 	  private static Vertx vertx;
 	  private static MockServer mockServer;
-	  private static boolean initialised;
 
 	  @BeforeClass
 	  public static void before() throws InterruptedException, ExecutionException, TimeoutException {
@@ -30,12 +29,12 @@ public class NcipTestSuite {
 	      vertx = Vertx.vertx();
 	    }
 
-	    mockServer = new MockServer(mockPort);
+	    mockServer = new MockServer(MOCK_PORT);
 	    mockServer.start();
 
 	    RestAssured.reset();
-	    RestAssured.baseURI = "http://localhost:" + okapiPort;
-	    RestAssured.port = okapiPort;
+	    RestAssured.baseURI = "http://localhost:" + OKAPI_PORT;
+	    RestAssured.port = OKAPI_PORT;
 	    RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 	  }
 
@@ -43,9 +42,5 @@ public class NcipTestSuite {
 	  public static void after() {
 	    vertx.close();
 	    mockServer.close();
-	    initialised = false;
 	  }
-
-
-
 }

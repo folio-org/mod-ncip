@@ -1,0 +1,57 @@
+{
+    "id" : "c7369b8e-a573-45e4-b2ab-9c39e7fe04a4",
+    "userId" : "99999999-9999-1999-8999-999999999901",
+    "itemId" : "b195771a-6c54-43dc-802e-b20cbc5b34ff",
+    "status" : {
+      "name" : "Open"
+    },
+    "loanDate" : "2019-10-07T20:16:19Z",
+    "dueDate" : "2020-01-14T23:59:59.000+0000",
+    "action" : "checkedout",
+    "loanPolicyId" : "b3d3e18a-9bf4-401c-a5b3-b88dd5653858",
+    "checkoutServicePointId" : "79faacf1-4ba4-42c7-8b2a-566b259e4641",
+    "metadata" : {
+      "createdDate" : "2019-10-07T20:16:20.501+0000",
+      "createdByUserId" : "99999999-9999-1999-8999-999999999901",
+      "updatedDate" : "2019-10-07T20:16:20.501+0000",
+      "updatedByUserId" : "99999999-9999-1999-8999-999999999901"
+    },
+    "patronGroupAtCheckout" : {
+      "id" : "dac3aab4-7a86-422b-b5fc-6fbf7afd7aeb",
+      "name" : "GRAD"
+    },
+    "item" : {
+      "id" : "b195771a-6c54-43dc-802e-b20cbc5b34ff",
+      "holdingsRecordId" : "09065bab-34dd-438e-95be-79eccc1f95aa",
+      "instanceId" : "97e40763-b77c-4fe5-baf5-4d2655e92add",
+      "title" : "TEST ONE",
+      "barcode" : "LEH-20191003225",
+      "callNumber" : "LEH-20191003225",
+      "status" : {
+        "name" : "Checked out"
+      },
+      "location" : {
+        "name" : "PALCI Shelf"
+      },
+      "materialType" : {
+        "name" : "PALCI"
+      }
+    },
+    "checkoutServicePoint" : {
+      "name" : "Linderman",
+      "code" : "LINDERMAN",
+      "discoveryDisplayName" : "Linderman",
+      "description" : null,
+      "shelvingLagTime" : 10,
+      "pickupLocation" : true
+    },
+    "borrower" : {
+      "firstName" : "Doe",
+      "lastName" : "Jane",
+      "middleName" : null,
+      "barcode" : "8377630"
+    },
+    "loanPolicy" : {
+      "name" : "Example Loan Policy"
+    }
+}

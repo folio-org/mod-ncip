@@ -1,0 +1,50 @@
+{
+  "id": "5fc504cb-9042-4bfe-a54f-287c56cd7a11",
+  "requestLevel": "Title",
+  "requestType": "Page",
+  "requestDate": "2024-06-18T14:47:28.668+00:00",
+  "requesterId": "a0774de4-d6fa-4ce4-83a2-e86ad07b15de",
+  "instanceId": "2f380c68-4903-4f89-8039-c8ab14e30a05",
+  "holdingsRecordId": "64fff52f-136e-48e5-b1c9-5c829574d65b",
+  "itemId": "37980327-208d-4b49-9541-2e115dcbd28e",
+  "status": "Open - Awaiting delivery",
+  "instance": {
+    "title": "Test Apple (Lord of the Flies)"
+  },
+  "item": {
+    "barcode": "at-a18",
+    "location": {
+      "name": "SLNP TWO Location A",
+      "libraryName": "SLNP TWO Library A",
+      "code": "slnp_two_loc_a"
+    },
+    "status": "Available",
+    "callNumberComponents": {}
+  },
+  "requester": {
+    "lastName": "SLNP_ONE_inst_user",
+    "barcode": "slnp_one_inst_user",
+    "patronGroup": {
+      "id": "3684a786-6671-4268-8ed0-9db82ebca60b",
+      "group": "staff",
+      "desc": "Staff Member"
+    },
+    "patronGroupId": "3684a786-6671-4268-8ed0-9db82ebca60b"
+  },
+  "fulfillmentPreference": "Delivery",
+  "pickupServicePointId": "cc860dbd-d5e7-4149-b327-5426f0c4034b",
+  "metadata": {
+    "createdDate": "2024-06-18T14:47:28.961+00:00",
+    "createdByUserId": "9666d8ea-5d30-406c-949b-b983018a5832",
+    "updatedDate": "2024-06-18T14:48:02.311+00:00",
+    "updatedByUserId": "9666d8ea-5d30-406c-949b-b983018a5832"
+  },
+  "pickupServicePoint": {
+    "name": "SLNP TWO service A",
+    "code": "slnp_two_service_a",
+    "discoveryDisplayName": "SLNP TWO service A",
+    "description": null,
+    "shelvingLagTime": null,
+    "pickupLocation": true
+  }
+}

@@ -8,14 +8,14 @@ import org.extensiblecatalog.ncip.v2.service.AcceptItemResponseData;
 import org.extensiblecatalog.ncip.v2.service.AcceptItemService;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
-import org.extensiblecatalog.ncip.v2.service.ItemIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.Problem;
 import org.extensiblecatalog.ncip.v2.service.ProblemType;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
-import org.extensiblecatalog.ncip.v2.service.RequestIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.extensiblecatalog.ncip.v2.service.Version2ItemIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version2RequestIdentifierType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
@@ -77,15 +77,14 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 	        	
 	        }
 
-	        
-	        ItemIdentifierType itemIdentifierType = new ItemIdentifierType(Constants.SCHEME, Constants.ITEM_BARCODE);
-	        RequestIdentifierType requestIdentifierType = new RequestIdentifierType(Constants.SCHEME,Constants.REQUEST_ID);
-	        
 	        itemId.setAgencyId(new AgencyId(requesterAgencyId));
-	        itemId.setItemIdentifierType(itemIdentifierType);
+	        itemId.setItemIdentifierType(Version2ItemIdentifierType.BARCODE);
 	        RequestId ncipRequestId = new RequestId();
 	        ncipRequestId.setAgencyId(new AgencyId(requesterAgencyId));
-	        ncipRequestId.setRequestIdentifierType(requestIdentifierType);
+	        ncipRequestId.setRequestIdentifierType(Version2RequestIdentifierType.UUID);
+			ItemId itemUuid = new ItemId();
+			itemUuid.setAgencyId(new AgencyId(requesterAgencyId));
+			itemUuid.setItemIdentifierType(Version2ItemIdentifierType.UUID);
 	           
 	        try {
 	        	//THE SERVICE MANAGER CALLS THE OKAPI APIs
@@ -94,6 +93,8 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 	        	responseData.setItemId(itemId);
 	        	ncipRequestId.setRequestIdentifierValue(assignedRequestId);
 	        	responseData.setRequestId(ncipRequestId);
+				itemUuid.setItemIdentifierValue(acceptItemResponseDetails.getJsonObject("item").getString("id"));
+				responseData.setItemUuid(itemUuid);
 	        }
 	        catch(Exception  e) {
 	        	if (responseData.getProblems() == null) responseData.setProblems(new ArrayList<Problem>());

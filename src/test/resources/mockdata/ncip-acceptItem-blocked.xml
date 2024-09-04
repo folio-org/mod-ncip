@@ -1,0 +1,43 @@
+<?xml version = '1.0' encoding='UTF-8'?>
+<NCIPMessage version='http://www.niso.org/schemas/ncip/v2_0/ncip_v2_0.xsd'>xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	<AcceptItem>
+		<InitiationHeader>
+    		 <FromAgencyId>
+        		<AgencyId>Relais</AgencyId>
+    		</FromAgencyId>
+    		<ToAgencyId>
+        		<AgencyId>LEHI</AgencyId>
+    		</ToAgencyId>
+    	</InitiationHeader>
+		<RequestId>
+			<AgencyId>Relais</AgencyId>
+			<RequestIdentifierValue>LEH-20191003227</RequestIdentifierValue>
+		</RequestId>
+		<RequestedActionType>Hold For Pickup</RequestedActionType>
+		<UserId>
+			<AgencyId>LEH</AgencyId>
+			<UserIdentifierValue>5551213</UserIdentifierValue>
+		</UserId>
+		<ItemId>
+			<AgencyId>LEH</AgencyId>
+			<ItemIdentifierValue>LEH-20191003227</ItemIdentifierValue>
+		</ItemId>
+		<ItemOptionalFields>
+			<BibliographicDescription>
+			<Author>Author</Author>
+			<Title>TEST ONE</Title>
+		</BibliographicDescription>
+		<ItemDescription>
+			<CallNumber>Call Number</CallNumber>
+		</ItemDescription>
+		</ItemOptionalFields>
+		<PickupLocation>DELIVERY</PickupLocation>
+		<FiscalTransactionInformation>
+			<FiscalActionType>charge-default-patron-fee</FiscalActionType>
+			<FiscalTransactionType>ILL-fee</FiscalTransactionType>
+			<Amount>
+				<MonetaryValue>0</MonetaryValue>
+			</Amount>
+		</FiscalTransactionInformation>
+	</AcceptItem>
+</NCIPMessage>

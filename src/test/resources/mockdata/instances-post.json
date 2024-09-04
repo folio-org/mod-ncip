@@ -1,0 +1,89 @@
+{
+    "id": "5b1eb450-ff9f-412d-a9e7-887f6eaeb5b4",
+    "_version": "1",
+    "hrid": "inst000000000010",
+    "source": "FOLIO",
+    "title": "Concepts of fashion 1921 - 1987 microform a study of garments worn by selected winners of the Miss America Pageant Marian Ann J. Matwiejczyk-Montgomery",
+    "administrativeNotes": [],
+    "parentInstances": [],
+    "childInstances": [],
+    "isBoundWith": false,
+    "alternativeTitles": [],
+    "editions": [],
+    "series": [],
+    "identifiers": [
+      {
+        "identifierTypeId": "5d164f4b-0b15-4e42-ae75-cfcf85318ad9",
+        "value": "1008673218"
+      },
+      {
+        "identifierTypeId": "7e591197-f335-4afb-bc6d-a6d76ca3bace",
+        "value": "(DE-599)GBV1008673218"
+      }
+    ],
+    "contributors": [
+      {
+        "authorityId": null,
+        "contributorNameTypeId": "2b94c631-fca9-4892-a730-03ee529ffe2a",
+        "name": "Matwiejczyk-Montgomery, Marian Ann J",
+        "contributorTypeId": null,
+        "contributorTypeText": null,
+        "primary": null
+      }
+    ],
+    "subjects": [
+      {
+        "authorityId": null,
+        "value": "Hochschulschrift"
+      }
+    ],
+    "classifications": [],
+    "publication": [
+      {
+        "publisher": "University Microfims International",
+        "place": "Ann Arbor, MI",
+        "dateOfPublication": "1993",
+        "role": null
+      }
+    ],
+    "publicationFrequency": [],
+    "publicationRange": [],
+    "electronicAccess": [],
+    "instanceTypeId": "6312d172-f0cf-40f6-b27d-9fa8feaf332f",
+    "instanceFormatIds": [],
+    "physicalDescriptions": [],
+    "languages": [
+      "eng"
+    ],
+    "notes": [
+      {
+        "instanceNoteTypeId": null,
+        "note": "Dissertation New York University 1993",
+        "staffOnly": false
+      },
+      {
+        "instanceNoteTypeId": "6a2533a7-4de2-4e64-8466-074c2fa9308c",
+        "note": "Mikrofiche-Ausgabe",
+        "staffOnly": false
+      }
+    ],
+    "previouslyHeld": false,
+    "discoverySuppress": false,
+    "statisticalCodeIds": [],
+    "statusUpdatedDate": "2024-05-16T14:06:53.398+0000",
+    "metadata": {
+      "createdDate": "2024-05-16T14:06:53.398+00:00",
+      "createdByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89",
+      "updatedDate": "2024-05-16T14:06:53.398+00:00",
+      "updatedByUserId": "15a65190-1f3e-5dd7-bbd7-a203d6e85a89"
+    },
+    "tags": {
+      "tagList": []
+    },
+    "natureOfContentTermIds": [],
+    "publicationPeriod": {
+      "start": 1993
+    },
+    "precedingTitles": [],
+    "succeedingTitles": []
+}

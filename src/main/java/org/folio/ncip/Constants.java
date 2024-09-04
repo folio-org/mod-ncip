@@ -3,6 +3,13 @@ package org.folio.ncip;
 public class Constants {
 	public static final String BLOCKED = "BLOCKED";
 	public static final String OK = "OK";
+	public static final String ID = "id";
+	public static final String TITLE = "title";
+	public static final String STATUS = "status";
+	public static final String REQUEST_LEVEL = "requestLevel";
+	public static final String TOTAL_RECORDS = "totalRecords";
+	public static final String HOLDINGS_RECORD_ID = "holdingsRecordId";
+	public static final String LOCATION = "location";
 	public static final String AUTH_UID = "Username";
 	public static final String AUTH_BARCODE = "Barcode Id";
 	public static final String ACTIVE = "ACTIVE";
@@ -39,6 +46,12 @@ public class Constants {
 	public static final String REQUEST_ID_MISSING = "Request ID Missing";
 	public static final String FROM_AGENCY_MISSING = "Could not determine FromAgency";
 	public static final String COULD_NOT_DETERMINE_USER = "User id missing from request or user id provided in authentication input does not exist";
+	public static final String REQUEST_ITEM_PROBLEM = "Problem performing RequestItem";
+	public static final String REQUEST_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
+	public static final String REQUEST_ITEM_MISSING_PROBLEM = "Problem occurred while fetching item";
+	public static final String CANCEL_REQUEST_ITEM_PROBLEM = "Problem performing CancelRequestItem";
+	public static final String DELETE_ITEM_PROBLEM = "Problem performing DeleteItem";
+	public static final String CREATE_USER_FISCAL_TRANSACTION_PROBLEM = "Problem performing CreateUserFiscalTransaction";
 	
 	//MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
@@ -60,6 +73,8 @@ public class Constants {
 	public static final String INITIALIZED_PROPERTY = ".ncip.initialized";
 	public static final String SCHEME = "Scheme";
 	public static final String ITEM_BARCODE = "Item Barcode";
+	public static final String PAGE = "Page";
+	public static final String ITEM = "Item";
 	public static final String USER_BARCODE = "User Barcode";
 	public static final String REQUEST_ID = "Request Id";
 	public static final String CONFIGS = "configs";
@@ -68,6 +83,11 @@ public class Constants {
 	public static final String OK_CONFIG = "user.priv.ok.status"; 
 	public static final String BLOCKED_CONFIG = "user.priv.blocked.status";
 	public static final String EMAIL_STRING = "user.email.type";
+	public static final String REQUEST_CANCELLED_STATUS = "Closed - Cancelled";
+	public static final String REQUEST_CANCEL_ADDITIONAL_INFO = "NCIP cancel";
+	public static final String REQUEST_CANCEL_PATRON_ADDITIONAL_INFO = "Patron did not pickup item";
+	public static final String AUTH_TYPE_PIN = "pin";
+	public static final String PATRON_GROUP = "patronGroup";
 	
 	
 	//ENDPOINTS
@@ -76,11 +96,30 @@ public class Constants {
 	public static final String INSTANCE_URL = "/inventory/instances";
 	public static final String HOLDINGS_URL = "/holdings-storage/holdings";
 	public static final String ITEM_URL = "/inventory/items";
+	public static final String ITEM_SEARCH_URL = "/inventory/items?limit=1&query=hrid%3D%3D%22$hrid$%22";
+	public static final String INSTANCE_SEARCH_URL = "/inventory/instances?limit=1&query=hrid%3D%3D%22$hrid$%22";
 	public static final String REQUEST_URL = "/circulation/requests";
+	public static final String OPEN_REQUEST_BY_ITEM_ID_URL = "/circulation/requests?limit=100&query=%28status%3D%3D%28%22Open%20-%20Awaiting%20pickup%22%20or%20%22Open%20-%20Awaiting%20delivery%22%20or%20%22Open%20-%20In%20transit%22%20or%20%22Open%20-%20Not%20yet%20filled%22%29%29%20and%20itemId%3D%3D";
+	public static final String ITEM_SEARCH_BY_BARCODE_URL = "/inventory/items?limit=1&query=barcode%3D%3D%22$barcode$%22";
 	public static final String ADDRESS_TYPES = "/addresstypes";
-	
+	public static final String PATRON_PIN_VERIFY = "/patron-pin/verify";
+	public static final String FEE_OWNER_URL = "/owners?query=owner=%22Reshare-ILL%22&limit=1";
+	public static final String FEE_FINE_BY_OWNER_AND_TYPE = "/feefines?query=ownerId==$ownerId$%20and%20feeFineType=%22$feeType$%22&limit=1";
+	public static final String PATRON_GROUP_BY_ID = "/groups/";
+	public static final String ACCOUNT_URL = "/accounts";
+	public static final String NOTES_URL = "/notes";
+	public static final String ADD_STAFF_INFO_URL = "/circulation/loans/%s/add-info";
 	
 	public static final String DEFAULT_TIMEOUT = "30000";
 	public static final String SERVICE_MGR_TIMEOUT = "service_manager_timeout_ms";
+	public static final String CHARGE_DEFAULT_PATRON_FEE = "charge-default-patron-fee";
+	public static final String DEFAULT_PAYMENT_STATUS = "Outstanding";
+	public static final String DEFAULT_FEE_STATUS = "Open";
+	public static final String BOOLEAN_TRUE = "true";
+	public static final String NOTE_DOMAIN_REQUESTS = "requests";
+	public static final String NOTE_TITLE_TEMPLATE = "ILL Request id: %s";
+	public static final String NOTE_LINK_TYPE_REQUEST = "request";
+	public static final String STAFF_INFO_TYPE = "staffInfoAdded";
+	public static final String ITEM_STATUS_UNAVAILABLE = "Unavailable";
 
 }

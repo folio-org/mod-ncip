@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,8 +22,18 @@ import org.extensiblecatalog.ncip.v2.common.MessageHandlerFactory;
 import org.extensiblecatalog.ncip.v2.common.ServiceValidatorFactory;
 import org.extensiblecatalog.ncip.v2.common.Translator;
 import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
+import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
+import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
+import org.extensiblecatalog.ncip.v2.service.FiscalActionType;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionType;
+import org.extensiblecatalog.ncip.v2.service.LocationType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
 import org.extensiblecatalog.ncip.v2.service.NCIPResponseData;
+import org.extensiblecatalog.ncip.v2.service.PickupLocation;
+import org.extensiblecatalog.ncip.v2.service.RequestScopeType;
+import org.extensiblecatalog.ncip.v2.service.RequestType;
+import org.extensiblecatalog.ncip.v2.service.SchemeValueBehavior;
+import org.extensiblecatalog.ncip.v2.service.SchemeValuePair;
 import org.folio.util.StringUtil;
 import org.folio.util.PercentCodec;
 import io.vertx.core.Future;
@@ -52,6 +61,7 @@ public class FolioNcipHelper {
 	protected Properties defaultToolkitObjects = new Properties();
 
 	public FolioNcipHelper(Promise<Void> promise) {
+		setUpMapping();
 		initToolkitDefaults().onComplete(promise);
 	}
 
@@ -84,6 +94,20 @@ public class FolioNcipHelper {
 			logger.fatal(e.getLocalizedMessage());
 			return Future.failedFuture(Constants.UNABLE_TO_INIT_TOOLKIT);
 		}
+	}
+
+	private void setUpMapping(){
+		SchemeValuePair.allowNullScheme(RequestType.class.getName(), RequestScopeType.class.getName(),
+				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(), PickupLocation.class.getName(),
+				FiscalActionType.class.getName(), FiscalTransactionType.class.getName(), CurrencyCode.class.getName());
+		SchemeValuePair.mapBehavior(RequestType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(RequestScopeType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(BibliographicRecordIdentifierCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(LocationType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(PickupLocation.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(FiscalActionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(FiscalTransactionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(CurrencyCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 	}
 
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
@@ -293,7 +317,7 @@ public class FolioNcipHelper {
 			}
 
 			ncipProperties.put(tenant, properties);
-
+			logger.info("Has tenant properties {}", (ncipProperties.get(tenant) != null));
 	}
 
 

@@ -1,0 +1,23 @@
+{
+  "feefines": [
+    {
+      "automatic": false,
+      "feeFineType": "staff",
+      "defaultAmount": 5.0,
+      "ownerId": "fe2307cf-6f39-4b2e-bb37-7668a2b5accf",
+      "metadata": {
+        "createdDate": "2024-07-19T10:11:07.117+00:00",
+        "createdByUserId": "7d265701-9b80-5501-bc85-0758b4667022",
+        "updatedDate": "2024-07-19T10:11:07.117+00:00",
+        "updatedByUserId": "7d265701-9b80-5501-bc85-0758b4667022"
+      },
+      "id": "00fb288d-207a-4caa-9538-d18989367fbc"
+    }
+  ],
+  "totalRecords": 1,
+  "resultInfo": {
+    "totalRecords": 1,
+    "facets": [],
+    "diagnostics": []
+  }
+}

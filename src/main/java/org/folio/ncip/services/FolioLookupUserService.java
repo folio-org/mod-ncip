@@ -29,6 +29,7 @@ import org.extensiblecatalog.ncip.v2.service.UserPrivilege;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatus;
 import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType;
 import org.folio.ncip.Constants;
+import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
 import java.util.Properties;
 import java.util.ArrayList;
@@ -96,10 +97,11 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			    	  responseData.getProblems().add(p);
 			    	  return responseData;
 				 }
-				 responseData =constructResponse(initData,patronDetailsAsJson,requesterAgencyId);
+				 responseData = constructResponse(initData,patronDetailsAsJson,requesterAgencyId);
 				 logger.info("API LOOKUP RESULTS...");
 				 logger.info(patronDetailsAsJson.toString());
 
+				 checkPinIfNeeded(initData, (FolioRemoteServiceManager)serviceManager, patronDetailsAsJson.getString("id"));
 			 } catch (Exception e) {
 				 logger.error("error during performService:");
 				 logger.error(e.toString());
@@ -110,9 +112,6 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 		    	 return responseData;
 			}
 			 return responseData;
-		 
-	
-		   
 	 }
 
 	 private LookupUserResponseData constructResponse(LookupUserInitiationData initData,JsonObject userDetails,String requesterAgencyId) throws Exception {
@@ -384,4 +383,16 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			return Constants.ACTIVE;
 		}
 
+		private void checkPinIfNeeded(LookupUserInitiationData initData, FolioRemoteServiceManager serviceManager,
+									  String userId) throws FolioNcipException {
+			if (initData.getAuthenticationInputs() != null) {
+				for (AuthenticationInput authenticationInput : initData.getAuthenticationInputs()) {
+					String authType = authenticationInput.getAuthenticationInputType().getValue();
+					if (Constants.AUTH_TYPE_PIN.equalsIgnoreCase(authType)) {
+						String authValue = authenticationInput.getAuthenticationInputData();
+						serviceManager.checkUserPin(userId, authValue);
+					}
+				}
+			}
+		}
 }

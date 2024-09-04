@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import org.apache.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.AgencyId;
 import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
@@ -18,6 +19,7 @@ import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.ServiceContext;
 import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
+import org.extensiblecatalog.ncip.v2.service.Version2ItemIdentifierType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioRemoteServiceManager;
 
@@ -37,6 +39,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		ItemId itemId = initData.getItemId();
 		UserId userId = retrieveUserId(initData);
 		String dueDate = null;
+		String loanUuid = null;
         try {
         	validateUserId(userId);
         	validateItemId(itemId);
@@ -79,6 +82,7 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
         	//THE SERVICE MANAGER CALLS THE OKAPI APIs
         	 JsonObject checkOutItemResponseDetails = ((FolioRemoteServiceManager)serviceManager).checkOut(initData,requesterAgencyId.toLowerCase());
         	 dueDate = checkOutItemResponseDetails.getString("dueDate");
+			 loanUuid = checkOutItemResponseDetails.getString("id");
         	 //DUE DATE PARSE STARTED FAILING 11-2020
          	 //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -110,6 +114,10 @@ public class FolioCheckOutItemService extends FolioNcipService implements CheckO
 		responseData.setDateDue(calendar);
 		responseData.setItemId(iId);
 		responseData.setUserId(uId);
+		ItemId loanId = new ItemId();
+		loanId.setItemIdentifierValue(loanUuid);
+		loanId.setItemIdentifierType(Version2ItemIdentifierType.UUID);
+		responseData.setLoanUuid(loanId);
 		
 		return responseData;
 	 }

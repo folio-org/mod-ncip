@@ -1,0 +1,23 @@
+{
+  "amount": 5.0,
+  "remaining": 5.0,
+  "status": {
+    "name": "Open"
+  },
+  "paymentStatus": {
+    "name": "Outstanding"
+  },
+  "feeFineType": "staff",
+  "feeFineOwner": "Reshare-ILL",
+  "metadata": {
+    "createdDate": "2024-07-23T07:35:12.492+00:00",
+    "createdByUserId": "7d265701-9b80-5501-bc85-0758b4667022",
+    "updatedDate": "2024-07-23T07:35:12.492+00:00",
+    "updatedByUserId": "7d265701-9b80-5501-bc85-0758b4667022"
+  },
+  "userId": "d4a845bd-a326-4916-9cb4-6a5ac1a86155",
+  "feeFineId": "00fb288d-207a-4caa-9538-d18989367fbc",
+  "ownerId": "fe2307cf-6f39-4b2e-bb37-7668a2b5accf",
+  "id": "628e0831-30b0-415f-8b21-944950624926",
+  "contributors": []
+}

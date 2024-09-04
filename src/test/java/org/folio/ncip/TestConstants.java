@@ -20,4 +20,6 @@ public class TestConstants {
 	static final String OK = "OK";
 	static final String BLOCKED = "BLOCKED";
 
+	static final String PROBLEM_PIN_CHECK_FAILED = "Lookup User Failed: org.folio.ncip.FolioNcipException: PIN check failed";
+
 }

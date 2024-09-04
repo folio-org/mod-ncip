@@ -1,0 +1,29 @@
+{
+  "id": "e3ff6133-b9a2-4d4c-a1c9-dc1867d4df19",
+  "_version": 1,
+  "hrid": "hold000000000009",
+  "holdingsTypeId": "03c9c400-b9e3-4a07-ac0e-05ab470233ed",
+  "formerIds": [],
+  "instanceId": "5bf370e0-8cca-4d9c-82e4-5170ab2a0a39",
+  "permanentLocationId": "fcd64ce1-6995-48f0-840e-89ffa2288371",
+  "effectiveLocationId": "fcd64ce1-6995-48f0-840e-89ffa2288371",
+  "electronicAccess": [],
+  "callNumberTypeId": "512173a7-bd09-490e-b773-17d83f2b63fe",
+  "callNumber": "TK5105.88815 . A58 2004 FT MEADE",
+  "shelvingTitle": " TK5105.88815",
+  "administrativeNotes": [],
+  "notes": [],
+  "illPolicyId": "46970b40-918e-47a4-a45d-b1677a2d3d46",
+  "holdingsStatements": [],
+  "holdingsStatementsForIndexes": [],
+  "holdingsStatementsForSupplements": [],
+  "statisticalCodeIds": [
+    "b5968c9e-cddc-4576-99e3-8e60aed8b0dd"
+  ],
+  "holdingsItems": [],
+  "bareHoldingsItems": [],
+  "metadata": {
+    "createdDate": "2023-04-11T03:29:37.478+00:00",
+    "updatedDate": "2023-04-11T03:29:37.478+00:00"
+  }
+}

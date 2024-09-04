@@ -32,5 +32,12 @@
 		</ItemDescription>
 		</ItemOptionalFields>
 		<PickupLocation>DELIVERY</PickupLocation>
+		<FiscalTransactionInformation>
+			<FiscalActionType>charge-default-patron-fee</FiscalActionType>
+			<FiscalTransactionType>ILL-fee</FiscalTransactionType>
+			<Amount>
+				<MonetaryValue>0</MonetaryValue>
+			</Amount>
+		</FiscalTransactionInformation>
 	</AcceptItem>
 </NCIPMessage>
