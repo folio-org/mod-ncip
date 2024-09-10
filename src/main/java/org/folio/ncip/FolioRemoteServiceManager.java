@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
+import org.extensiblecatalog.ncip.v2.service.Location;
 import org.extensiblecatalog.ncip.v2.service.RemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.RequestId;
 import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
@@ -590,7 +591,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					.put("holdings", new JsonObject(holdingsResponse));
 
 			addDefaultPatronFee(initData.getFiscalTransactionInformation(), user.getString(Constants.ID), user.getString(Constants.PATRON_GROUP), baseUrl);
-			addNoteIfNeeded(requesterAgencyId, returnValues.getString(Constants.ID), initData.getRequestId().getRequestIdentifierValue(), baseUrl, false);
+			addNoteIfNeeded(requesterAgencyId, returnValues.getString(Constants.ID), initData.getRequestId().getRequestIdentifierValue(), baseUrl);
 		} catch (Exception e) {
 			// IF ANY OF THE ABOVE FAILED - ATTEMPT TO DELETE THE INSTANCE, HOLDINGS ITEM
 			// THAT MAY HAVE BEEN CREATED ALONG THE WAY
@@ -688,13 +689,25 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return servicePoints.getJsonArray("servicepoints").getJsonObject(0).getString(Constants.ID);
 	}
 	public JsonObject requestItem(RequestItemInitiationData initData) throws Exception {
+		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+		String agencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
+		agencyId = agencyId == null ? agencyId : agencyId.toLowerCase();
+		initProperties(agencyId, baseUrl);
 		String hrid = initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier();
 		final boolean titleRequest = initData.getRequestScopeType() != null && initData.getRequestScopeType().getValue().toLowerCase().contains(Constants.TITLE);
 		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(), "Page");
 		String pickUpLocationCode = null;
 		if (initData.getPickupLocation() != null && StringUtils.isNotBlank(initData.getPickupLocation().getValue())) {
 			pickUpLocationCode = initData.getPickupLocation().getValue();
-
+		}
+		String locationCode = null;
+		if (initData.getItemOptionalFields() != null && initData.getItemOptionalFields().getLocations() != null &&
+				!initData.getItemOptionalFields().getLocations().isEmpty()) {
+			Location location = initData.getItemOptionalFields().getLocation(0);
+			if (location.getLocationName() != null && location.getLocationName().getLocationNameInstances() != null &&
+					!location.getLocationName().getLocationNameInstances().isEmpty()) {
+				locationCode = location.getLocationName().getLocationNameInstance(0).getLocationNameValue();
+			}
 		}
 
 		JsonObject returnValues = new JsonObject();
@@ -702,7 +715,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		if (user == null)
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
 		try {
-			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
+
 			String searchUrl =  baseUrl + (titleRequest ? Constants.INSTANCE_SEARCH_URL : Constants.ITEM_SEARCH_URL)
 					.replace("$hrid$", hrid);
 			String responseString = callApiGet(searchUrl);
@@ -730,17 +743,21 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				request.put("fulfillmentPreference", "Delivery");
 				request.put("requesterId", user.getString(Constants.ID));
 				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
+				String servicePointId;
 				if (pickUpLocationCode != null) {
-					String servicePointId = getServicePointId(pickUpLocationCode, baseUrl);
-					request.put("pickupServicePointId", servicePointId);
+					servicePointId = getServicePointId(pickUpLocationCode, baseUrl);
+				} else {
+					servicePointId = ncipProperties.getProperty(agencyId + ".checkout.service.point.id");
 				}
+				request.put("pickupServicePointId", servicePointId);
+				request.put("itemLocationCode", locationCode);
 
 				String requestUrl = baseUrl + Constants.REQUEST_URL;
 				String requestResponse = callApiPost(requestUrl, request);
 
 				returnValues.mergeIn(new JsonObject(requestResponse));
-				addNoteIfNeeded(initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue(),
-						returnValues.getString(Constants.ID), initData.getRequestId().getRequestIdentifierValue(), baseUrl, true);
+				addNoteIfNeeded(agencyId, returnValues.getString(Constants.ID),
+						initData.getRequestId().getRequestIdentifierValue(), baseUrl);
 			} else {
 				logger.error("Found total of {} items by hrid {}", totalRecords, hrid);
 				throw new FolioNcipException(Constants.REQUEST_ITEM_MISSING_PROBLEM);
@@ -753,13 +770,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return returnValues;
 	}
 
-	private void addNoteIfNeeded(String agencyId, String requestUuid, String illRequestId, String baseUrl, boolean initProperties) {
+	private void addNoteIfNeeded(String agencyId, String requestUuid, String illRequestId, String baseUrl) {
 		try {
-			agencyId = agencyId == null ? agencyId : agencyId.toLowerCase();
-			if (initProperties) {
-				initProperties(agencyId, baseUrl);
-			}
-
 			String noteEnabled = ncipProperties.getProperty(agencyId + ".request.note.enabled");
 			if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled)) {
 				JsonObject note = new JsonObject();

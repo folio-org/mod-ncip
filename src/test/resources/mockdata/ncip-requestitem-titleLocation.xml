@@ -1,0 +1,39 @@
+<NCIPMessage version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
+    <RequestItem>
+        <InitiationHeader>
+            <FromAgencyId>
+                <AgencyId>relais</AgencyId>
+            </FromAgencyId>
+            <ToAgencyId>
+                <AgencyId>Lehigh University</AgencyId>
+            </ToAgencyId>
+        </InitiationHeader>
+        <UserId>
+            <UserIdentifierValue>8377630</UserIdentifierValue>
+        </UserId>
+        <RequestId>
+            <RequestIdentifierValue>requestId1</RequestIdentifierValue>
+        </RequestId>
+        <ItemId>
+            <ItemIdentifierValue>item1</ItemIdentifierValue>
+        </ItemId>
+        <RequestType>Hold</RequestType>
+        <RequestScopeType>Title</RequestScopeType>
+        <BibliographicId>
+            <BibliographicRecordId>
+                <BibliographicRecordIdentifier>instanceHrid1</BibliographicRecordIdentifier>
+            </BibliographicRecordId>
+        </BibliographicId>
+        <ItemOptionalFields>
+            <Location>
+                <LocationType Scheme="Scheme">Item</LocationType>
+                <LocationName>
+                    <LocationNameInstance>
+                        <LocationNameLevel>3</LocationNameLevel>
+                        <LocationNameValue>Datalogisk Institut</LocationNameValue>
+                    </LocationNameInstance>
+                </LocationName>
+            </Location>
+        </ItemOptionalFields>
+    </RequestItem>
+</NCIPMessage>
