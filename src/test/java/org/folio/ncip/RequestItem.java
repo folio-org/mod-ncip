@@ -37,8 +37,6 @@ public class RequestItem extends TestBase {
 		assertTrue(body.contains(REQUESTER_ID));
 	}
 
-
-
 	@Test
 	public void callRequestItemTitle() throws MalformedURLException {
 		Response response = postData("src/test/resources/mockdata/ncip-requestitem-title.xml");
@@ -51,4 +49,17 @@ public class RequestItem extends TestBase {
 		assertTrue(body.contains(LOCATION));
 		assertTrue(body.contains(REQUESTER_ID));
 	}
+
+    @Test
+    public void callRequestItemTitleLocation() throws MalformedURLException {
+        Response response = postData("src/test/resources/mockdata/ncip-requestitem-titleLocation.xml");
+        String body = response.getBody().prettyPrint();
+        System.out.println(body);
+        assertEquals(200, response.getStatusCode());
+        assertTrue(body.contains(CREATED_REQUEST_ID));
+        assertTrue(body.contains(ITEM_IDENTIFIER));
+        assertTrue(body.contains(CALL_NUMBER));
+        assertTrue(body.contains(LOCATION));
+        assertTrue(body.contains(REQUESTER_ID));
+    }
 }
