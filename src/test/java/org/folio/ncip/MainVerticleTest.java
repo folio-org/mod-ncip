@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -50,7 +48,8 @@ public class MainVerticleTest {
 
 	@Test
 	public void health(TestContext ctx) {
-		vertx.deployVerticle(new MainVerticle(), success(ctx, x -> {
+		vertx.deployVerticle(new MainVerticle())
+		.onComplete(ctx.asyncAssertSuccess(x -> {
 			get("/admin/health").
 			then().
 			statusCode(200).
@@ -75,34 +74,24 @@ public class MainVerticleTest {
 			default: req.response().setStatusCode(500).end("Bad path " + req.path()); break;
 			}
 		})
-		.listen(8082, ctx.asyncAssertSuccess(x -> {
-			vertx.deployVerticle(new MainVerticle(), success(ctx, y -> {
-				get("/ncipconfigcheck").
-				then().
-				statusCode(200).
-				body(is("OK"));
-			}));
+		.listen(8082)
+		.compose(x -> vertx.deployVerticle(new MainVerticle()))
+		.onComplete(ctx.asyncAssertSuccess(x -> {
+			get("/ncipconfigcheck").
+			then().
+			statusCode(200).
+			body(is("OK"));
 		}));
 	}
 
 	@Test
 	public void ncipConfigCheckFailure(TestContext ctx) {
-		vertx.deployVerticle(new MainVerticle(), success(ctx, y -> {
+		vertx.deployVerticle(new MainVerticle())
+		.onComplete(ctx.asyncAssertSuccess(y -> {
 			get("/ncipconfigcheck").
 			then().
 			statusCode(500).
 			body(containsString("localhost:8082"));
 		}));
-	}
-
-	/**
-	 * Like TestContext.asyncAssertSuccess, but use executeBlocking to run nextHandler
-	 * so that the mock http server can respond.
-	 */
-	private <T> Handler<AsyncResult<T>> success(TestContext ctx, Handler<T> nextHandler) {
-		return ctx.asyncAssertSuccess(value -> vertx.executeBlocking(promise -> {
-			nextHandler.handle(value);
-			promise.complete();
-		}, ctx.asyncAssertSuccess()));
 	}
 }
