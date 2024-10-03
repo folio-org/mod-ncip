@@ -1,3 +1,7 @@
+## 1.15.1 2024-10-03
+* [MODNCIP-71](https://folio-org.atlassian.net/browse/MODNCIP-71) Upgrade dependencies for Ramsons
+* [MODNCIP-68](https://folio-org.atlassian.net/browse/MODNCIP-68) Add callNumber to CheckOutItem response
+
 ## 1.15.0 2024-09-04
  * [MODNCIP-69](https://folio-org.atlassian.net/browse/MODNCIP-69) API version update (mod-inventory-storage)
  * [MODNCIP-67](https://folio-org.atlassian.net/browse/MODNCIP-67) mod-ncip v1.14.X asserts compatibility with circulation interface v12 and 13 but actually requires v14
