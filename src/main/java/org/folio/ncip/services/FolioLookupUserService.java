@@ -31,6 +31,8 @@ import org.extensiblecatalog.ncip.v2.service.UserPrivilegeStatusType;
 import org.folio.ncip.Constants;
 import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
+
+import java.util.List;
 import java.util.Properties;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -114,36 +116,41 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 			 return responseData;
 	 }
 
-	 private LookupUserResponseData constructResponse(LookupUserInitiationData initData,JsonObject userDetails,String requesterAgencyId) throws Exception {
-		 
-		 LookupUserResponseData responseData = new LookupUserResponseData();
-		 try {
-			 
-			  if (responseData.getUserOptionalFields()==null)
-		        	responseData.setUserOptionalFields(new UserOptionalFields());
-			  
-			 if (initData.getNameInformationDesired()) {
-				 responseData.getUserOptionalFields().setNameInformation(this.retrieveName(userDetails));
-			 }
-			 
-			 if (initData.getUserIdDesired())
-				 responseData.setUserId(this.retrieveBarcode(userDetails,requesterAgencyId));
-			 
-			  if (initData.getUserAddressInformationDesired())
-		        	responseData.getUserOptionalFields().setUserAddressInformations(this.retrieveAddress(userDetails,requesterAgencyId));
-			   
-			  if (initData.getUserPrivilegeDesired()) {
-		        	responseData.getUserOptionalFields().setUserPrivileges(this.retrievePrivileges(userDetails,requesterAgencyId));
-			        responseData.getUserOptionalFields().getUserPrivileges().add(this.retrieveBorrowingPrvilege(userDetails,requesterAgencyId));
-			  }
-		 }
-		 catch(Exception e) {
-			 logger.error("error during constructing lookup user construct response:");
-			 logger.error(e.toString());
-			 throw e;
-		 }
-		 return responseData;
-	 }
+	private LookupUserResponseData constructResponse(LookupUserInitiationData initData,JsonObject userDetails,String requesterAgencyId) throws Exception {
+
+		LookupUserResponseData responseData = new LookupUserResponseData();
+		try {
+
+			if (responseData.getUserOptionalFields()==null)
+				responseData.setUserOptionalFields(new UserOptionalFields());
+
+			if (initData.getNameInformationDesired()) {
+				responseData.getUserOptionalFields().setNameInformation(this.retrieveName(userDetails));
+			}
+
+			if (initData.getUserIdDesired()) {
+				responseData.setUserId(this.retrieveBarcode(userDetails, requesterAgencyId));
+				UserId userUuid = new UserId();
+				userUuid.setUserIdentifierType(new UserIdentifierType("uuid"));
+				userUuid.setUserIdentifierValue(userDetails.getString("id"));
+				responseData.getUserOptionalFields().setUserIds(List.of(userUuid));
+			}
+
+			if (initData.getUserAddressInformationDesired())
+				responseData.getUserOptionalFields().setUserAddressInformations(this.retrieveAddress(userDetails,requesterAgencyId));
+
+			if (initData.getUserPrivilegeDesired()) {
+				responseData.getUserOptionalFields().setUserPrivileges(this.retrievePrivileges(userDetails,requesterAgencyId));
+				responseData.getUserOptionalFields().getUserPrivileges().add(this.retrieveBorrowingPrvilege(userDetails,requesterAgencyId));
+			}
+		}
+		catch(Exception e) {
+			logger.error("error during constructing lookup user construct response:");
+			logger.error(e.toString());
+			throw e;
+		}
+		return responseData;
+	}
 	 
 	   private UserId retrieveBarcode(JsonObject jsonObject,String agencyId) throws Exception {
 		   UserId userId = new UserId();
