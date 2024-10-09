@@ -1,3 +1,6 @@
+## 1.15.2 2024-10-08
+* Return user UUID in LookupUser call
+
 ## 1.15.1 2024-10-03
 * [MODNCIP-71](https://folio-org.atlassian.net/browse/MODNCIP-71) Upgrade dependencies for Ramsons
 * [MODNCIP-68](https://folio-org.atlassian.net/browse/MODNCIP-68) Add callNumber to CheckOutItem response
