@@ -132,7 +132,7 @@ public class FolioLookupUserService  extends FolioNcipService  implements Lookup
 				responseData.setUserId(this.retrieveBarcode(userDetails, requesterAgencyId));
 				UserId userUuid = new UserId();
 				userUuid.setUserIdentifierType(new UserIdentifierType("uuid"));
-				userUuid.setUserIdentifierValue(userDetails.getString("id"));
+				userUuid.setUserIdentifierValue(userDetails.getString("userUuid"));
 				responseData.getUserOptionalFields().setUserIds(List.of(userUuid));
 			}
 
