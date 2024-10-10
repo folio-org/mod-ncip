@@ -31,6 +31,8 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
    owners.collection.get
    feefines.collection.get
    accounts.item.post
+   circulation.requests.item.get
+   circulation.requests.item.put
 ```
 ### IMPORTANT NOTE ABOUT FOLIO USER - It has to be assigned a patron group. There is an issue with 'create item' which requires the user to be assigned a patron group.
 
