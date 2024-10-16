@@ -1,3 +1,6 @@
+## 1.15.3
+* [MODNCIP-76](https://folio-org.atlassian.net/browse/MODNCIP-76) Upgrade `holdings-storage` to 8.0
+
 ## 1.15.2 2024-10-08
 * Return user UUID in LookupUser call
 
