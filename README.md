@@ -172,6 +172,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP      |          Relais           | request.note.name                  |           ILL note |		
 | NCIP      |          Relais           | request.note.enabled               |              false |		
 | NCIP      |          Relais           | item.soft.delete                   |               true |		
+| NCIP      |          Relais           | user.email.type 	                 |             mailto |
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
