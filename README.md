@@ -13,7 +13,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ## Preparation
 1. The NCIP module requires a FOLIO user with the following permissions:
 ```
-   culation-storage.cancellation-reasons.collection.get
+   circulation-storage.cancellation-reasons.collection.get
    circulation-storage.circulation-rules.get
    inventory-storage.items.collection.get
    manualblocks.collection.get
@@ -172,6 +172,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP      |          Relais           | request.note.name                  |           ILL note |		
 | NCIP      |          Relais           | request.note.enabled               |              false |		
 | NCIP      |          Relais           | item.soft.delete                   |               true |		
+| NCIP      |          Relais           | user.email.type 	                 |             mailto |
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
@@ -265,6 +266,11 @@ The checkin item service is called when an item is checked in.  This service can
 Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
+
+##### Delete Item
+##### Request Item
+##### Cancel Request Item
+##### Create User Fiscal Transaction
 
 ### About the Extensible Catalog NCIP Toolkit
 
