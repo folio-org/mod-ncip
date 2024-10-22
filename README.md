@@ -13,7 +13,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ## Preparation
 1. The NCIP module requires a FOLIO user with the following permissions:
 ```
-   culation-storage.cancellation-reasons.collection.get
+   circulation-storage.cancellation-reasons.collection.get
    circulation-storage.circulation-rules.get
    inventory-storage.items.collection.get
    manualblocks.collection.get
