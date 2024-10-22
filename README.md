@@ -267,6 +267,11 @@ Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
 
+##### Delete Item
+##### Request Item
+##### Cancel Request Item
+##### Create User Fiscal Transaction
+
 ### About the Extensible Catalog NCIP Toolkit
 
 The eXtensible Catalog (XC) NCIP Toolkit was developed as a stand-alone Web application that would receive NCIP requests, communicate with your ILS (via a ‘connector’) and send back an XML response.
