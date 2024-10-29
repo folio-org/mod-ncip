@@ -13,26 +13,13 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 ## Preparation
 1. The NCIP module requires a FOLIO user with the following permissions:
 ```
-   circulation-storage.cancellation-reasons.collection.get
-   circulation-storage.circulation-rules.get
-   inventory-storage.items.collection.get
-   manualblocks.collection.get
    ncip.all
-   note.types.collection.get
-   automated-patron-blocks.collection.get
+   inventory-storage.items.collection.get
    ui-circulation.settings.lost-item-fees-policies
    ui-circulation.settings.overdue-fines-policies
-   inventory.instances.collection.get
-   inventory.items.collection.get
-   circulation.requests.collection.get
-   inventory.items.item.put
-   inventory.items.item.delete
-   inventory.instances.item.delete   
-   owners.collection.get
-   feefines.collection.get
-   accounts.item.post
-   circulation.requests.item.get
-   circulation.requests.item.put
+   automated-patron-blocks.collection.get
+   circulation-storage.circulation-rules.get
+   manualblocks.collection.get
 ```
 ### IMPORTANT NOTE ABOUT FOLIO USER - It has to be assigned a patron group. There is an issue with 'create item' which requires the user to be assigned a patron group.
 
