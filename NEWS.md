@@ -1,4 +1,4 @@
-## 1.15.3 2024-10-16
+## 1.15.3 2024-10-31
 * [MODNCIP-75](https://folio-org.atlassian.net/browse/MODNCIP-75) inventory API version update (13.0 to 14.0)
 * [MODNCIP-76](https://folio-org.atlassian.net/browse/MODNCIP-76) Upgrade `holdings-storage` to 8.0
 
