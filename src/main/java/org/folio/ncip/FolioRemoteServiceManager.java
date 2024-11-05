@@ -618,7 +618,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					throw new FolioNcipException("Failed to find patron group " + patronGroupId);
 				}
 				JsonObject fees = new JsonObject(callApiGet(baseUrl + Constants.FEE_FINE_BY_OWNER_AND_TYPE
-						.replace("$ownerId$", ownerId).replace("$feeType$", patronGroup)));
+						.replace("$ownerId$", ownerId).replace("$feeType$", StringUtil.urlEncode(patronGroup))));
 				if (fees.getJsonArray("feefines").isEmpty()) {
 					throw new FolioNcipException("Failed to find fee type " + patronGroup);
 				}
