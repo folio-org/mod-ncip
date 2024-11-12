@@ -139,10 +139,15 @@ public class MockServer {
             ctx.reroute("/configurations/entries/toolkit");
         }
 
-
-        String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "ncip-configs.json";
-        String body = readLineByLine(mockFileName);
-        serverResponse(ctx, 200, APPLICATION_JSON, body);
+        if (param.contains("code==\"request.fulfillment_preference\"") ||
+                param.contains("code==\"request.accept.fulfillment_preference\"") ||
+                param.contains("code==\"checkout.loan.info.type\"")) {
+            serverResponse(ctx, 200, APPLICATION_JSON, "{\"configs\": []}");
+        } else {
+            String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "ncip-configs.json";
+            String body = readLineByLine(mockFileName);
+            serverResponse(ctx, 200, APPLICATION_JSON, body);
+        }
     }
 
     private void getToolkitCofigs(RoutingContext ctx) {
