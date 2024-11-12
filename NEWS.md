@@ -1,3 +1,7 @@
+## 1.15.4 2024-11-12
+* Add new configuration options
+* Make sure default values are used
+
 ## 1.15.4 2024-11-11
 * Update documentation
 * Clean configuration
