@@ -49,6 +49,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
     * (20) item.soft.delete DeleteItem will use soft delete or delete entities. Default value `true`
     * (21) request.fulfillment_preference ILS request fulfillment preference when RequestItem. Default value `Hold Shelf`
     * (22) request.accept.fulfillment_preference ILS request fulfillment preference when AcceptItem. Default value `Hold Shelf`
+    * (23) checkout.loan.info.type In checkout process if note is enabled then use this type to add info. Default value `patronInfoAdded` other possible value `staffInfoAdded`
 
 Notes 
 * You can assign different values to these settings per Agency ID used in the NCIP requests.  This approach lets you setup different values for different Agency IDs.  For example, if Relais calls your NCIP server with the Agency ID of 'Relais' you can configure values for that agency.  If ReShare calls your NCIP server using a different Agency ID, you can set up different configuration values to be used for ReShare requests.  These settings have to exist for each Agency ID that will be used in the NCIP requests.
@@ -164,6 +165,7 @@ There are three types of settings that can exist in mod-configuration for the NC
 | NCIP      |          Relais           | user.email.type                       |             mailto |		
 | NCIP      |          Relais           | request.fulfillment_preference        |         Hold Shelf |	
 | NCIP      |          Relais           | request.accept.fulfillment_preference |         Hold Shelf |
+| NCIP      |          Relais           | checkout.loan.info.type               |    patronInfoAdded |
 
 
 You will need a set of these settings in mod-configuration for each individual Agency ID making NCIP requests.  Example of an AgencyID in an NCIP request:
