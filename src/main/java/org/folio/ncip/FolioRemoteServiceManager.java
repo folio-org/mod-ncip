@@ -572,7 +572,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put("requestType", "Page");
 			// FOR EXPLAINATION ABOUT HARDCODE FULFILLMENT
 			// SEE NOTES.TXT
-			request.put("fulfillmentPreference", "Hold Shelf");
+			request.put("fulfillmentPreference", ncipProperties.getProperty(requesterAgencyId + ".request.accept.fulfillment_preference"));
 			String uid = user.getString(Constants.ID);
 			request.put("requesterId", uid);
 			request.put("itemId", itemUuid.toString());
@@ -740,7 +740,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					request.put(Constants.REQUEST_LEVEL, "Item");
 				}
 				request.put("requestType", requestType);
-				request.put("fulfillmentPreference", "Delivery");
+				request.put("fulfillmentPreference", ncipProperties.getProperty(agencyId + ".request.fulfillment_preference"));
 				request.put("requesterId", user.getString(Constants.ID));
 				request.put("requestDate", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
 				String servicePointId;
