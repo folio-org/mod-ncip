@@ -451,7 +451,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null &&
 				requestId.getRequestIdentifierValue() != null) {
 			JsonObject staffInfo = new JsonObject();
-			staffInfo.put("action", Constants.STAFF_INFO_TYPE);
+			staffInfo.put("action", ncipProperties.getProperty(agencyId + ".checkout.loan.info.type"));
 			staffInfo.put("actionComment", String.format(Constants.NOTE_TITLE_TEMPLATE, requestId.getRequestIdentifierValue()));
 			try {
 				callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
