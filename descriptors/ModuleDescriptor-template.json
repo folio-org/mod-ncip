@@ -54,7 +54,8 @@
             "accounts.item.post",  
             "circulation.requests.item.get",  
             "circulation.requests.item.put",
-            "note.types.collection.get"
+            "note.types.collection.get",
+            "circulation.loans.add-info.post"
         ]
         },
         {
