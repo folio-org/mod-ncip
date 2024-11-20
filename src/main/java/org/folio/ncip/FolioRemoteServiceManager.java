@@ -497,6 +497,11 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			throw new FolioNcipException(Constants.REQUEST_ID_MISSING);
 		}
 
+		String callNumber = null;
+		if (initData.getItemOptionalFields() != null && initData.getItemOptionalFields().getItemDescription() != null) {
+			callNumber = initData.getItemOptionalFields().getItemDescription().getCallNumber();
+		}
+
 		// VALIDATE PICKUP LOCATION
 		String pickUpLocationCode = initData.getPickupLocation().getValue();
 		String sPointId = getServicePointId(pickUpLocationCode, baseUrl);
@@ -547,7 +552,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			item.put(Constants.ID, itemUuid.toString());
 			item.put(Constants.HOLDINGS_RECORD_ID, holdingsUuid.toString());
 			item.put("discoverySuppress", true);
-			item.put("itemLevelCallNumber", itemId.getItemIdentifierValue());
+
+			item.put("itemLevelCallNumber", StringUtils.isNotBlank(callNumber) ? callNumber : itemId.getItemIdentifierValue());
 			// PLACE HOLD DOES NOT WORK UNLESS THE ITEM HAS A PERM LOCATION
 			JsonObject permLocation = new JsonObject();
 			permLocation.put(Constants.ID, itemLocation);
