@@ -1,4 +1,8 @@
-## 1.15.4 2024-11-12
+## 1.15.6 2024-11-21
+* Fix missing permission issue
+* Use item call number from AcceptItem request if it is provided
+
+## 1.15.5 2024-11-12
 * Add new configuration options
 * Make sure default values are used
 
