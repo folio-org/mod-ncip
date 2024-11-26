@@ -12,7 +12,7 @@
           "permissionsRequired": ["ncip.post"],
           "modulePermissions": [
             "users.collection.get",
-            "automated-patron-blocks.collection.get",
+            "patron-blocks.automated-patron-blocks.collection.get",
             "addresstypes.collection.get",
             "circulation.requests.item.post",
             "circulation-storage.circulation-rules.get",
