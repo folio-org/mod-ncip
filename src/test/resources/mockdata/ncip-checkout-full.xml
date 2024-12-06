@@ -22,5 +22,12 @@
       <ns1:AgencyId>relais</ns1:AgencyId>
       <ns1:RequestIdentifierValue>js-test-0015</ns1:RequestIdentifierValue>
     </ns1:RequestId>
+    <ns1:Ext>
+      <ns1:RequestId>
+        <ns1:AgencyId>relais</ns1:AgencyId>
+        <ns1:RequestIdentifierType ns1:Scheme="Schema">ExternReferenz</ns1:RequestIdentifierType>
+        <ns1:RequestIdentifierValue>GDFG2343</ns1:RequestIdentifierValue>
+      </ns1:RequestId>
+    </ns1:Ext>
   </ns1:CheckOutItem>
 </ns1:NCIPMessage>
