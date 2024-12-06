@@ -448,37 +448,40 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	private void addStaffInfoIfNeeded(String agencyId, RequestId requestId, String loanUuid, String baseUrl, RequestId externalReference) {
 		String noteEnabled = getProperty(agencyId, "request.note.enabled");
-		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null &&
-						requestId.getRequestIdentifierValue() != null) {
+		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null) {
+			String requestIdentifierValue = requestId.getRequestIdentifierValue();
 
-			JsonObject staffInfo = new JsonObject();
-			if (externalReference != null
-							&& externalReference.getRequestIdentifierValue() != null
-								&& externalReference.getRequestIdentifierType() != null) {
-				// Use the custom template if externalReference is passed
+			if (requestIdentifierValue != null) {
+				JsonObject staffInfo = new JsonObject();
+				String actionComment = generateActionComment(requestIdentifierValue, externalReference);
 				staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
-				staffInfo.put("actionComment", String.format(
-								Constants.NOTE_TITLE_TEMPLATE_CUSTOM_EXTERNAL_REFERNECE,
-								requestId.getRequestIdentifierValue(),
-								externalReference.getRequestIdentifierType().getValue(),
-								externalReference.getRequestIdentifierValue())
+				staffInfo.put("actionComment", actionComment);
 
-				);
-			} else {
-				// Use the original template if externalReference is not passed
-				staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
-				staffInfo.put("actionComment", String.format(
-								Constants.NOTE_TITLE_TEMPLATE,
-								requestId.getRequestIdentifierValue()
-				));
+				try {
+					callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
+				} catch (Exception e) {
+					logger.error("Unable to add staff info to loan: {}", loanUuid);
+					logger.error(e.getMessage());
+				}
 			}
+		}
+	}
 
-			try {
-				callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
-			} catch (Exception e) {
-				logger.error("Unable to add staff info to loan: {}", loanUuid);
-				logger.error(e.getMessage());
-			}
+	private String generateActionComment(String requestIdentifierValue, RequestId externalReference) {
+		if (externalReference != null &&
+						externalReference.getRequestIdentifierValue() != null &&
+						externalReference.getRequestIdentifierType() != null) {
+			return String.format(
+							Constants.NOTE_TITLE_TEMPLATE_CUSTOM_EXTERNAL_REFERNECE,
+							requestIdentifierValue,
+							externalReference.getRequestIdentifierType().getValue(),
+							externalReference.getRequestIdentifierValue()
+			);
+		} else {
+			return String.format(
+							Constants.NOTE_TITLE_TEMPLATE,
+							requestIdentifierValue
+			);
 		}
 	}
 
