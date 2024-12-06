@@ -118,6 +118,7 @@ public class Constants {
 	public static final String BOOLEAN_TRUE = "true";
 	public static final String NOTE_DOMAIN_REQUESTS = "requests";
 	public static final String NOTE_TITLE_TEMPLATE = "ILL Request id: %s";
+	public static final String NOTE_TITLE_TEMPLATE_CUSTOM_EXTERNAL_REFERNECE = "ILL Request id: %s, ILS %s: %s";
 	public static final String NOTE_LINK_TYPE_REQUEST = "request";
 	public static final String ITEM_STATUS_UNAVAILABLE = "Unavailable";
 

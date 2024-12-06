@@ -421,7 +421,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			String checkoutResponse = callApiPost(url, jsonObject);
 			JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
-			addStaffInfoIfNeeded(agencyId, initData.getRequestId(), checkoutResponseAsJson.getString(Constants.ID), baseUrl);
+			addStaffInfoIfNeeded(agencyId, initData.getRequestId(), checkoutResponseAsJson.getString(Constants.ID), baseUrl, initData.getExternalReference());
 			return checkoutResponseAsJson;
 		}
 		catch(Exception e) {
@@ -446,13 +446,33 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 	}
 
-	private void addStaffInfoIfNeeded(String agencyId, RequestId requestId, String loanUuid, String baseUrl){
+	private void addStaffInfoIfNeeded(String agencyId, RequestId requestId, String loanUuid, String baseUrl, RequestId externalReference) {
 		String noteEnabled = getProperty(agencyId, "request.note.enabled");
 		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null &&
-				requestId.getRequestIdentifierValue() != null) {
+						requestId.getRequestIdentifierValue() != null) {
+
 			JsonObject staffInfo = new JsonObject();
-			staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
-			staffInfo.put("actionComment", String.format(Constants.NOTE_TITLE_TEMPLATE, requestId.getRequestIdentifierValue()));
+			if (externalReference != null
+							&& externalReference.getRequestIdentifierValue() != null
+								&& externalReference.getRequestIdentifierType() != null) {
+				// Use the custom template if externalReference is passed
+				staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
+				staffInfo.put("actionComment", String.format(
+								Constants.NOTE_TITLE_TEMPLATE_CUSTOM_EXTERNAL_REFERNECE,
+								requestId.getRequestIdentifierValue(),
+								externalReference.getRequestIdentifierType().getValue(),
+								externalReference.getRequestIdentifierValue())
+
+				);
+			} else {
+				// Use the original template if externalReference is not passed
+				staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
+				staffInfo.put("actionComment", String.format(
+								Constants.NOTE_TITLE_TEMPLATE,
+								requestId.getRequestIdentifierValue()
+				));
+			}
+
 			try {
 				callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
 			} catch (Exception e) {
