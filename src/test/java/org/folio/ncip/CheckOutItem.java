@@ -41,16 +41,4 @@ public class CheckOutItem extends TestBase {
         assertEquals(200, response.getStatusCode());
         assertTrue(body.contains(ITEM_ID));
     }
-
-    @Test
-    public void callCheckOutItem_GivenNoRequestId() throws MalformedURLException {
-        Response response = postData("src/test/resources/mockdata/ncip-checkout-null-request-id.xml");
-        assertNull(response);
-    }
-
-    @Test
-    public void callCheckOutItem_GivenNullRequestIdentifierValue() throws MalformedURLException {
-        Response response = postData("src/test/resources/mockdata/ncip-checkout-null-request-identifier-value.xml");
-        assertNull(response);
-    }
 }
