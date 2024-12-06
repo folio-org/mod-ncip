@@ -5,8 +5,7 @@ import org.junit.Test;
 
 import java.net.MalformedURLException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CheckOutItem extends TestBase {
 
@@ -14,6 +13,30 @@ public class CheckOutItem extends TestBase {
     @Test
     public void callCheckOutItem() throws MalformedURLException {
         Response response = postData("src/test/resources/mockdata/ncip-checkout-full.xml");
+        String body = response.getBody().prettyPrint();
+        assertEquals(200, response.getStatusCode());
+        assertTrue(body.contains(ITEM_ID));
+    }
+
+    @Test
+    public void callCheckOutItemWithoutExternalReference() throws MalformedURLException {
+        Response response = postData("src/test/resources/mockdata/ncip-checkout-null-request-id-external-reference.xml");
+        String body = response.getBody().prettyPrint();
+        assertEquals(200, response.getStatusCode());
+        assertTrue(body.contains(ITEM_ID));
+    }
+
+    @Test
+    public void callCheckOutItemWithoutExternalReferenceType() throws MalformedURLException {
+        Response response = postData("src/test/resources/mockdata/ncip-checkout-null-external-reference-type.xml");
+        String body = response.getBody().prettyPrint();
+        assertEquals(200, response.getStatusCode());
+        assertTrue(body.contains(ITEM_ID));
+    }
+
+    @Test
+    public void callCheckOutItemEmptyExternalReferenceValue() throws MalformedURLException {
+        Response response = postData("src/test/resources/mockdata/ncip-checkout-null-external-reference-value.xml");
         String body = response.getBody().prettyPrint();
         assertEquals(200, response.getStatusCode());
         assertTrue(body.contains(ITEM_ID));

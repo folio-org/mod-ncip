@@ -421,7 +421,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			String checkoutResponse = callApiPost(url, jsonObject);
 			JsonObject checkoutResponseAsJson = new JsonObject(checkoutResponse);
-			addStaffInfoIfNeeded(agencyId, initData.getRequestId(), checkoutResponseAsJson.getString(Constants.ID), baseUrl);
+			addStaffInfoIfNeeded(agencyId, initData.getRequestId(), checkoutResponseAsJson.getString(Constants.ID), baseUrl, initData.getExternalReference());
 			return checkoutResponseAsJson;
 		}
 		catch(Exception e) {
@@ -446,19 +446,42 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 	}
 
-	private void addStaffInfoIfNeeded(String agencyId, RequestId requestId, String loanUuid, String baseUrl){
+	private void addStaffInfoIfNeeded(String agencyId, RequestId requestId, String loanUuid, String baseUrl, RequestId externalReference) {
 		String noteEnabled = getProperty(agencyId, "request.note.enabled");
-		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null &&
-				requestId.getRequestIdentifierValue() != null) {
-			JsonObject staffInfo = new JsonObject();
-			staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
-			staffInfo.put("actionComment", String.format(Constants.NOTE_TITLE_TEMPLATE, requestId.getRequestIdentifierValue()));
-			try {
-				callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
-			} catch (Exception e) {
-				logger.error("Unable to add staff info to loan: {}", loanUuid);
-				logger.error(e.getMessage());
+		if (Constants.BOOLEAN_TRUE.equalsIgnoreCase(noteEnabled) && requestId != null) {
+			String requestIdentifierValue = requestId.getRequestIdentifierValue();
+
+			if (requestIdentifierValue != null) {
+				JsonObject staffInfo = new JsonObject();
+				String actionComment = generateActionComment(requestIdentifierValue, externalReference);
+				staffInfo.put("action", getProperty(agencyId, "checkout.loan.info.type"));
+				staffInfo.put("actionComment", actionComment);
+
+				try {
+					callApiPost(baseUrl + String.format(Constants.ADD_STAFF_INFO_URL, loanUuid), staffInfo);
+				} catch (Exception e) {
+					logger.error("Unable to add staff info to loan: {}", loanUuid);
+					logger.error(e.getMessage());
+				}
 			}
+		}
+	}
+
+	private String generateActionComment(String requestIdentifierValue, RequestId externalReference) {
+		if (externalReference != null &&
+						externalReference.getRequestIdentifierValue() != null &&
+						externalReference.getRequestIdentifierType() != null) {
+			return String.format(
+							Constants.NOTE_TITLE_TEMPLATE_CUSTOM_EXTERNAL_REFERNECE,
+							requestIdentifierValue,
+							externalReference.getRequestIdentifierType().getValue(),
+							externalReference.getRequestIdentifierValue()
+			);
+		} else {
+			return String.format(
+							Constants.NOTE_TITLE_TEMPLATE,
+							requestIdentifierValue
+			);
 		}
 	}
 
