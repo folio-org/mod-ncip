@@ -1,5 +1,5 @@
 ## 1.15.7 2025-03-12
-* [FOLREL-651](https://folio-org.atlassian.net/browse/FOLREL-651) Update to Java 21
+* [FOLREL-651](https://folio-org.atlassian.net/browse/FOLREL-651) Update to Java 21 test build
 
 ## 1.15.6 2024-11-21
 * Fix missing permission issue
