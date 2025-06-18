@@ -215,9 +215,9 @@ or http://youredgencipendpoint/ncip?apikey=yourapikey
 The module determines which service is being called based on the XML passed into the service.
 These particular four services were selected because they are required to interact with the D2D software that supports the ILL service that several participating libraries currently use.  Mod-NCIP was written using the Extensible Catalog (XC) NCIP toolkit (more about this below).  This means that adding additional services to this module should mainly involve writing the code that calls the FOLIO web services.  The 'plumbing' that translates the XML to objects and back to XML is built into the toolkit for all of the NCIP messages in the protocol.
 
-#### Supported Services
+### Supported Services
 
-##### Lookup User
+#### Lookup User
 The lookup user service determines whether or not a patron is permitted to borrow.  The response can include details about the patron and will also include a "BLOCKED" or "ACTIVE" value to indicate whether or not a patron can borrow.  The service looks for manual and automated 'blocks' assigned to the patron.  It also looks at the patron 'active' indicator.
 
 
@@ -225,7 +225,7 @@ Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/lookupUser.xml
 
-##### Accept Item
+#### Accept Item
 The accept item service is called when a requested item arrives from another library.  This service essentially creates the temporary record and places it on hold.
 It is probably the most complicated of the existing four service.  It:
 
@@ -245,7 +245,7 @@ Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/acceptItem.xml
 
-##### Checkout Item
+#### Checkout Item
 The checkout item service is called when an item is checked out (either a temporary item being circulated to a local patron or a local item being loaned to another library).
 In the 1.0 version of this module, this service does check for blocks on the patron and looks at the active indicator.  If if finds blocks or if the patron is not 'active' the call to the service will fail.  If/when JIRA UXPROD-1683 is completed this check can be removed.
 
@@ -253,28 +253,35 @@ Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkOutItem.xml
 
-##### Checkin Item
+#### Checkin Item
 The checkin item service is called when an item is checked in.  This service can include patron information in the response.  However, if the CheckInItem service is called and there is not an outstanding loan, no patron information will be included in the response. 
 
 Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkInItem.xml
 
-##### Delete Item
-##### Request Item
+#### Delete Item
+#### Request Item
 
 Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/add-sample-requests-jun-18/docs/sampleNcipMessages/requestItem.xml
 
-##### Cancel Request Item
-##### Create User Fiscal Transaction
+#### Cancel Request Item
+#### Create User Fiscal Transaction
 
 Sample XML Request:
 
 https://github.com/folio-org/mod-ncip/blob/add-sample-requests-jun-18/docs/sampleNcipMessages/createUserFiscalTransaction.xml
 
-### About the Extensible Catalog NCIP Toolkit
+Notes - 
+As of Jun 18, 2025 this service requires the following:
+- It looks for a for a Fee/Fine owner of 'Reshare-ILL'
+- It looks for a Fee/Fine type that matches the name of the patron group (e.g. Undergrad Student)
+
+Related code: https://github.com/folio-org/mod-ncip/blob/4dcbec289a2e34b9c82b6c63e975c38bbf6b4dd4/src/main/java/org/folio/ncip/FolioRemoteServiceManager.java#L610
+
+## About the Extensible Catalog NCIP Toolkit
 
 The eXtensible Catalog (XC) NCIP Toolkit was developed as a stand-alone Web application that would receive NCIP requests, communicate with your ILS (via a ‘connector’) and send back an XML response.
 
