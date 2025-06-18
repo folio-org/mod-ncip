@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NCIPMessage xmlns="http://www.niso.org/2008/ncip"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.niso.org/2008/ncip 
+                                 http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd"
+             version="http://www.niso.org/schemas/ncip">
+    <RequestItem>
+        <InitiationHeader>
+            <FromAgencyId>
+                <AgencyId>Relais</AgencyId>
+            </FromAgencyId>
+            <ToAgencyId>
+                <AgencyId>LEHI</AgencyId>
+            </ToAgencyId>
+        </InitiationHeader>
+        <UserId>
+            <UserIdentifierValue>8377630</UserIdentifierValue>
+        </UserId>
+        <RequestId>
+            <RequestIdentifierValue>ITEMBARCODE</RequestIdentifierValue>
+        </RequestId>
+        <BibliographicId>
+            <BibliographicRecordId>
+                <BibliographicRecordIdentifier>ITEMHRID</BibliographicRecordIdentifier>
+            </BibliographicRecordId>
+        </BibliographicId>
+        <RequestType>Page</RequestType>
+        <RequestScopeType>Item</RequestScopeType>
+        <PickupLocation>FAIRCHILD</PickupLocation>
+    </RequestItem>
+</NCIPMessage>
