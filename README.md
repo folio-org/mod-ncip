@@ -277,7 +277,7 @@ https://github.com/folio-org/mod-ncip/blob/add-sample-requests-jun-18/docs/sampl
 Notes - 
 As of Jun 18, 2025 this service requires the following:
 - It looks for a for a Fee/Fine owner of 'Reshare-ILL'
-- It looks for a Fee/Fine type that matches the name of the patron group (e.g. Undergrad Student)
+- It looks for a Fee/Fine type that matches the name of the patron group (e.g. Undergrad Student) which is related to the Reshare-ILL Fee/Fine owner
 
 Related code: https://github.com/folio-org/mod-ncip/blob/4dcbec289a2e34b9c82b6c63e975c38bbf6b4dd4/src/main/java/org/folio/ncip/FolioRemoteServiceManager.java#L610
 
