@@ -262,8 +262,17 @@ https://github.com/folio-org/mod-ncip/blob/master/docs/sampleNcipMessages/checkI
 
 ##### Delete Item
 ##### Request Item
+
+Sample XML Request:
+
+https://github.com/folio-org/mod-ncip/blob/add-sample-requests-jun-18/docs/sampleNcipMessages/requestItem.xml
+
 ##### Cancel Request Item
 ##### Create User Fiscal Transaction
+
+Sample XML Request:
+
+https://github.com/folio-org/mod-ncip/blob/add-sample-requests-jun-18/docs/sampleNcipMessages/createUserFiscalTransaction.xml
 
 ### About the Extensible Catalog NCIP Toolkit
 
