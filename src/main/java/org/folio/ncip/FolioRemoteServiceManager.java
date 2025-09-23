@@ -729,7 +729,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			if ((hrid == null || hrid.isEmpty()) && !titleRequest) {
 			    if (initData != null && initData.getRequestId() != null) {
 			        String barcode = initData.getRequestId().getRequestIdentifierValue();
-			        if (barcode != null && !barcode.isEmpty()) {  // extra safety check
+			        if (barcode != null && !barcode.isEmpty()) { 
 			            searchUrl = baseUrl + (Constants.ITEM_SEARCH_BY_BARCODE_URL)
 			                .replace("$barcode$", barcode);
 			        }
