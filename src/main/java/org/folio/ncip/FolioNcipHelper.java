@@ -63,17 +63,10 @@ public class FolioNcipHelper {
 	// USE THESE TOOLKIT PROPERTIES AS DEFAULTS:
 	protected Properties defaultToolkitObjects = new Properties();
 
-    public FolioNcipHelper() {
-        setUpMapping();
-        // existing async init
-        initToolkitDefaults().onComplete(ar -> {
-            if (ar.succeeded()) {
-                initComplete.complete(null);
-            } else {
-                initComplete.completeExceptionally(ar.cause());
-            }
-        });
-    }
+	public FolioNcipHelper(Promise<Void> promise) {
+		setUpMapping();
+		initToolkitDefaults().onComplete(promise);
+	}
 
 	public void waitUntilReady() throws Exception {
         initComplete.get(); // blocks safely
