@@ -45,6 +45,8 @@ import io.vertx.ext.web.RoutingContext;
 
 public class FolioNcipHelper {
 
+	private final CompletableFuture<Void> initComplete = new CompletableFuture<>();
+	
 	private static final Logger logger = LogManager.getLogger(FolioNcipHelper.class);
 	
 	// INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext
@@ -60,10 +62,21 @@ public class FolioNcipHelper {
 	// USE THESE TOOLKIT PROPERTIES AS DEFAULTS:
 	protected Properties defaultToolkitObjects = new Properties();
 
-	public FolioNcipHelper(Promise<Void> promise) {
-		setUpMapping();
-		initToolkitDefaults().onComplete(promise);
-	}
+    public FolioNcipHelper() {
+        setUpMapping();
+        // existing async init
+        initToolkitDefaults().onComplete(ar -> {
+            if (ar.succeeded()) {
+                initComplete.complete(null);
+            } else {
+                initComplete.completeExceptionally(ar.cause());
+            }
+        });
+    }
+
+	public void waitUntilReady() throws Exception {
+        initComplete.get(); // blocks safely
+    }
 
 	/*
 	 *
