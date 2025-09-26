@@ -43,7 +43,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-
 public class FolioNcipHelper {
 
 	private static final Logger logger = LogManager.getLogger(FolioNcipHelper.class);
