@@ -42,7 +42,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-import java.util.concurrent.CompletableFuture;
+
 
 public class FolioNcipHelper {
 
@@ -67,10 +67,6 @@ public class FolioNcipHelper {
 		setUpMapping();
 		initToolkitDefaults().onComplete(promise);
 	}
-
-	public void waitUntilReady() throws Exception {
-        initComplete.get(); // blocks safely
-    }
 
 	/*
 	 *
