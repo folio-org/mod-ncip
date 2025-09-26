@@ -1,3 +1,6 @@
+## 1.15.8 2025-09-25
+* [MODNCIP-90](https://folio-org.atlassian.net/browse/MODNCIP-90) RequestItem service - make hrid optional (Ramsons)
+
 ## 1.15.6 2024-11-21
 * Fix missing permission issue
 * Use item call number from AcceptItem request if it is provided
