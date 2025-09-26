@@ -726,18 +726,18 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 					.replace("$hrid$", hrid);
 
 			// This allows the place request service to work with only the barcode in the request.  This is a fallback when hrid is missing.
-			logger.error("hrid?")
+			logger.error("hrid?");
 			if ((hrid == null || hrid.isEmpty()) && !titleRequest) {
-				logger.error("hrid - no")
+				logger.error("hrid - no");
 			    if (initData != null && initData.getRequestId() != null) {
-					logger.error("init data, request id?")
+					logger.error("init data, request id?");
 			        String barcode = initData.getRequestId().getRequestIdentifierValue();
-					logger.error("barcode")
+					logger.error("barcode");
 			        if (barcode != null && !barcode.isEmpty()) { 
-						logger.error("using barcode")
+						logger.error("using barcode");
 			            searchUrl = baseUrl + (Constants.ITEM_SEARCH_BY_BARCODE_URL)
 			                .replace("$barcode$", barcode);
-						logger.error(searchUrl)
+						logger.error(searchUrl);
 			        }
 			    }
 			}
