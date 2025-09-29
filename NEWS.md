@@ -1,3 +1,6 @@
+## 1.16.1 2025-09-25
+* [MODNCIP-90](https://folio-org.atlassian.net/browse/MODNCIP-90) RequestItem service - make hrid optional (Sunflower)
+
 ## 1.16.0 2025-09-25
 * Copy of 1.15.7 - version correction for Sunflower
 
