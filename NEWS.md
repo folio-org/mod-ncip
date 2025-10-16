@@ -1,3 +1,12 @@
+## 1.16.1 2025-09-25
+* [MODNCIP-90](https://folio-org.atlassian.net/browse/MODNCIP-90) RequestItem service - make hrid optional (Sunflower)
+
+## 1.16.0 2025-09-25
+* Copy of 1.15.7 - version correction for Sunflower
+
+## 1.15.8 2025-09-25
+* [MODNCIP-90](https://folio-org.atlassian.net/browse/MODNCIP-90) RequestItem service - make hrid optional (Ramsons)
+
 ## 1.15.7 2025-03-12
 * [FOLREL-651](https://folio-org.atlassian.net/browse/FOLREL-651) Update to Java 21
 
