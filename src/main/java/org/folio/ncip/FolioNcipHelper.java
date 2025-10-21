@@ -45,6 +45,14 @@ import io.vertx.ext.web.RoutingContext;
 
 public class FolioNcipHelper {
 
+
+	// This runs once when the class is first loaded by the JVM
+    static {
+        // Force initialization at class load time
+        setUpMapping();
+    }
+
+	
 	private static final Logger logger = LogManager.getLogger(FolioNcipHelper.class);
 	
 	// INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext
@@ -61,7 +69,6 @@ public class FolioNcipHelper {
 	protected Properties defaultToolkitObjects = new Properties();
 
 	public FolioNcipHelper(Promise<Void> promise) {
-		setUpMapping();
 		initToolkitDefaults().onComplete(promise);
 	}
 
@@ -96,7 +103,7 @@ public class FolioNcipHelper {
 		}
 	}
 	
-	private void setUpMapping(){
+    private static void setUpMapping(){
 		SchemeValuePair.allowNullScheme(RequestType.class.getName(), RequestScopeType.class.getName(),
 				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(), PickupLocation.class.getName(),
 				FiscalActionType.class.getName(), FiscalTransactionType.class.getName(), CurrencyCode.class.getName());
