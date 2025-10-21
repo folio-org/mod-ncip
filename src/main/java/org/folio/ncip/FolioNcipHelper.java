@@ -25,6 +25,7 @@ import org.extensiblecatalog.ncip.v2.common.TranslatorFactory;
 import org.extensiblecatalog.ncip.v2.service.BibliographicRecordIdentifierCode;
 import org.extensiblecatalog.ncip.v2.service.CurrencyCode;
 import org.extensiblecatalog.ncip.v2.service.FiscalActionType;
+import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.FiscalTransactionType;
 import org.extensiblecatalog.ncip.v2.service.LocationType;
 import org.extensiblecatalog.ncip.v2.service.NCIPInitiationData;
