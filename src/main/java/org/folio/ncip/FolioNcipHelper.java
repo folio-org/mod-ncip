@@ -108,6 +108,7 @@ public class FolioNcipHelper {
 		SchemeValuePair.mapBehavior(FiscalActionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 		SchemeValuePair.mapBehavior(FiscalTransactionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 		SchemeValuePair.mapBehavior(CurrencyCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(UserIdentifierType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 	}
 
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
