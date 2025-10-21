@@ -95,20 +95,27 @@ public class FolioNcipHelper {
 			return Future.failedFuture(Constants.UNABLE_TO_INIT_TOOLKIT);
 		}
 	}
-
-	private void setUpMapping(){
-		SchemeValuePair.allowNullScheme(RequestType.class.getName(), RequestScopeType.class.getName(),
-				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(), PickupLocation.class.getName(),
-				FiscalActionType.class.getName(), FiscalTransactionType.class.getName(), CurrencyCode.class.getName());
-		SchemeValuePair.mapBehavior(RequestType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(RequestScopeType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(BibliographicRecordIdentifierCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(LocationType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(PickupLocation.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(FiscalActionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(FiscalTransactionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(CurrencyCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-	}
+	
+private void setUpMapping(){
+    // Initialize one class at a time to avoid thread contention
+    String[] classes = {
+        RequestType.class.getName(),
+        RequestScopeType.class.getName(),
+        BibliographicRecordIdentifierCode.class.getName(),
+        LocationType.class.getName(),
+        PickupLocation.class.getName(),
+        FiscalActionType.class.getName(),
+        FiscalTransactionType.class.getName(),
+        CurrencyCode.class.getName()
+    };
+    
+    for (String className : classes) {
+        SchemeValuePair.allowNullScheme(className);
+        SchemeValuePair.mapBehavior(className, SchemeValueBehavior.ALLOW_ANY);
+        // Small delay to ensure class fully loads before next
+        try { Thread.sleep(10); } catch (InterruptedException e) {}
+    }
+}
 
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
 
