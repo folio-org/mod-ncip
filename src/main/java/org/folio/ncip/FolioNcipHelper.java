@@ -171,6 +171,7 @@ public class FolioNcipHelper {
 					(org.extensiblecatalog.ncip.v2.service.ServiceContext) serviceContext.get(tenant), responseData);
 		} catch (Exception e) {
 			logger.error(e.toString());
+			logger.error("Error processing NCIP request", e);
 			throw e;
 		}
 		return responseMsgInputStream;
