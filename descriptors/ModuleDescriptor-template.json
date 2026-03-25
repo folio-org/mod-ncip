@@ -121,6 +121,14 @@
   ],
   "permissionSets": [
     {
+      "permissionName": "mod-settings.global.read.ncip",
+      "displayName": "Read NCIP tenant settings"
+    },
+    {
+      "permissionName": "mod-settings.global.write.ncip",
+      "displayName": "Write NCIP tenant settings"
+    },
+    {
       "permissionName": "ncip.post",
       "displayName": "NCIP Request",
       "description": "Post NCIP request"
