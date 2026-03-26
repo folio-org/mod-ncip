@@ -149,7 +149,6 @@
       "subPermissions": [
         "ncip.post",
         "ncip.ncipconfigcheck.get",
-        "mod-settings.global.write.ncip",
         "mod-settings.global.read.ncip"
       ]
     }
