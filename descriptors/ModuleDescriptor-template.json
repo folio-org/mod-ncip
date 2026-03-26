@@ -87,6 +87,10 @@
       "version": "2.0"
       },
       {
+      "id": "settings",
+      "version": "2.0"
+      },
+      {
         "id":"identifier-types",
         "version" : "1.2"
       },
@@ -144,7 +148,9 @@
       "description": "Entire set of permissions needed to use NCIP",
       "subPermissions": [
         "ncip.post",
-        "ncip.ncipconfigcheck.get"
+        "ncip.ncipconfigcheck.get",
+        "mod-settings.global.write.ncip",
+        "mod-settings.global.read.ncip"
       ]
     }
   ],
