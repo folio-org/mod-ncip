@@ -55,7 +55,9 @@
             "circulation.requests.item.get",  
             "circulation.requests.item.put",
             "note.types.collection.get",
-            "circulation.loans.add-info.post"
+            "circulation.loans.add-info.post",
+            "mod-settings.entries.collection.get",
+            "mod-settings.global.read.mod-ncip.manage"
         ]
         },
         {
@@ -70,7 +72,9 @@
             "inventory-storage.material-types.collection.get",
             "configuration.entries.collection.get",
             "configuration.entries.item.get",
-            "inventory-storage.loan-types.collection.get"
+            "inventory-storage.loan-types.collection.get",
+            "mod-settings.entries.collection.get",
+            "mod-settings.global.read.mod-ncip.manage"
           ]
          
         }
@@ -117,16 +121,22 @@
       {
         "id":"circulation",
         "version":"14.0"
+      },
+      {
+        "id": "settings",
+        "version": "1.2"
       }
   ],
   "permissionSets": [
     {
-      "permissionName": "mod-settings.global.read.ncip",
-      "displayName": "Read NCIP tenant settings"
+      "permissionName": "mod-settings.global.read.mod-ncip.manage",
+      "displayName": "mod-ncip Settings - Read configuration",
+      "description": "To read the setting from mod-settings"
     },
     {
-      "permissionName": "mod-settings.global.write.ncip",
-      "displayName": "Write NCIP tenant settings"
+      "permissionName": "mod-settings.global.write.mod-ncip.manage",
+      "displayName": "mod-ncip Settings - Create configuration",
+      "description": "To write the configuration in mod-settings"
     },
     {
       "permissionName": "ncip.post",
