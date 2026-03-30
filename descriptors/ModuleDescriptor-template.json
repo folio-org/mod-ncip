@@ -129,12 +129,12 @@
   ],
   "permissionSets": [
     {
-      "permissionName": "mod-settings.global.read.mod-ncip.manage",
+      "permissionName": "mod-settings.global.read.mod-ncip",
       "displayName": "mod-ncip Settings - Read configuration",
       "description": "To read the setting from mod-settings"
     },
     {
-      "permissionName": "mod-settings.global.write.mod-ncip.manage",
+      "permissionName": "mod-settings.global.write.mod-ncip",
       "displayName": "mod-ncip Settings - Create configuration",
       "description": "To write the configuration in mod-settings"
     },
