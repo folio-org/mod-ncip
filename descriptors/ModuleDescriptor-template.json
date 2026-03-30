@@ -57,7 +57,8 @@
             "note.types.collection.get",
             "circulation.loans.add-info.post",
             "mod-settings.entries.collection.get",
-            "mod-settings.global.read.mod-ncip.manage"
+            "mod-settings.entries.item.get",
+            "mod-settings.global.read.mod-ncip"
         ]
         },
         {
