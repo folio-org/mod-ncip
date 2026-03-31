@@ -58,7 +58,7 @@
             "circulation.loans.add-info.post",
             "mod-settings.entries.collection.get",
             "mod-settings.entries.item.get",
-            "mod-settings.global.read.mod-ncip"
+            "mod-settings.global.read.mod-ncip.view"
         ]
         },
         {
@@ -76,7 +76,7 @@
             "inventory-storage.loan-types.collection.get",
             "mod-settings.entries.collection.get",
             "mod-settings.entries.item.get",
-            "mod-settings.global.read.mod-ncip"
+            "mod-settings.global.read.mod-ncip.view"
           ]
          
         }
