@@ -131,14 +131,24 @@
   ],
   "permissionSets": [
     {
-      "permissionName": "mod-settings.global.read.mod-ncip",
+      "permissionName": "mod-settings.global.read.mod-ncip.get",
       "displayName": "Read settings for mod-ncip",
       "description": "Read settings for mod-ncip"
     },
     {
-      "permissionName": "mod-settings.global.write.mod-ncip",
-      "displayName": "Write settings for mod-ncip",
-      "description": "Write settings for mod-ncip"
+      "permissionName": "mod-settings.global.write.mod-ncip.post",
+      "displayName": "Create settings for mod-ncip",
+      "description": "Create settings for mod-ncip"
+    },
+    {
+      "permissionName": "mod-settings.global.write.mod-ncip.put",
+      "displayName": "Update settings for mod-ncip",
+      "description": "Update settings for mod-ncip"
+    },
+    {
+      "permissionName": "mod-settings.global.write.mod-ncip.delete",
+      "displayName": "Delete settings for mod-ncip",
+      "description": "Delete settings for mod-ncip"
     },
     {
       "permissionName": "ncip.post",
