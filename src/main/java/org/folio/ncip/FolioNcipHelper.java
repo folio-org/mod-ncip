@@ -413,6 +413,7 @@ public class FolioNcipHelper {
 		} catch (Exception exception) {
 			// NOT A PROBLEM, ERROR WAS A STRING. UNABLE TO PARSE
 			// AS JSON
+			responseBuffer.append(responseBody);
 		}
 		return responseBuffer.toString();
 	}

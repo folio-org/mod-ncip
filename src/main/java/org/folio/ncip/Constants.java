@@ -91,6 +91,8 @@ public class Constants {
 	
 	
 	//ENDPOINTS
+	public static final String SETTINGS_URL = "/settings/entries";
+	public static final String SETTING_SCOPE = "mod-ncip";
 	public static final String CHECK_IN_BY_BARCODE = "/circulation/check-in-by-barcode";
 	public static final String CHECK_OUT_BY_BARCODE  = "/circulation/check-out-by-barcode";
 	public static final String INSTANCE_URL = "/inventory/instances";

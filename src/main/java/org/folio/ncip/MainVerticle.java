@@ -40,7 +40,9 @@ public class MainVerticle extends AbstractVerticle {
 		router.route().handler(BodyHandler.create());
 		router.route(HttpMethod.POST, "/ncip").handler(this::handleNcip);
 		router.route(HttpMethod.GET, "/ncipconfigcheck").handler(this::ncipConfigCheck);
+		//router.route(HttpMethod.GET, "/ncipconfigmigrate").handler(this::ncipConfigMigrate);
 		router.route(HttpMethod.GET, "/admin/health").handler(this::healthCheck);
+		router.route(HttpMethod.POST, "/_/tenant").handler(this::handleTenant);
 		final Promise<HttpServer> serverPromise = Promise.promise();
 		vertx.createHttpServer().requestHandler(router).listen(port, serverPromise);
 
@@ -49,6 +51,33 @@ public class MainVerticle extends AbstractVerticle {
 		.<Void>mapEmpty()
 		.onComplete(startPromise);
 	}
+	
+	protected void handleTenant(RoutingContext ctx) {
+		final Promise<Void> promise = Promise.promise();
+		NcipConfigMigrate ncipConfigMigrate = new NcipConfigMigrate(promise);
+		promise.future().compose(x -> {
+			try {
+				System.out.println("TESTING HANDLE TENANT");
+				//TEST ACCESS TO MOD-CONFIG
+				ncipConfigMigrate.process(ctx);
+			} catch (Exception e) {
+				return Future.failedFuture(e);
+			}
+			ctx.response()
+			.setStatusCode(200)
+			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.TEXT_PLAIN_STRING)
+			.end(Constants.OK);
+			return Future.succeededFuture();
+		}).onFailure(e -> {
+			logger.error("***************");
+			logger.error(e.getMessage(), e);
+			ctx.response()
+			.setStatusCode(500)
+			.putHeader(HttpHeaders.CONTENT_TYPE, Constants.APP_XML)
+			.end("<Problem><message>problem processing handle tenant</message><exception>" + e.toString()+ "</exception></Problem>");
+		});
+	}
+
 
 
 
@@ -127,6 +156,9 @@ public class MainVerticle extends AbstractVerticle {
 		});
 
 	}
+	
+	
+	
 
 
 }
