@@ -58,28 +58,62 @@ public class NcipConfigMigrate extends FolioNcipHelper {
 		//TESTING - GET CONFIGS FROM MOD-CONFIGURATION
 		String okapiBaseEndpoint = routingContext.request().getHeader(Constants.X_OKAPI_URL);
 		String configQuery = "(module==NCIP)";
-		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=" + PercentCodec.encode(configQuery) + "&limit=200";
+		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=" + PercentCodec.encode(configQuery) + "&limit=10000";
 		String response = callApiGet(configEndpoint, routingContext.request().headers());
 		JsonObject jsonObject = new JsonObject(response);
 		JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
 		if (configs.size() < 1) {
-			logger.info("No toolkit configurations found.  Using defaults.  QUERY:" + configEndpoint);
+			logger.info("No NCIP configurations found to migrate.  QUERY:" + configEndpoint);
 			throw new Exception(
-					"No NCP configurations found in mod-configuration");
+					"No NCIP configurations found in mod-configuration");
 		}
-		
-		//TESTING MOD-SETTINGS
+		Iterator configsIterator = configs.iterator();
 		String url = baseUrl + Constants.SETTINGS_URL;
-		// BUILD SETTING
-		UUID settingUUID = UUID.randomUUID();
-		JsonObject setting = new JsonObject();
-		setting.put("id", settingUUID.toString());
-		setting.put("scope", Constants.SETTING_SCOPE);
-		setting.put("key", settingUUID.toString());
-		setting.put("value", "test");
-		System.out.println(setting.toString());
-		String settingsResponse = callApiPost(url, setting);
-		System.out.print("done");
+		while (configsIterator.hasNext()) {
+			JsonObject config = (JsonObject) configsIterator.next();
+			String code = config.getString(Constants.CODE_KEY);
+			String configName = config.getString(Constants.CONFIG_KEY);
+			String value = config.getString(Constants.VALUE_KEY);
+			String combinedKey = configName + "::" + code ;
+			String configUuid = config.getString(Constants.ID);
+			
+			//CONSTRUCT mod-settings
+			JsonObject setting = new JsonObject();
+			setting.put("id", configUuid);
+			setting.put("scope", Constants.SETTING_SCOPE);
+			setting.put(Constants.KEY, combinedKey);
+			setting.put("value", value);
+			System.out.println(setting.toString());
+			//INSERT mod-settings
+			String settingsResponse = callApiPost(url, setting);
+			
+			//VERIFY THE CONFIGURATION HAS BEEN MIGRATED TO MOD-SETTINGS
+			String getConfigEndpoint = okapiBaseEndpoint + "/configurations/entries/" + configUuid;
+			String verifySettingResponse = callApiGet(getConfigEndpoint , okapiHeaders);
+			System.out.println(getConfigEndpoint);
+			System.out.println(verifySettingResponse);
+			JsonObject oldConfig = new JsonObject(verifySettingResponse);
+			
+			
+			//VERIFY THE CONFIGURATION HAS BEEN MIGRATED TO MOD-SETTINGS
+			String getSettingsEndpoint = okapiBaseEndpoint + "/settings/entries/" + configUuid;
+			String newSettingsResult = callApiGet(getConfigEndpoint , okapiHeaders);
+			JsonObject newSetting = new JsonObject(newSettingsResult);
+			newSetting.getString("configName");
+			newSetting.getString("code");
+			if (combinedKey.equalsIgnoreCase(newSetting.getString("configName") + "::" + newSetting.getString("code"))) {
+				System.out.println("MATCHED - CONFIRMED CONFIG HAS BEEN MIGRATED TO SETTING");
+			}
+			if (newSetting.getString("value").equalsIgnoreCase(value)) {
+				System.out.println("MATCHED - CONFIRMED CONFIG HAS BEEN MIGRATED TO SETTING - COMPARED VALUE");
+			}
+			System.out.println(setting);
+			System.out.println(oldConfig);
+			
+			
+			
+			
+		}
 		
 	}
 	
