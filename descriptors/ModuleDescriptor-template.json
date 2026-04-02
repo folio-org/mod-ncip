@@ -99,7 +99,7 @@
             "mod-settings.global.write.mod-ncip",
           ]
         }
-    },
+    }
   ],
    "requires": [
       {
