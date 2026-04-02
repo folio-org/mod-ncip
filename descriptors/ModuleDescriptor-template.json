@@ -79,9 +79,27 @@
             "mod-settings.global.read.mod-ncip.manage"
           ]
          
-        }
+        },
       ]
-    }
+    },
+    {
+      "id": "_tenant",
+      "version": "1.0",
+      "interfaceType": "system",
+      "handlers": [
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/_/tenant",
+          "modulePermissions": [
+            "mod-settings.entries.collection.get",
+            "mod-settings.entries.item.get",
+            "mod-settings.global.read.mod-ncip",
+            "mod-settings.global.write.mod-ncip",
+          ]
+        }
+    },
   ],
    "requires": [
       {
@@ -131,12 +149,12 @@
   ],
   "permissionSets": [
     {
-      "permissionName": "mod-settings.global.read.mod-ncip.manage",
+      "permissionName": "mod-settings.global.read.mod-ncip",
       "displayName": "Read settings for mod-ncip",
       "description": "Read settings for mod-ncip"
     },
     {
-      "permissionName": "mod-settings.global.write.mod-ncip.manage",
+      "permissionName": "mod-settings.global.write.mod-ncip",
       "displayName": "Write settings for mod-ncip",
       "description": "Write settings for mod-ncip"
     },
