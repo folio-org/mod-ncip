@@ -79,7 +79,7 @@
             "mod-settings.global.read.mod-ncip.manage"
           ]
          
-        },
+        }
       ]
     },
     {
@@ -96,9 +96,10 @@
             "mod-settings.entries.collection.get",
             "mod-settings.entries.item.get",
             "mod-settings.global.read.mod-ncip",
-            "mod-settings.global.write.mod-ncip",
+            "mod-settings.global.write.mod-ncip"
           ]
         }
+      ]
     }
   ],
    "requires": [
