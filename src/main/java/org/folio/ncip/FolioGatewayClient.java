@@ -136,7 +136,6 @@ public class FolioGatewayClient {
 
             String key = header.getKey();
 
-            // 🚨 DO NOT forward unsafe transport headers
             if (key.equalsIgnoreCase("Content-Length")) {
                 continue;
             }
