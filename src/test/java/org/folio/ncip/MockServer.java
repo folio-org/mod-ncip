@@ -158,7 +158,7 @@ public class MockServer {
         if (query != null && query.contains("key==toolkit")) {
             mockFileName = TestConstants.PATH_TO_MOCK_FILES + "toolkit-settings.json";
         } else {
-            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "ncip-agency-settings.json";
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "ncip-settings.json";
         }
 
         String body = readLineByLine(mockFileName);
