@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "id": "ecb9cf87-adcb-4be7-9253-e8caf8828ee6",
+      "scope": "mod-ncip",
+      "key": "relais",
+      "value": {
+        "instance.type.name": "PALCI",
+        "instance.source": "PALCI",
+        "item.material.type.name": "PALCI",
+        "item.perm.loan.type.name": "PALCI",
+        "item.status.name": "Available",
+        "item.perm.location.code": "PALCI_LEHIGH",
+        "holdings.perm.location.code": "PALCI_LEHIGH",
+        "instance.custom.identifier.name": "PALCI Request ID",
+        "checkout.service.point.code": "FAIRCHILD",
+        "checkin.service.point.code": "FAIRCHILD",
+        "user.email.type": "mailto",
+        "cancel.request.reason.name": "Item Not Available",
+        "cancel.request.reason.patron.name": "Item Not Available",
+        "request.note.name": "ILL Note",
+        "request.note.enabled": "true",
+        "item.soft.delete": "false"
+      }
+    }
+  ],
+  "resultInfo": {
+    "totalRecords": 1,
+    "diagnostics": []
+  }
+}

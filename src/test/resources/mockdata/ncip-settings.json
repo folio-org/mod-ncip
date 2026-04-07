@@ -1,0 +1,44 @@
+{
+    "items": [
+        {
+            "id": "886a3a7b-ec5f-3a46-9e3d-127aca4ffe5d",
+            "scope": "mod-ncip",
+            "key": "rapid",
+            "value": {
+                "instance.source": "RAPID",
+                "item.status.name": "Available",
+                "instance.type.name": "text",
+                "holdings.source.name": "RAPID",
+                "item.material.type.name": "book",
+                "item.perm.location.code": "KU/CC/DI/M",
+                "item.perm.loan.type.name": "Can circulate",
+                "checkin.service.point.code": "cd1",
+                "checkout.service.point.code": "cd1",
+                "holdings.perm.location.code": "KU/CC/DI/M",
+                "instance.custom.identifier.name": "Local identifier"
+            }
+        },
+        {
+            "id": "896a3a7b-ec5f-3a46-9e3d-127aca4ffe5e",
+            "scope": "mod-ncip",
+            "key": "rapido",
+            "value": {
+                "instance.source": "rapido",
+                "item.status.name": "Available",
+                "instance.type.name": "text",
+                "holdings.source.name": "RAPID",
+                "item.material.type.name": "book",
+                "item.perm.location.code": "KU/CC/DI/M",
+                "item.perm.loan.type.name": "Can circulate",
+                "checkin.service.point.code": "cd1",
+                "checkout.service.point.code": "cd1",
+                "holdings.perm.location.code": "KU/CC/DI/M",
+                "instance.custom.identifier.name": "Local identifier"
+            }
+        }
+    ],
+    "resultInfo": {
+        "totalRecords": 2,
+        "diagnostics": []
+    }
+}

@@ -39,9 +39,9 @@ public class Constants {
 	public static final String CHECK_IN_PROBLEM = "Problem performing check in";
 	public static final String FATAL_ERROR_OCCURED = "An error occurred processing this request.  Unable to construct a proper NCIP response with problem element";
 	public static final String USER_ID_MISSING = "User id missing";
-	public static final String USER_ID_IS_INVALID  = "User id is invalid";
+	public static final String USER_ID_IS_INVALID = "User id is invalid";
 	public static final String ITEM_ID_IS_MISSING = "Item id missing";
-	public static final String  ITEM_ID_IS_INVALID = "Item id is invalid";
+	public static final String ITEM_ID_IS_INVALID = "Item id is invalid";
 	public static final String PICKUP_LOCATION_MISSING = "Pickup location is missing";
 	public static final String REQUEST_ID_MISSING = "Request ID Missing";
 	public static final String FROM_AGENCY_MISSING = "Could not determine FromAgency";
@@ -52,8 +52,8 @@ public class Constants {
 	public static final String CANCEL_REQUEST_ITEM_PROBLEM = "Problem performing CancelRequestItem";
 	public static final String DELETE_ITEM_PROBLEM = "Problem performing DeleteItem";
 	public static final String CREATE_USER_FISCAL_TRANSACTION_PROBLEM = "Problem performing CreateUserFiscalTransaction";
-	
-	//MISC
+
+	// MISC
 	public static final String NCIP_TOOLKIT_PROPS = "ncip_toolkit_props";
 	public static final String APP_XML = "application/xml";
 	public static final String SYS_PORT = "port";
@@ -80,7 +80,7 @@ public class Constants {
 	public static final String CONFIGS = "configs";
 	public static final String AGENCY_ID = "Agency ID";
 	public static final String RESPONSE_INCLUDES_PHYSICAL_ADDRESS = "response.includes.physical.address";
-	public static final String OK_CONFIG = "user.priv.ok.status"; 
+	public static final String OK_CONFIG = "user.priv.ok.status";
 	public static final String BLOCKED_CONFIG = "user.priv.blocked.status";
 	public static final String EMAIL_STRING = "user.email.type";
 	public static final String REQUEST_CANCELLED_STATUS = "Closed - Cancelled";
@@ -88,11 +88,30 @@ public class Constants {
 	public static final String REQUEST_CANCEL_PATRON_ADDITIONAL_INFO = "Patron did not pickup item";
 	public static final String AUTH_TYPE_PIN = "pin";
 	public static final String PATRON_GROUP = "patronGroup";
-	
-	
-	//ENDPOINTS
+	public static final String USERS = "users";
+	public static final String ITEMS = "items";
+	public static final String INSTANCES = "instances";
+	public static final String REQUESTS = "requests";
+	public static final String SERVICEPOINTS = "servicepoints";
+	public static final String MANUAL_BLOCKS = "manualblocks";
+	public static final String AUTOMATED_PATRON_BLOCKS = "automatedPatronBlocks";
+	public static final String ACTIVE_LOWERCASE = "active";
+	public static final String BARCODE_LOWERCASE = "barcode";
+	public static final String REQUEST_TYPE = "requestType";
+	public static final String FULFILLMENT_PREFERENCE = "fulfillmentPreference";
+	public static final String REQUESTER_ID = "requesterId";
+	public static final String INSTANCE_ID = "instanceId";
+	public static final String ITEM_ID = "itemId";
+	public static final String PICKUP_SERVICE_POINT_ID = "pickupServicePointId";
+	public static final String REQUEST_DATE = "requestDate";
+	public static final String CANCELLATION_REASON_ID = "cancellationReasonId";
+	public static final String CANCELLATION_ADDITIONAL_INFORMATION = "cancellationAdditionalInformation";
+	public static final String CANCELLED_BY_USER_ID = "cancelledByUserId";
+	public static final String CANCELLED_DATE = "cancelledDate";
+
+	// ENDPOINTS
 	public static final String CHECK_IN_BY_BARCODE = "/circulation/check-in-by-barcode";
-	public static final String CHECK_OUT_BY_BARCODE  = "/circulation/check-out-by-barcode";
+	public static final String CHECK_OUT_BY_BARCODE = "/circulation/check-out-by-barcode";
 	public static final String INSTANCE_URL = "/inventory/instances";
 	public static final String HOLDINGS_URL = "/holdings-storage/holdings";
 	public static final String ITEM_URL = "/inventory/items";
@@ -109,7 +128,7 @@ public class Constants {
 	public static final String ACCOUNT_URL = "/accounts";
 	public static final String NOTES_URL = "/notes";
 	public static final String ADD_STAFF_INFO_URL = "/circulation/loans/%s/add-info";
-	
+
 	public static final String DEFAULT_TIMEOUT = "30000";
 	public static final String SERVICE_MGR_TIMEOUT = "service_manager_timeout_ms";
 	public static final String CHARGE_DEFAULT_PATRON_FEE = "charge-default-patron-fee";
@@ -120,5 +139,11 @@ public class Constants {
 	public static final String NOTE_TITLE_TEMPLATE = "ILL Request id: %s";
 	public static final String NOTE_LINK_TYPE_REQUEST = "request";
 	public static final String ITEM_STATUS_UNAVAILABLE = "Unavailable";
+
+	// Settings migration constants
+	public static final String CONFIG_KEY = "configName";
+	public static final String KEY = "key";
+	public static final String SETTING_SCOPE = "mod-ncip";
+	public static final String SETTINGS_URL = "/settings/entries";
 
 }

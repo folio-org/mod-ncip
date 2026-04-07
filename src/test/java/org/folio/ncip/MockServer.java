@@ -3,9 +3,8 @@ package org.folio.ncip;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -32,9 +32,6 @@ import java.util.stream.Stream;
 import static org.junit.Assert.fail;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import org.folio.okapi.common.XOkapiHeaders;
-import org.folio.okapi.common.logging.FolioLoggingContext;
-
 import javax.ws.rs.core.MediaType;
 
 public class MockServer {
@@ -42,7 +39,6 @@ public class MockServer {
     private static FolioNcipHelper folioNcipHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(MockServer.class);
-
 
     static HashMap<String, Integer> params = new HashMap<>();
 
@@ -54,34 +50,33 @@ public class MockServer {
         this.vertx = Vertx.vertx();
     }
 
-
     void start() throws InterruptedException, ExecutionException, TimeoutException {
-        // Setup Mock Server...
+
         final Promise<Void> promise = Promise.promise();
-        folioNcipHelper = new FolioNcipHelper(promise);  //TODO????
-        //WebContext context = new WebContext(routingContext);
+        folioNcipHelper = new FolioNcipHelper(promise);
+
         HttpServer server = vertx.createHttpServer();
+
         params.put("port", this.port);
+
         CompletableFuture<HttpServer> deploymentComplete = new CompletableFuture<>();
-        server.requestHandler(defineRoutes()).listen(port, result -> {
-            if (result.succeeded()) {
-                deploymentComplete.complete(result.result());
-            } else {
-                deploymentComplete.completeExceptionally(result.cause());
-            }
-        });
+
+        server.requestHandler(defineRoutes())
+                .listen(port)
+                .onSuccess(deploymentComplete::complete)
+                .onFailure(deploymentComplete::completeExceptionally);
+
         deploymentComplete.get(60, TimeUnit.SECONDS);
     }
 
     void close() {
-        vertx.close(res -> {
-            if (res.failed()) {
-                logger.error("Failed to shut down mock server", res.cause());
-                fail(res.cause().getMessage());
-            } else {
-                logger.info("Successfully shut down mock server");
-            }
-        });
+        try {
+            vertx.close().toCompletionStage().toCompletableFuture().get();
+            logger.info("Successfully shut down mock server");
+        } catch (Exception e) {
+            logger.error("Failed to shut down mock server", e);
+            fail(e.getMessage());
+        }
     }
 
     private Router defineRoutes() {
@@ -95,10 +90,11 @@ public class MockServer {
         router.get("/service-points").handler(this::servicePointUsers);
         router.get("/manualblocks").handler(this::manualBlocks);
         router.get("/automated-patron-blocks/:id").handler(this::automatedBlocks);
-        //router.get("/configurations/entries/maxloancount").handler(this::getMaxLoanCount);
-        //router.get("/configurations/entries/maxfineamount").handler(this::getMaxFineAmount);
+        // router.get("/configurations/entries/maxloancount").handler(this::getMaxLoanCount);
+        // router.get("/configurations/entries/maxfineamount").handler(this::getMaxFineAmount);
         router.get("/configurations/entries/toolkit").handler(this::getToolkitCofigs);
         router.get("/configurations/entries").handler(this::getNcipConfigs);
+        router.get("/settings/entries").handler(this::getSettings);
         router.get("/inventory/items").handler(this::items);
         router.post("/inventory/items").handler(this::itemsPost);
         router.get("/inventory/instances").handler(this::instances);
@@ -133,7 +129,6 @@ public class MockServer {
         List<String> param = params.getAll("query");
         String toolkit = "configName=toolkit";
 
-
         param.contains(toolkit);
         if (param.contains(toolkit)) {
             ctx.reroute("/configurations/entries/toolkit");
@@ -152,6 +147,20 @@ public class MockServer {
 
     private void getToolkitCofigs(RoutingContext ctx) {
         String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "toolkit-configs.json";
+        String body = readLineByLine(mockFileName);
+        serverResponse(ctx, 200, APPLICATION_JSON, body);
+    }
+
+    private void getSettings(RoutingContext ctx) {
+        String query = ctx.request().getParam("query");
+        String mockFileName;
+
+        if (query != null && query.contains("key==toolkit")) {
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "toolkit-settings.json";
+        } else {
+            mockFileName = TestConstants.PATH_TO_MOCK_FILES + "ncip-agency-settings.json";
+        }
+
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
     }
@@ -364,14 +373,12 @@ public class MockServer {
                 .end(body);
     }
 
-
     private void test(RoutingContext ctx) {
 
+        logger.info("gotx: " + ctx.body());
 
-        logger.info("gotx: " + ctx.getBodyAsString());
         String id = UUID.randomUUID().toString();
-        JsonObject body = ctx.getBodyAsJson();
-
+        JsonObject body = ctx.body().asJsonObject();
     }
 
     private static String readLineByLine(String filePath) {
@@ -384,42 +391,40 @@ public class MockServer {
         return contentBuilder.toString();
     }
 
-
     protected void ncip(RoutingContext ctx) {
 
-        String requestId = ctx.request().headers().get(XOkapiHeaders.REQUEST_ID);
-        String userId = ctx.request().headers().get(XOkapiHeaders.USER_ID);
-        String tenant = ctx.request().headers().get(XOkapiHeaders.TENANT);
-        FolioLoggingContext.put(FolioLoggingContext.REQUEST_ID_LOGGING_VAR_NAME, requestId);
-        FolioLoggingContext.put(FolioLoggingContext.MODULE_ID_LOGGING_VAR_NAME, "mod-ncip");
-        FolioLoggingContext.put(FolioLoggingContext.TENANT_ID_LOGGING_VAR_NAME, tenant);
-        FolioLoggingContext.put(FolioLoggingContext.USER_ID_LOGGING_VAR_NAME, userId);
+        String requestId = ctx.request().getHeader("X-Okapi-Request-Id");
+        String userId = ctx.request().getHeader("X-Okapi-User-Id");
+        String tenant = ctx.request().getHeader("X-Okapi-Tenant");
+        Map<String, String> ctxMap = new HashMap<>();
+        ctxMap.put("requestId", requestId);
+        ctxMap.put("tenant", tenant);
+        ctxMap.put("userId", userId);
 
-        vertx.executeBlocking(promise -> {
-            InputStream responseMsgInputStream = null;
-            try {
-                //FolioNcipHelper folioNcipHelper = new FolioNcipHelper(ctx);
-                responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
-            } catch (Exception e) {
-                logger.error("error occured processing this request.  Unable to construct a proper NCIP response with problem element");
-                logger.error(e.toString());
+        vertx.executeBlocking(() -> {
+            InputStream responseMsgInputStream = folioNcipHelper.ncipProcess(ctx);
+
+            return new Scanner(responseMsgInputStream, "UTF-8")
+                    .useDelimiter("\\A")
+                    .next();
+        }).onComplete(res -> {
+
+            if (res.failed()) {
+                logger.error("error occurred processing request", res.cause());
+
                 ctx.response()
                         .setStatusCode(500)
-                        .putHeader(HttpHeaders.CONTENT_TYPE, "application/xml") //TODO CONSTANT
-                        //THIS REALLY SHOULD BE AN NCIP RESONSE THAT MIRRORS THE NCIP REQUEST TYPE (WITH PROBLEM ELEMENT) HOWEVER...
-                        //THAT IS NOT POSSIBLE IF WE'VE REACHED HERE BECAUSE ONLY THE MESSAGE HANDLER CAN CONSTRUCT A RESPONSE OBJECT
-                        //WE SHOULDN'T EVER GET HERE - FAMOUS LAST WORDS
-                        .end("<Problem><message>problem processing NCIP request</message><exception>" + e.getLocalizedMessage() + "</exception></Problem>");
+                        .putHeader(HttpHeaders.CONTENT_TYPE, "application/xml")
+                        .end("<Problem><message>problem processing NCIP request</message><exception>"
+                                + res.cause().getLocalizedMessage()
+                                + "</exception></Problem>");
+                return;
             }
 
-            String inputStreamString = new Scanner(responseMsgInputStream, "UTF-8").useDelimiter("\\A").next();
-            promise.complete(inputStreamString);
-        }, res -> {
-            System.out.println("The result is: " + res.result());
             ctx.response()
                     .setStatusCode(200)
-                    .putHeader(HttpHeaders.CONTENT_TYPE, "application/xml") //TODO CONSTANT
-                    .end(res.result().toString());
+                    .putHeader(HttpHeaders.CONTENT_TYPE, "application/xml")
+                    .end(res.result());
         });
 
     }

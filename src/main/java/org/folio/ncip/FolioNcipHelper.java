@@ -7,14 +7,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Properties;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.common.MappedMessageHandler;
@@ -46,7 +38,7 @@ import io.vertx.ext.web.RoutingContext;
 public class FolioNcipHelper {
 
 	private static final Logger logger = LogManager.getLogger(FolioNcipHelper.class);
-	
+
 	// INSTANCES OF org.extensiblecatalog.ncip.v2.service.ServiceContext
 	// serviceContext PER TENANT
 	protected Properties serviceContext = new Properties();
@@ -61,13 +53,29 @@ public class FolioNcipHelper {
 	protected Properties defaultToolkitObjects = new Properties();
 
 	public FolioNcipHelper(Promise<Void> promise) {
-		setUpMapping();
+		// setUpMapping();
 		initToolkitDefaults().onComplete(promise);
+	}
+
+	private void setUpMapping() {
+		SchemeValuePair.allowNullScheme(RequestType.class.getName(), RequestScopeType.class.getName(),
+				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(),
+				PickupLocation.class.getName(),
+				FiscalActionType.class.getName(), FiscalTransactionType.class.getName(), CurrencyCode.class.getName());
+		SchemeValuePair.mapBehavior(RequestType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(RequestScopeType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(BibliographicRecordIdentifierCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(LocationType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(PickupLocation.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(FiscalActionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(FiscalTransactionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
+		SchemeValuePair.mapBehavior(CurrencyCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
 	}
 
 	/*
 	 *
-	 * When the module starts, default config. values for the NCIP toolkit are loaded. When
+	 * When the module starts, default config. values for the NCIP toolkit are
+	 * loaded. When
 	 * ncip requests are made, the module will check for updated
 	 * configurations using mod-configuration.
 	 *
@@ -96,55 +104,42 @@ public class FolioNcipHelper {
 		}
 	}
 
-	private void setUpMapping(){
-		SchemeValuePair.allowNullScheme(RequestType.class.getName(), RequestScopeType.class.getName(),
-				BibliographicRecordIdentifierCode.class.getName(), LocationType.class.getName(), PickupLocation.class.getName(),
-				FiscalActionType.class.getName(), FiscalTransactionType.class.getName(), CurrencyCode.class.getName());
-		SchemeValuePair.mapBehavior(RequestType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(RequestScopeType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(BibliographicRecordIdentifierCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(LocationType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(PickupLocation.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(FiscalActionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(FiscalTransactionType.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-		SchemeValuePair.mapBehavior(CurrencyCode.class.getName(), SchemeValueBehavior.ALLOW_ANY);
-	}
-
 	public InputStream ncipProcess(RoutingContext context) throws Exception {
 
 		logger.info("ncip process called...");
-		//logger.info("=====okapi headers================");
-		//for (Map.Entry<String, String> entry : context.request().headers().entries()) {
-		//	logger.info(entry.getKey() + "-" + entry.getValue());
-		//}
-		//logger.info("==============================");
+		// logger.info("=====okapi headers================");
+		// for (Map.Entry<String, String> entry : context.request().headers().entries())
+		// {
+		// logger.info(entry.getKey() + "-" + entry.getValue());
+		// }
+		// logger.info("==============================");
+		String body = context.body().asString();
 		logger.info("==========BODY===============");
-		logger.info(context.getBodyAsString());
+		logger.info(body);
 
 		String tenant = context.request().headers().get(Constants.X_OKAPI_TENANT);
 
+		// INITIALIZE THIS TENANTS TOOLKIT PROPERTIES WITH THE DEFAULT VALUES:
+		toolkitProperties.put(tenant, defaultToolkitObjects.get("toolkit"));
+		serviceContext.put(tenant, defaultToolkitObjects.get("servicecontext"));
+		translator.put(tenant, defaultToolkitObjects.get("translator"));
+		// HAVE THEY OVERWRITTEN ANY OF THESE VALUES IN MOD-SETTINGS?
+		try {
+			initToolkit(context);
+		} catch (Exception e) {
+			logger.info(e.getLocalizedMessage());
+			logger.info("Unable to initialize custom toolkit properties.  Using default");
+			logger.info(e.getLocalizedMessage());
+		}
 
-			// INITIALIZE THIS TENANTS TOOLKIT PROPERTIES WITH THE DEFAULT VALUES:
-			toolkitProperties.put(tenant, defaultToolkitObjects.get("toolkit"));
-			serviceContext.put(tenant, defaultToolkitObjects.get("servicecontext"));
-			translator.put(tenant, defaultToolkitObjects.get("translator"));
-			// HAVE THEY OVERWRITTEN ANY OF THESE VALUES IN MOD-CONFIGURATION?
-			try {
-				initToolkit(context);
-			} catch (Exception e) {
-				logger.info(e.getLocalizedMessage());
-				logger.info("Unable to initialize custom toolkit properties.  Using default");
-				logger.info(e.getLocalizedMessage());
-			}
+		try {
+			initNcipProperties(context);
+		} catch (Exception e) {
+			logger.error("Unable to initialize NCIP properties with mod-settings", e);
+			throw e;
+		}
 
-			try {
-				initNcipProperties(context);
-			} catch (Exception e) {
-				logger.info("Unable to initialize NCIP properties with mod-configuration.");
-				logger.info(e.getLocalizedMessage());
-			}
-
-		InputStream stream = new ByteArrayInputStream(context.getBodyAsString().getBytes(StandardCharsets.UTF_8));
+		InputStream stream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
 		NCIPInitiationData initiationData = null;
 		InputStream responseMsgInputStream = null;
 		FolioRemoteServiceManager folioRemoteServiceManager = null;
@@ -177,8 +172,9 @@ public class FolioNcipHelper {
 	}
 
 	/**
-	 * XC NCIP Toolkit properties initialized for each tenant using
-	 * mod-configuration
+	 * XC NCIP Toolkit properties initialized for each tenant using mod-settings.
+	 * Reads the single "toolkit" settings entry (scope=mod-ncip, key=toolkit)
+	 * and applies each field in its value object as a toolkit property override.
 	 *
 	 * @throws Exception
 	 *
@@ -186,38 +182,49 @@ public class FolioNcipHelper {
 	public void initToolkit(RoutingContext context) throws Exception {
 
 		try {
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.TOOLKIT_PROP_FILE);
-			// DO THE TOOLKIT PROPERTIES EXIST IN MOD-CONFIGURATION?
 			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
-			String configEndpoint = okapiBaseEndpoint + "/configurations/entries" + "?query=" + PercentCodec.encode("configName=toolkit") + "&limit=200";
-			// GET THE EXISTING PROPERTIES FOR THE TOOLKIT
-			// AND JUST OVERWRITE ANY THAT HAVE BEEN SET IN MOD-CONFIGURATION
+			String settingsQuery = "scope==" + Constants.SETTING_SCOPE + " and key==toolkit";
+			String settingsEndpoint = okapiBaseEndpoint + Constants.SETTINGS_URL + "?query="
+					+ PercentCodec.encode(settingsQuery) + "&limit=1";
+
 			Properties properties = (Properties) toolkitProperties.get(tenant);
 
-			String response = callApiGet(configEndpoint, context.request().headers());
+			String response = callApiGet(settingsEndpoint, context.request().headers());
 			JsonObject jsonObject = new JsonObject(response);
-			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
-			if (configs.size() < 1) {
-				logger.info("No toolkit configurations found.  Using defaults.  QUERY:" + configEndpoint);
+			JsonArray items = jsonObject.getJsonArray("items");
+
+			if (items == null || items.isEmpty()) {
+				logger.info("No toolkit settings found in mod-settings. Using defaults.");
 				return;
 			}
 
-			Iterator configsIterator = configs.iterator();
-			while (configsIterator.hasNext()) {
-				JsonObject config = (JsonObject) configsIterator.next();
-				String code = config.getString(Constants.CODE_KEY);
-				String value = config.getString(Constants.VALUE_KEY);
-				properties.setProperty(code, value);
+			JsonObject toolkitValueObj = items.getJsonObject(0).getJsonObject("value");
+			if (toolkitValueObj == null) {
+				logger.info("Toolkit settings entry has no value object. Using defaults.");
+				return;
 			}
+
+			// Apply each field in the value object as a toolkit property override
+			for (String key : toolkitValueObj.fieldNames()) {
+				Object rawValue = toolkitValueObj.getValue(key);
+				if (rawValue == null) {
+					logger.warn("Toolkit setting '{}' has null value, skipping", key);
+					continue;
+				}
+				String value = String.valueOf(rawValue);
+				logger.info("Overriding toolkit property: {} = {}", key, value);
+				properties.setProperty(key, value);
+			}
+
 			toolkitProperties.put(tenant, properties);
 			serviceContext.put(tenant,
 					ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
 			translator.put(tenant, TranslatorFactory.buildTranslator(null, properties));
 		} catch (Exception e) {
-			logger.fatal("Unable to initialize toolkit.properties file.");
+			logger.fatal("Unable to initialize toolkit properties from mod-settings.");
 			logger.fatal(e.getLocalizedMessage());
-			throw new Exception("Unable to initialize toolkit properties using mod-configuration.  EXCEPTION: "
+			throw new Exception("Unable to initialize toolkit properties using mod-settings. EXCEPTION: "
 					+ e.getLocalizedMessage());
 		}
 
@@ -233,98 +240,117 @@ public class FolioNcipHelper {
 	 * @throws Exception
 	 *
 	 */
+	/**
+	 * Initializing property values needed for several of the services.
+	 * Reads all agency settings from mod-settings (scope=mod-ncip, excluding
+	 * the "toolkit" entry) in a single API call. Each setting entry represents
+	 * one agency, with properties stored as agencyId.propertyCode.
+	 *
+	 * @throws Exception
+	 *
+	 */
 	public void initNcipProperties(RoutingContext context) throws Exception {
 
-			String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+		String tenant = context.request().getHeader(Constants.X_OKAPI_TENANT);
+		String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
 
-			// THE NCIP PROPERTY FILE CONTAINS A LIST OF PROPERTIES
-			// THAT NEED TO BE INITIALIZED
-			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-			String okapiBaseEndpoint = context.request().getHeader(Constants.X_OKAPI_URL);
-			String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=";
+		Properties properties = new Properties();
 
-			Properties properties = new Properties();
-			//DEFAULT VALUES
-			properties.setProperty("holdings.source.name", "FOLIO");
-			properties.setProperty("response.includes.physical.address","false");
-			properties.setProperty("user.priv.ok.status","ACTIVE");
-			properties.setProperty("user.priv.blocked.status","BLOCKED");
-			// LOOK FOR EACH PROPERTY:
-			while (reader.ready()) {
-				String line = reader.readLine();
-				logger.info(line);
-				if (line.contains("#"))
-					continue; // ignore comments in the file
-				String[] parts = line.split("=");
-				// IF THE CONFIG EXISTS IN MOD-CONFIGURATION, ADD TO PROPERTIES VAR
-				// IF THE CONFIG DOES NOT EXIST IN MOD-CONFIGURATION,
-				// THROW AN EXCEPTION.
-				try {
-					String configCode = parts[0];
-					String query = "code==" + StringUtil.cqlEncode(configCode);
-					String url = configEndpoint + PercentCodec.encode(query);
-					String response = callApiGet(url + "&limit=200", context.request().headers());
-					JsonObject jsonObject = new JsonObject(response);
-					JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
-					if (configs.size() < 1 && parts.length == 2) {
-						//NO CONFIG SETTING - USE THE DEFAULT
-						properties.setProperty(parts[0], parts[1]);
+		// APPLY DEFAULTS FROM ncip.properties FOR ANY PROPERTY NOT SET IN MOD-SETTINGS
+		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		while (reader.ready()) {
+			String line = reader.readLine();
+			if (line == null || line.contains("#") || line.isBlank())
+				continue;
+			String[] parts = line.split("=", 2);
+			if (parts.length == 2 && !parts[1].isBlank()) {
+				properties.setProperty(parts[0].trim(), parts[1].trim());
+			}
+		}
+
+		// FETCH ALL AGENCY SETTINGS FROM MOD-SETTINGS IN ONE CALL
+		try {
+			String settingsQuery = "scope==" + Constants.SETTING_SCOPE;
+			String settingsEndpoint = okapiBaseEndpoint + Constants.SETTINGS_URL + "?query="
+					+ PercentCodec.encode(settingsQuery) + "&limit=1000";
+
+			logger.info("Fetching NCIP agency settings from mod-settings: {}", settingsEndpoint);
+			String response = callApiGet(settingsEndpoint, context.request().headers());
+			JsonObject jsonObject = new JsonObject(response);
+			JsonArray items = jsonObject.getJsonArray("items");
+
+			if (items == null || items.isEmpty()) {
+				logger.error("No NCIP agency settings found in mod-settings. QUERY: {}", settingsEndpoint);
+				ncipProperties.remove(tenant);
+				throw new Exception("No NCIP agency settings found in mod-settings");
+			}
+
+			// EACH ITEM IS ONE AGENCY - APPLY ITS PROPERTIES AS agencyId.propertyCode
+			for (int i = 0; i < items.size(); i++) {
+				JsonObject item = items.getJsonObject(i);
+				String key = item.getString(Constants.KEY);
+				if ("toolkit".equalsIgnoreCase(key)) {
+					continue;
+				}
+
+				if (key == null || key.isBlank()) {
+					logger.warn("Skipping settings entry with blank key");
+					continue;
+				}
+
+				String agencyId = key.toLowerCase();
+				JsonObject agencyValues = item.getJsonObject("value");
+
+				if (agencyValues == null) {
+					logger.warn("Agency settings entry '{}' has no value object, skipping", agencyId);
+					continue;
+				}
+
+				logger.info("Loading {} properties for agency '{}'", agencyValues.size(), agencyId);
+				for (String code : agencyValues.fieldNames()) {
+					Object rawValue = agencyValues.getValue(code);
+					if (rawValue == null) {
+						logger.warn("Agency '{}' setting '{}' has null value, skipping", agencyId, code);
 						continue;
 					}
-					if (configs.size() < 1) {
-						throw new Exception("No ncip properties found in mod-configuration for property: " + line);
-					}
-					// SAVE EACH PROPERTY found
-					// THERE COULD BE MULTIPLE - A DIFFERENT PROPERTY FOR
-					// EACH AGENCY ID
-					Iterator configsIterator = configs.iterator();
-					while (configsIterator.hasNext()) {
-						JsonObject config = (JsonObject) configsIterator.next();
-						String code = config.getString(Constants.CODE_KEY);
-						String configName = config.getString("configName");
-						String value = config.getString(Constants.VALUE_KEY);
-						// CONFIG NAME CONTAINS THE AGENCY ID FOR THIS VALUE
-						// THERE COULD BE MULTIPLE VALUES FOR DIFFERENT AGENCY IDS
-						properties.setProperty((configName + "." + code).toLowerCase(), value);
-					}
-				} catch (Exception e) {
-					// UNABLE TO GET PROPERTY VALUE FROM MOD-CONFIGURATION
-					logger.fatal("Unable to initialize ncip properties using mod-configuration.");
-					logger.fatal(e.getLocalizedMessage());
-					ncipProperties.remove(tenant);
-					throw new Exception(
-							"Unable to initialize NCIP properties using mod-configuration." + e.getLocalizedMessage());
+					properties.setProperty((agencyId + "." + code).toLowerCase(), String.valueOf(rawValue));
 				}
 			}
+		} catch (Exception e) {
+			logger.fatal("Unable to initialize NCIP properties from mod-settings.");
+			logger.error("NCIP init failure", e);
+			ncipProperties.remove(tenant);
+			throw e;
+		}
 
-			try {
-				logger.info("=======> initializing address types");
-				String addressTypesEndpoint =  okapiBaseEndpoint + Constants.ADDRESS_TYPES ;
-				String addressTypesResponse = callApiGet(addressTypesEndpoint,context.request().headers());
-				JsonObject addressesTypesAsJson = new JsonObject(addressTypesResponse);
-				JsonArray addressTypeArray = addressesTypesAsJson.getJsonArray("addressTypes");
-				Iterator addressTypeIterator = addressTypeArray.iterator();
-				while (addressTypeIterator.hasNext()) {
-					JsonObject addressType = (JsonObject) addressTypeIterator.next();
-					properties.setProperty(addressType.getString("id"), addressType.getString("addressType"));
-				}
+		// FETCH ADDRESS TYPES - UNCHANGED
+		try {
+			logger.info("=======> initializing address types");
+			String addressTypesEndpoint = okapiBaseEndpoint + Constants.ADDRESS_TYPES;
+			String addressTypesResponse = callApiGet(addressTypesEndpoint, context.request().headers());
+			JsonObject addressesTypesAsJson = new JsonObject(addressTypesResponse);
+			JsonArray addressTypeArray = addressesTypesAsJson.getJsonArray("addressTypes");
+			Iterator addressTypeIterator = addressTypeArray.iterator();
+			while (addressTypeIterator.hasNext()) {
+				JsonObject addressType = (JsonObject) addressTypeIterator.next();
+				properties.setProperty(addressType.getString("id"), addressType.getString("addressType"));
 			}
-			catch(Exception e) {
-				//THIS IS FINE...CAN CONTINUE
-				logger.fatal("Unable to initialize address types.");
-				logger.fatal(e.getLocalizedMessage());
-			}
+		} catch (Exception e) {
+			// THIS IS FINE...CAN CONTINUE
+			logger.fatal("Unable to initialize address types.");
+			logger.fatal(e.getLocalizedMessage());
+		}
 
-			ncipProperties.put(tenant, properties);
-			logger.info("Has tenant properties {}", (ncipProperties.get(tenant) != null));
+		ncipProperties.put(tenant, properties);
+		logger.info("Has tenant properties {}", (ncipProperties.get(tenant) != null));
 	}
-
 
 	public String getConfigValue(String code, MultiMap okapiHeaders) {
 		String returnValue = null;
 		String okapiBaseEndpoint = okapiHeaders.get(Constants.X_OKAPI_URL);
-		//String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=(code==" + URLEncoder.encode(code) + ")";
+		// String configEndpoint = okapiBaseEndpoint +
+		// "/configurations/entries?query=(code==" + URLEncoder.encode(code) + ")";
 		String configEndpoint = okapiBaseEndpoint + "/configurations/entries?query=";
 
 		try {
@@ -333,7 +359,7 @@ public class FolioNcipHelper {
 			String response = callApiGet(url, okapiHeaders);
 			JsonObject jsonObject = new JsonObject(response);
 			JsonArray configs = jsonObject.getJsonArray(Constants.CONFIGS);
-			if (configs.size() < 1) {
+			if (configs == null || configs.isEmpty()) {
 				return null;
 			}
 			returnValue = configs.getJsonObject(0).getString(Constants.VALUE_KEY);
@@ -347,48 +373,8 @@ public class FolioNcipHelper {
 	}
 
 	public String callApiGet(String uriString, MultiMap okapiHeaders)
-			throws Exception  {
-		CloseableHttpClient client = HttpClients.custom().build();
-		final String timeoutString = System.getProperty(Constants.SERVICE_MGR_TIMEOUT,Constants.DEFAULT_TIMEOUT);
-		int timeout = Integer.parseInt(timeoutString);
-		logger.info("Using timeout: " + timeout);
-		RequestConfig config = RequestConfig.custom()
-			.setConnectTimeout(timeout)
-			.setSocketTimeout(timeout)
-			.build();
-		HttpUriRequest request = RequestBuilder.get().setUri(uriString)
-			.setConfig(config)
-			.setHeader(Constants.X_OKAPI_TENANT, okapiHeaders.get(Constants.X_OKAPI_TENANT))
-			.setHeader(Constants.ACCEPT_TEXT, Constants.CONTENT_JSON_AND_PLAIN) // do i need version here?
-			.setHeader(Constants.X_OKAPI_URL, okapiHeaders.get(Constants.X_OKAPI_URL))
-			.setHeader(Constants.X_OKAPI_TOKEN, okapiHeaders.get(Constants.X_OKAPI_TOKEN)).build();
-		String responseString = "";
-		try {
-			HttpResponse response = client.execute(request);
-			HttpEntity entity = response.getEntity();
-			responseString = EntityUtils.toString(entity, "UTF-8");
-			int responseCode = response.getStatusLine().getStatusCode();
-
-			logger.info("GET:");
-			logger.info(uriString);
-			logger.info(responseCode);
-			//logger.info(responseString);
-
-			if (responseCode > 399) {
-				String responseBody = processErrorResponse(responseString);
-				throw new Exception(responseBody);
-			}
-		}
-		catch(Exception e) {
-			logger.fatal("callApiGet failed");
-			logger.fatal(uriString);
-			throw e;
-		}
-		finally {
-			client.close();
-		}
-
-		return responseString;
+			throws Exception {
+		return FolioGatewayClient.get(uriString, okapiHeaders);
 
 	}
 
@@ -405,7 +391,7 @@ public class FolioNcipHelper {
 			JsonObject jsonObject = new JsonObject(responseBody);
 			JsonArray errors = jsonObject.getJsonArray("errors");
 			Iterator i = errors.iterator();
-			responseBuffer.append("ERROR: " );
+			responseBuffer.append("ERROR: ");
 			while (i.hasNext()) {
 				JsonObject errorMessage = (JsonObject) i.next();
 				responseBuffer.append(errorMessage.getString("message"));
