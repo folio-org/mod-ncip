@@ -187,6 +187,71 @@ public class FolioNcipHelperTest {
     }
 
     @Test
+    public void initToolkitKeepsDefaultsWhenNoSettingsItemsExist() throws Exception {
+        String tenant = "diku";
+        MutableToolkitStubFolioNcipHelper helper = new MutableToolkitStubFolioNcipHelper(Promise.promise());
+        helper.initializeTenantToolkitState(tenant);
+        helper.setToolkitResponse(new io.vertx.core.json.JsonObject().put("items", new io.vertx.core.json.JsonArray())
+                .encode());
+
+        helper.initToolkit(buildContext(tenant, "http://okapi"));
+
+        Properties tenantProps = (Properties) helper.toolkitProperties.get(tenant);
+        assertNotNull(tenantProps);
+    }
+
+    @Test
+    public void initToolkitKeepsDefaultsWhenSettingsValueObjectMissing() throws Exception {
+        String tenant = "diku";
+        MutableToolkitStubFolioNcipHelper helper = new MutableToolkitStubFolioNcipHelper(Promise.promise());
+        helper.initializeTenantToolkitState(tenant);
+        helper.setToolkitResponse(new io.vertx.core.json.JsonObject()
+                .put("items", new io.vertx.core.json.JsonArray()
+                        .add(new io.vertx.core.json.JsonObject().put("key", "toolkit")))
+                .encode());
+
+        helper.initToolkit(buildContext(tenant, "http://okapi"));
+
+        Properties tenantProps = (Properties) helper.toolkitProperties.get(tenant);
+        assertNotNull(tenantProps);
+    }
+
+    @Test
+    public void initNcipPropertiesSkipsBlankKeysMissingValuesAndNullFields() throws Exception {
+        String tenant = "diku";
+        String okapiUrl = "http://okapi";
+
+        String settingsResponse = new io.vertx.core.json.JsonObject()
+                .put("items", new io.vertx.core.json.JsonArray()
+                        .add(new io.vertx.core.json.JsonObject()
+                                .put("key", "toolkit")
+                                .put("value", new io.vertx.core.json.JsonObject().put("ignored", "value")))
+                        .add(new io.vertx.core.json.JsonObject()
+                                .put("key", "")
+                                .put("value", new io.vertx.core.json.JsonObject().put("ignored", "value")))
+                        .add(new io.vertx.core.json.JsonObject()
+                                .put("key", "relais"))
+                        .add(new io.vertx.core.json.JsonObject()
+                                .put("key", "rapid")
+                                .put("value", new io.vertx.core.json.JsonObject()
+                                        .put("valid.code", "text")
+                                        .putNull("null.code"))))
+                .encode();
+
+        String addressTypesResponse = new io.vertx.core.json.JsonObject()
+                .put("addressTypes", new io.vertx.core.json.JsonArray())
+                .encode();
+
+        FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), settingsResponse, addressTypesResponse);
+        helper.initNcipProperties(buildContext(tenant, okapiUrl));
+
+        Properties loaded = (Properties) helper.ncipProperties.get(tenant);
+        assertEquals("text", loaded.getProperty("rapid.valid.code"));
+        assertNull(loaded.getProperty("rapid.null.code"));
+        assertNull(loaded.getProperty("relais.valid.code"));
+    }
+
+    @Test
     public void setUpMappingExecutesWithoutError() throws Exception {
         FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), "{}", "{}");
         Method method = FolioNcipHelper.class.getDeclaredMethod("setUpMapping");
