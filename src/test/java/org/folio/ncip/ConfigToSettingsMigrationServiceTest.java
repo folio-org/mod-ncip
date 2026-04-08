@@ -122,6 +122,119 @@ public class ConfigToSettingsMigrationServiceTest {
         }
     }
 
+    @Test
+    public void processNoLegacyConfigsCompletesWithoutWrites() throws Exception {
+        StubApi stub = new StubApi(new JsonArray(), 201);
+        try {
+            stub.start();
+
+            ConfigToSettingsMigrationService service = new ConfigToSettingsMigrationService();
+            service.process(mockContext(stub.baseUrl()))
+                    .toCompletionStage()
+                    .toCompletableFuture()
+                    .get(10, TimeUnit.SECONDS);
+
+            assertEquals(0, stub.postCount.get());
+            assertEquals(0, stub.putCount.get());
+            assertEquals(0, stub.deleteCount.get());
+        } finally {
+            stub.close();
+        }
+    }
+
+    @Test
+    public void processContinuesWhenVerifyReturnsDifferentKey() throws Exception {
+        JsonArray legacyConfigs = new JsonArray()
+                .add(new JsonObject()
+                        .put(Constants.ID, "legacy-1")
+                        .put(Constants.CONFIG_KEY, "relais")
+                        .put(Constants.CODE_KEY, "checkout.service.point.id")
+                        .put(Constants.VALUE_KEY, "sp-1"));
+
+        StubApi stub = new StubApi(legacyConfigs, 201, 204, true, false);
+        try {
+            stub.start();
+
+            ConfigToSettingsMigrationService service = new ConfigToSettingsMigrationService();
+            service.process(mockContext(stub.baseUrl()))
+                    .toCompletionStage()
+                    .toCompletableFuture()
+                    .get(10, TimeUnit.SECONDS);
+
+            assertEquals(1, stub.postCount.get());
+            assertEquals(0, stub.putCount.get());
+            assertEquals(1, stub.deleteCount.get());
+        } finally {
+            stub.close();
+        }
+    }
+
+    @Test
+    public void processFailsWhenDeleteReturnsUnexpectedStatus() throws Exception {
+        JsonArray legacyConfigs = new JsonArray()
+                .add(new JsonObject()
+                        .put(Constants.ID, "legacy-1")
+                        .put(Constants.CONFIG_KEY, "relais")
+                        .put(Constants.CODE_KEY, "checkout.service.point.id")
+                        .put(Constants.VALUE_KEY, "sp-1"));
+
+        StubApi stub = new StubApi(legacyConfigs, 201, 500, false, false);
+        try {
+            stub.start();
+
+            ConfigToSettingsMigrationService service = new ConfigToSettingsMigrationService();
+            CompletableFuture<Void> result = service.process(mockContext(stub.baseUrl()))
+                    .toCompletionStage()
+                    .toCompletableFuture();
+
+            boolean failedAsExpected = false;
+            try {
+                result.get(10, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                failedAsExpected = true;
+            }
+
+            assertTrue(failedAsExpected);
+            assertEquals(1, stub.postCount.get());
+            assertEquals(1, stub.deleteCount.get());
+        } finally {
+            stub.close();
+        }
+    }
+
+    @Test
+    public void processFailsWhenFetchReturnsBlankBody() throws Exception {
+        JsonArray legacyConfigs = new JsonArray()
+                .add(new JsonObject()
+                        .put(Constants.ID, "legacy-1")
+                        .put(Constants.CONFIG_KEY, "relais")
+                        .put(Constants.CODE_KEY, "checkout.service.point.id")
+                        .put(Constants.VALUE_KEY, "sp-1"));
+
+        StubApi stub = new StubApi(legacyConfigs, 201, 204, false, true);
+        try {
+            stub.start();
+
+            ConfigToSettingsMigrationService service = new ConfigToSettingsMigrationService();
+            CompletableFuture<Void> result = service.process(mockContext(stub.baseUrl()))
+                    .toCompletionStage()
+                    .toCompletableFuture();
+
+            boolean failedAsExpected = false;
+            try {
+                result.get(10, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                failedAsExpected = true;
+            }
+
+            assertTrue(failedAsExpected);
+            assertEquals(0, stub.postCount.get());
+            assertEquals(0, stub.deleteCount.get());
+        } finally {
+            stub.close();
+        }
+    }
+
     private RoutingContext mockContext(String baseUrl) {
         RoutingContext context = mock(RoutingContext.class);
         HttpServerRequest request = mock(HttpServerRequest.class);
@@ -136,6 +249,9 @@ public class ConfigToSettingsMigrationServiceTest {
         private final Vertx vertx = Vertx.vertx();
         private final JsonArray legacyConfigs;
         private final int postStatus;
+        private final int deleteStatus;
+        private final boolean returnMismatchedVerifyKey;
+        private final boolean blankConfigResponse;
 
         private HttpServer server;
         private int port;
@@ -146,8 +262,16 @@ public class ConfigToSettingsMigrationServiceTest {
         private final Map<String, JsonObject> settingsById = new ConcurrentHashMap<>();
 
         StubApi(JsonArray legacyConfigs, int postStatus) {
+            this(legacyConfigs, postStatus, 204, false, false);
+        }
+
+        StubApi(JsonArray legacyConfigs, int postStatus, int deleteStatus,
+                boolean returnMismatchedVerifyKey, boolean blankConfigResponse) {
             this.legacyConfigs = legacyConfigs;
             this.postStatus = postStatus;
+            this.deleteStatus = deleteStatus;
+            this.returnMismatchedVerifyKey = returnMismatchedVerifyKey;
+            this.blankConfigResponse = blankConfigResponse;
         }
 
         void start() throws Exception {
@@ -156,6 +280,12 @@ public class ConfigToSettingsMigrationServiceTest {
             router.route().handler(BodyHandler.create());
 
             router.get("/configurations/entries").handler(ctx -> {
+                if (blankConfigResponse) {
+                    ctx.response().setStatusCode(200).putHeader("Content-Type", "application/json")
+                            .end(" ");
+                    return;
+                }
+
                 JsonObject response = new JsonObject().put(Constants.CONFIGS, legacyConfigs);
                 ctx.response().setStatusCode(200).putHeader("Content-Type", "application/json")
                         .end(response.encode());
@@ -198,6 +328,9 @@ public class ConfigToSettingsMigrationServiceTest {
                 if (setting == null) {
                     ctx.response().setStatusCode(404).end();
                 } else {
+                    if (returnMismatchedVerifyKey) {
+                        setting = setting.copy().put(Constants.KEY, "different-key");
+                    }
                     ctx.response().setStatusCode(200).putHeader("Content-Type", "application/json")
                             .end(setting.encode());
                 }
@@ -205,7 +338,7 @@ public class ConfigToSettingsMigrationServiceTest {
 
             router.delete("/configurations/entries/:id").handler(ctx -> {
                 deleteCount.incrementAndGet();
-                ctx.response().setStatusCode(204).end();
+                ctx.response().setStatusCode(deleteStatus).end();
             });
 
             server = vertx.createHttpServer();
