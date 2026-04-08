@@ -11,8 +11,16 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.core.Promise;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -162,6 +170,112 @@ public class MainVerticleTest {
 				}));
 	}
 
+	@Test
+	public void tenantInitMigratesAndReturnsNoContent(TestContext ctx) {
+		int appPort = findFreePort();
+		int okapiPort = findFreePort();
+		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
+
+		Map<String, JsonObject> settingsById = new ConcurrentHashMap<>();
+		String configsResponse = new JsonObject().put(Constants.CONFIGS, new JsonArray()
+				.add(new JsonObject()
+						.put(Constants.ID, "legacy-1")
+						.put(Constants.CONFIG_KEY, "relais")
+						.put(Constants.CODE_KEY, "checkout.service.point.id")
+						.put(Constants.VALUE_KEY, "sp-1")))
+				.encodePrettily();
+
+		vertx.createHttpServer()
+				.requestHandler(req -> {
+					if (req.method().name().equals("GET") && req.path().equals("/configurations/entries")) {
+						req.response().setStatusCode(200).end(configsResponse);
+						return;
+					}
+
+					if (req.method().name().equals("POST") && req.path().equals(Constants.SETTINGS_URL)) {
+						req.bodyHandler(body -> {
+							JsonObject payload = body.toJsonObject();
+							settingsById.put(payload.getString(Constants.ID), payload);
+							req.response().setStatusCode(201).end(payload.encode());
+						});
+						return;
+					}
+
+					if (req.method().name().equals("GET") && req.path().startsWith(Constants.SETTINGS_URL + "/")) {
+						String id = req.path().substring((Constants.SETTINGS_URL + "/").length());
+						JsonObject payload = settingsById.get(id);
+						if (payload == null) {
+							req.response().setStatusCode(404).end();
+						} else {
+							req.response().setStatusCode(200).end(payload.encode());
+						}
+						return;
+					}
+
+					if (req.method().name().equals("DELETE") && req.path().startsWith("/configurations/entries/")) {
+						req.response().setStatusCode(204).end();
+						return;
+					}
+
+					req.response().setStatusCode(500).end("Bad path " + req.method() + " " + req.path());
+				})
+				.listen(okapiPort)
+				.compose(x -> vertx.deployVerticle(new MainVerticle()))
+				.onComplete(ctx.asyncAssertSuccess(x -> {
+					vertx.executeBlocking(() -> {
+						request(appPort, okapiPort)
+								.post("/_/tenant")
+								.then()
+								.statusCode(204);
+						return null;
+					}).onComplete(ctx.asyncAssertSuccess());
+				}));
+	}
+
+	@Test
+	public void ncipReturnsSuccessWhenHelperSucceeds(TestContext ctx) {
+		int appPort = findFreePort();
+		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
+
+		vertx.deployVerticle(new MainVerticle())
+				.onComplete(ctx.asyncAssertSuccess(x -> {
+					setHelperForTest(new StubMainVerticleHelper(false));
+					vertx.executeBlocking(() -> {
+						request(appPort, null)
+								.header("X-Okapi-Request-Id", "req-1")
+								.header("X-Okapi-User-Id", "user-1")
+								.body("<request/>")
+								.post("/ncip")
+								.then()
+								.statusCode(200)
+								.body(is("<mock-ncip-response/>"));
+						return null;
+					}).onComplete(ctx.asyncAssertSuccess());
+				}));
+	}
+
+	@Test
+	public void ncipReturnsProblemWhenHelperFails(TestContext ctx) {
+		int appPort = findFreePort();
+		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
+
+		vertx.deployVerticle(new MainVerticle())
+				.onComplete(ctx.asyncAssertSuccess(x -> {
+					setHelperForTest(new StubMainVerticleHelper(true));
+					vertx.executeBlocking(() -> {
+						request(appPort, null)
+								.header("X-Okapi-Request-Id", "req-2")
+								.header("X-Okapi-User-Id", "user-2")
+								.body("<request/>")
+								.post("/ncip")
+								.then()
+								.statusCode(500)
+								.body(containsString("problem processing NCIP request"));
+						return null;
+					}).onComplete(ctx.asyncAssertSuccess());
+				}));
+	}
+
 	private RequestSpecification request(int appPort, Integer okapiPort) {
 		RequestSpecification request = RestAssured.given()
 				.port(appPort)
@@ -179,6 +293,33 @@ public class MainVerticleTest {
 			return socket.getLocalPort();
 		} catch (IOException e) {
 			throw new IllegalStateException("Unable to allocate test port", e);
+		}
+	}
+
+	private void setHelperForTest(FolioNcipHelper helper) {
+		try {
+			Field field = MainVerticle.class.getDeclaredField("folioNcipHelper");
+			field.setAccessible(true);
+			field.set(null, helper);
+		} catch (Exception e) {
+			throw new IllegalStateException("Unable to replace FolioNcipHelper for test", e);
+		}
+	}
+
+	private static class StubMainVerticleHelper extends FolioNcipHelper {
+		private final boolean fail;
+
+		StubMainVerticleHelper(boolean fail) {
+			super(Promise.promise());
+			this.fail = fail;
+		}
+
+		@Override
+		public InputStream ncipProcess(RoutingContext context) throws Exception {
+			if (fail) {
+				throw new Exception("mock failure");
+			}
+			return new ByteArrayInputStream("<mock-ncip-response/>".getBytes(StandardCharsets.UTF_8));
 		}
 	}
 }

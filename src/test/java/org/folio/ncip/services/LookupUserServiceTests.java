@@ -13,11 +13,21 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInput;
+import org.extensiblecatalog.ncip.v2.service.AuthenticationInputType;
+import org.extensiblecatalog.ncip.v2.service.FromAgencyId;
+import org.extensiblecatalog.ncip.v2.service.InitiationHeader;
+import org.extensiblecatalog.ncip.v2.service.LookupUserInitiationData;
+import org.extensiblecatalog.ncip.v2.service.LookupUserResponseData;
+import org.extensiblecatalog.ncip.v2.service.UserId;
+import org.folio.ncip.FolioRemoteServiceManager;
 import org.extensiblecatalog.ncip.v2.service.NameInformation;
 import org.extensiblecatalog.ncip.v2.service.UserAddressInformation;
 import org.folio.ncip.services.FolioLookupUserService;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import io.vertx.core.json.JsonObject;
 
@@ -98,5 +108,129 @@ public class LookupUserServiceTests {
 		
 	
 	}
+
+		@Test
+		public void retrieveAuthenticationInputTypeOfReturnsBarcodeFromPatronLookup() throws Exception {
+			FolioLookupUserService service = new FolioLookupUserService();
+			Method method = service.getClass().getDeclaredMethod("retrieveAuthenticationInputTypeOf",
+					LookupUserInitiationData.class,
+					org.extensiblecatalog.ncip.v2.service.RemoteServiceManager.class);
+			method.setAccessible(true);
+
+			LookupUserInitiationData initData = new LookupUserInitiationData();
+			AuthenticationInput input = new AuthenticationInput();
+			input.setAuthenticationInputType(new AuthenticationInputType(null, "barcode"));
+			input.setAuthenticationInputData("value-1");
+			initData.setAuthenticationInputs(java.util.List.of(input));
+
+			FolioRemoteServiceManager serviceManager = new FolioRemoteServiceManager() {
+				@Override
+				public JsonObject lookupPatronRecordBy(String type, String value) {
+					return new JsonObject().put("barcode", "123456");
+				}
+			};
+
+			String resolved = (String) method.invoke(service, initData, serviceManager);
+			assertEquals("123456", resolved);
+		}
+
+		@Test
+		public void retrieveAuthenticationInputTypeOfReturnsNullWhenNoInputsPresent() throws Exception {
+			FolioLookupUserService service = new FolioLookupUserService();
+			Method method = service.getClass().getDeclaredMethod("retrieveAuthenticationInputTypeOf",
+					LookupUserInitiationData.class,
+					org.extensiblecatalog.ncip.v2.service.RemoteServiceManager.class);
+			method.setAccessible(true);
+
+			LookupUserInitiationData initData = new LookupUserInitiationData();
+			String resolved = (String) method.invoke(service, initData, new FolioRemoteServiceManager());
+
+			assertNull(resolved);
+		}
+
+		@Test
+		public void performServiceReturnsProblemWhenAgencyHeaderMissing() throws Exception {
+			FolioLookupUserService service = new FolioLookupUserService();
+			LookupUserInitiationData initData = mock(LookupUserInitiationData.class);
+			when(initData.toString()).thenReturn("lookup-request");
+
+			FolioRemoteServiceManager manager = mock(FolioRemoteServiceManager.class);
+			when(manager.getNcipProperties()).thenReturn(new Properties());
+
+			LookupUserResponseData response = service.performService(initData, null, manager);
+			assertNotNull(response.getProblems());
+			assertTrue(!response.getProblems().isEmpty());
+		}
+
+		@Test
+		public void performServiceReturnsProblemWhenUserCannotBeDetermined() throws Exception {
+			FolioLookupUserService service = new FolioLookupUserService();
+			LookupUserInitiationData initData = initDataWithAgency("relais");
+			when(initData.getUserId()).thenReturn(null);
+			when(initData.getAuthenticationInputs()).thenReturn(null);
+
+			FolioRemoteServiceManager manager = mock(FolioRemoteServiceManager.class);
+			when(manager.getNcipProperties()).thenReturn(new Properties());
+
+			LookupUserResponseData response = service.performService(initData, null, manager);
+			assertNotNull(response.getProblems());
+			assertTrue(!response.getProblems().isEmpty());
+		}
+
+		@Test
+		public void performServiceReturnsNotFoundProblemWhenManagerReturnsNullUser() throws Exception {
+			FolioLookupUserService service = new FolioLookupUserService();
+			LookupUserInitiationData initData = initDataWithAgency("relais");
+			UserId userId = new UserId();
+			userId.setUserIdentifierValue("user-1");
+			when(initData.getUserId()).thenReturn(userId);
+
+			FolioRemoteServiceManager manager = mock(FolioRemoteServiceManager.class);
+			when(manager.getNcipProperties()).thenReturn(new Properties());
+			when(manager.lookupUser(userId)).thenReturn(null);
+
+			LookupUserResponseData response = service.performService(initData, null, manager);
+			assertNotNull(response.getProblems());
+			assertTrue(!response.getProblems().isEmpty());
+		}
+
+		@Test
+		public void performServiceReturnsResponseWhenManagerReturnsPatronDetails() throws Exception {
+			FolioLookupUserService service = new FolioLookupUserService();
+			LookupUserInitiationData initData = initDataWithAgency("relais");
+			UserId userId = new UserId();
+			userId.setUserIdentifierValue("user-1");
+			when(initData.getUserId()).thenReturn(userId);
+
+			FolioRemoteServiceManager manager = mock(FolioRemoteServiceManager.class);
+			when(manager.getNcipProperties()).thenReturn(new Properties());
+			when(manager.lookupUser(userId)).thenReturn(new JsonObject()
+					.put("id", "uuid-1")
+					.put("userUuid", "uuid-1")
+					.put("personal", new JsonObject().put("firstName", "First").put("lastName", "Last"))
+					.put("manualblocks", new io.vertx.core.json.JsonArray())
+					.put("automatedPatronBlocks", new io.vertx.core.json.JsonArray())
+					.put("active", true));
+
+			LookupUserResponseData response = service.performService(initData, null, manager);
+			assertNotNull(response);
+			assertNull(response.getProblems());
+		}
+
+		private LookupUserInitiationData initDataWithAgency(String agency) {
+			LookupUserInitiationData initData = mock(LookupUserInitiationData.class);
+			when(initData.toString()).thenReturn("lookup-request");
+
+			InitiationHeader initiationHeader = mock(InitiationHeader.class);
+			FromAgencyId fromAgencyId = mock(FromAgencyId.class);
+			org.extensiblecatalog.ncip.v2.service.AgencyId agencyId = mock(
+					org.extensiblecatalog.ncip.v2.service.AgencyId.class);
+
+			when(agencyId.getValue()).thenReturn(agency);
+			when(fromAgencyId.getAgencyId()).thenReturn(agencyId);
+			when(initiationHeader.getFromAgencyId()).thenReturn(fromAgencyId);
+			when(initData.getInitiationHeader()).thenReturn(initiationHeader);
+			return initData;
+		}
 
 }

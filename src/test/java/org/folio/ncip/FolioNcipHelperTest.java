@@ -152,6 +152,39 @@ public class FolioNcipHelperTest {
         assertEquals("other", loaded.getProperty("cancel.request.reason.name"));
     }
 
+    @Test
+    public void getConfigValueReturnsFirstConfigurationValue() {
+        String configResponse = new io.vertx.core.json.JsonObject()
+                .put(Constants.CONFIGS, new io.vertx.core.json.JsonArray()
+                        .add(new io.vertx.core.json.JsonObject().put(Constants.VALUE_KEY, "configured-value")))
+                .encode();
+
+        FolioNcipHelper helper = new ConfigLookupStubFolioNcipHelper(Promise.promise(), configResponse, false);
+        MultiMap headers = MultiMap.caseInsensitiveMultiMap().add(Constants.X_OKAPI_URL, "http://okapi");
+
+        assertEquals("configured-value", helper.getConfigValue("my.code", headers));
+    }
+
+    @Test
+    public void getConfigValueReturnsNullOnApiFailure() {
+        FolioNcipHelper helper = new ConfigLookupStubFolioNcipHelper(Promise.promise(), "", true);
+        MultiMap headers = MultiMap.caseInsensitiveMultiMap().add(Constants.X_OKAPI_URL, "http://okapi");
+
+        assertNull(helper.getConfigValue("my.code", headers));
+    }
+
+    @Test
+    public void processErrorResponseParsesJsonErrors() {
+        FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), "{}", "{}");
+        String body = new io.vertx.core.json.JsonObject()
+                .put("errors", new io.vertx.core.json.JsonArray()
+                        .add(new io.vertx.core.json.JsonObject().put("message", "first"))
+                        .add(new io.vertx.core.json.JsonObject().put("message", "second")))
+                .encode();
+
+        assertEquals("ERROR: firstsecond", helper.processErrorResponse(body));
+    }
+
     private static class StubFolioNcipHelper extends FolioNcipHelper {
         private final String settingsResponse;
         private final String addressTypesResponse;
@@ -197,6 +230,25 @@ public class FolioNcipHelperTest {
                         .encode();
             }
             throw new IllegalArgumentException("Unexpected URL: " + uriString);
+        }
+    }
+
+    private static class ConfigLookupStubFolioNcipHelper extends FolioNcipHelper {
+        private final String response;
+        private final boolean throwError;
+
+        ConfigLookupStubFolioNcipHelper(Promise<Void> promise, String response, boolean throwError) {
+            super(promise);
+            this.response = response;
+            this.throwError = throwError;
+        }
+
+        @Override
+        public String callApiGet(String uriString, MultiMap okapiHeaders) throws Exception {
+            if (throwError) {
+                throw new Exception("mock failure");
+            }
+            return response;
         }
     }
 
