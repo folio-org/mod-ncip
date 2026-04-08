@@ -63,7 +63,7 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 		} catch (Exception e) {
 			logger.error("Could not determine agency id from initiation header.");
 			if (responseData.getProblems() == null)
-				responseData.setProblems(new ArrayList<Problem>());
+				responseData.setProblems(new ArrayList<>());
 			Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_FAILED), Constants.AGENCY_ID,
 					Constants.FROM_AGENCY_MISSING, e.getMessage());
 			responseData.getProblems().add(p);
@@ -75,7 +75,7 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 			userId = retrieveUserId(initData, serviceManager);
 		} catch (Exception e) {
 			if (responseData.getProblems() == null)
-				responseData.setProblems(new ArrayList<Problem>());
+				responseData.setProblems(new ArrayList<>());
 			Problem p = new Problem(new ProblemType(Constants.LOOKUP_USER_FAILED), Constants.LOOKUP_USER_FAILED,
 					"Authentication failed: " + e.getMessage(), e.getMessage());
 			responseData.getProblems().add(p);
@@ -202,9 +202,9 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 			Iterator i = blocks.iterator();
 			while (i.hasNext()) {
 				JsonObject block = (JsonObject) i.next();
-				if (block.getBoolean(Constants.BORROWING_BLOCK) != null && block.getBoolean(Constants.BORROWING_BLOCK))
+				if (Boolean.TRUE.equals(block.getBoolean(Constants.BORROWING_BLOCK)))
 					return blockedMessage;
-				if (block.getBoolean(Constants.REQUEST_BLOCK) != null && block.getBoolean(Constants.REQUEST_BLOCK))
+				if (Boolean.TRUE.equals(block.getBoolean(Constants.REQUEST_BLOCK)))
 					return blockedMessage;
 			}
 
@@ -212,16 +212,14 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 			Iterator automatedPatronBlocksIterator = automatedPatronBlocks.iterator();
 			while (automatedPatronBlocksIterator.hasNext()) {
 				JsonObject block = (JsonObject) automatedPatronBlocksIterator.next();
-				if (block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK) != null
-						&& block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK))
+				if (Boolean.TRUE.equals(block.getBoolean(Constants.AUTOMATED_BORROWING_BLOCK)))
 					return blockedMessage;
-				if (block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK) != null
-						&& block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK))
+				if (Boolean.TRUE.equals(block.getBoolean(Constants.AUTOMATED_REQUEST_BLOCK)))
 					return blockedMessage;
 			}
 
 			// IS THE PATRON ACTIVE?
-			if (!jsonObject.getBoolean("active"))
+			if (!Boolean.TRUE.equals(jsonObject.getBoolean("active")))
 				return blockedMessage;
 
 			// NO BLOCKS FOUND - RETURN THE okMessage
@@ -237,8 +235,7 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 	private ArrayList<UserPrivilege> retrievePrivileges(JsonObject jsonObject, String agencyId) {
 		String patronType = jsonObject.getString("group");
 		String patronHomeLibrary = jsonObject.getString("code");
-		ArrayList<UserPrivilege> list = new ArrayList<UserPrivilege>();
-		;
+		ArrayList<UserPrivilege> list = new ArrayList<>();
 		list.add(this.retrievePrivilegeFor(patronType, "User Profile", "PROFILE", agencyId));
 		list.add(this.retrievePrivilegeFor(patronHomeLibrary, "User Library", "LIBRARY", agencyId));
 		return list;
@@ -372,15 +369,11 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 			String authType = authenticationInput.getAuthenticationInputType().getValue();
 			String authValue = authenticationInput.getAuthenticationInputData();
 
-			try {
-				JsonObject patronDetailsAsJson = ((FolioRemoteServiceManager) serviceManager)
-						.lookupPatronRecordBy(authType, authValue);
-				barcode = patronDetailsAsJson.getString("barcode");
-				if (barcode != null && !barcode.equalsIgnoreCase(""))
-					return barcode;
-			} catch (Exception e) {
-				throw e;
-			}
+			JsonObject patronDetailsAsJson = ((FolioRemoteServiceManager) serviceManager)
+					.lookupPatronRecordBy(authType, authValue);
+			barcode = patronDetailsAsJson.getString("barcode");
+			if (barcode != null && !barcode.equalsIgnoreCase(""))
+				return barcode;
 
 		}
 		if (barcode != null && barcode.equalsIgnoreCase(""))

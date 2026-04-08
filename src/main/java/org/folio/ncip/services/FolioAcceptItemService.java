@@ -45,7 +45,7 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 		} catch (Exception exception) {
 			logger.error("Failed validating userid, itemid or pickup location." + exception.getLocalizedMessage());
 			if (responseData.getProblems() == null)
-				responseData.setProblems(new ArrayList<Problem>());
+				responseData.setProblems(new ArrayList<>());
 			Problem p = new Problem(new ProblemType(Constants.ACCEPT_ITEM_PROBLEM), Constants.ACCEPT_ITEM_INPUT_PROBLEM,
 					exception.getMessage(), exception.getMessage());
 			responseData.getProblems().add(p);
@@ -68,7 +68,7 @@ public class FolioAcceptItemService extends FolioNcipService implements AcceptIt
 			} catch (Exception except) {
 				logger.error("Could not determine agency id from initiation header or request id element.");
 				if (responseData.getProblems() == null)
-					responseData.setProblems(new ArrayList<Problem>());
+					responseData.setProblems(new ArrayList<>());
 				Problem p = new Problem(new ProblemType(Constants.ACCEPT_ITEM_PROBLEM), Constants.AGENCY_ID,
 						Constants.FROM_AGENCY_MISSING, e.getMessage());
 				responseData.getProblems().add(p);

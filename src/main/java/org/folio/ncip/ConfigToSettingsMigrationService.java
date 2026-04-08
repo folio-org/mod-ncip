@@ -26,7 +26,7 @@ public class ConfigToSettingsMigrationService {
         okapiHeaders = ctx.request().headers();
         baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 
-        return fetchConfig(ctx)
+        return fetchConfig()
                 .compose(this::transform)
                 .compose(this::writeSettings)
                 .compose(this::verifySettings)
@@ -35,7 +35,7 @@ public class ConfigToSettingsMigrationService {
                 .onFailure(e -> logger.error("migration failed", e));
     }
 
-    private Future<JsonObject> fetchConfig(RoutingContext ctx) {
+    private Future<JsonObject> fetchConfig() {
         logger.info("fetchConfig called");
 
         String configQuery = "(module==NCIP)";
@@ -87,7 +87,7 @@ public class ConfigToSettingsMigrationService {
             Map<String, JsonObject> groupedValues = new HashMap<>();
             Map<String, String> groupIds = new HashMap<>();
 
-            Iterator configsIterator = configs.iterator();
+            Iterator<Object> configsIterator = configs.iterator();
             while (configsIterator.hasNext()) {
                 JsonObject config = (JsonObject) configsIterator.next();
                 String code = config.getString(Constants.CODE_KEY);

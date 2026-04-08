@@ -188,11 +188,11 @@ public class FolioGatewayClient {
     public static String processErrorResponse(String responseBody) {
         // SOMETIMES ERRORS ARE RETURNED BY THE API AS PLAIN STRINGS
         // SOMETIMES ERRORS ARE RETURNED BY THE API AS JSON
-        StringBuffer responseBuffer = new StringBuffer();
+        StringBuilder responseBuffer = new StringBuilder();
         try {
             JsonObject jsonObject = new JsonObject(responseBody);
             JsonArray errors = jsonObject.getJsonArray("errors");
-            Iterator i = errors.iterator();
+            Iterator<Object> i = errors.iterator();
             responseBuffer.append("ERROR: ");
             while (i.hasNext()) {
                 JsonObject errorMessage = (JsonObject) i.next();
