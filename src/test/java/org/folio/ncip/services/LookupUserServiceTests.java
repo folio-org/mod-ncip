@@ -26,6 +26,7 @@ import org.folio.ncip.services.FolioLookupUserService;
 import org.junit.Before;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.vertx.core.json.JsonObject;
@@ -138,6 +139,31 @@ public class LookupUserServiceTests {
 		LookupUserInitiationData initData = new LookupUserInitiationData();
 		String resolved = (String) method.invoke(service, initData, new FolioRemoteServiceManager());
 
+		assertNull(resolved);
+	}
+
+	@Test
+	public void retrieveAuthenticationInputTypeOfReturnsNullWhenLookupBarcodeBlank() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		Method method = service.getClass().getDeclaredMethod("retrieveAuthenticationInputTypeOf",
+				LookupUserInitiationData.class,
+				org.extensiblecatalog.ncip.v2.service.RemoteServiceManager.class);
+		method.setAccessible(true);
+
+		LookupUserInitiationData initData = new LookupUserInitiationData();
+		AuthenticationInput input = new AuthenticationInput();
+		input.setAuthenticationInputType(new AuthenticationInputType(null, "barcode"));
+		input.setAuthenticationInputData("value-1");
+		initData.setAuthenticationInputs(java.util.List.of(input));
+
+		FolioRemoteServiceManager serviceManager = new FolioRemoteServiceManager() {
+			@Override
+			public JsonObject lookupPatronRecordBy(String type, String value) {
+				return new JsonObject().put("barcode", "");
+			}
+		};
+
+		String resolved = (String) method.invoke(service, initData, serviceManager);
 		assertNull(resolved);
 	}
 
@@ -277,6 +303,79 @@ public class LookupUserServiceTests {
 				"relais");
 
 		assertTrue(addresses.size() >= 4);
+	}
+
+	@Test
+	public void retrieveAddressReturnsElectronicOnlyWhenPhysicalDisabled() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		Field ncipProperties = service.getClass().getDeclaredField("ncipProperties");
+		ncipProperties.setAccessible(true);
+		Properties p = new Properties();
+		p.setProperty("relais.response.includes.physical.address", "false");
+		ncipProperties.set(service, p);
+
+		Method retrieveAddress = service.getClass().getDeclaredMethod("retrieveAddress", JsonObject.class,
+				String.class);
+		retrieveAddress.setAccessible(true);
+
+		JsonObject personal = new JsonObject()
+				.put("email", "x@y.org")
+				.put("phone", "5551111")
+				.put("mobilePhone", "5552222")
+				.put("addresses", new io.vertx.core.json.JsonArray()
+						.add(new JsonObject().put("addressLine1", "1 Main Street").put("addressTypeId", "home")));
+		JsonObject user = new JsonObject().put("personal", personal);
+
+		@SuppressWarnings("unchecked")
+		ArrayList<UserAddressInformation> addresses = (ArrayList<UserAddressInformation>) retrieveAddress.invoke(
+				service,
+				user,
+				"relais");
+
+		assertEquals(3, addresses.size());
+	}
+
+	@Test
+	public void getBlockedAndOkMessagesUseAgencySpecificConfiguration() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		Field ncipProperties = service.getClass().getDeclaredField("ncipProperties");
+		ncipProperties.setAccessible(true);
+		Properties p = new Properties();
+		p.setProperty("relais." + org.folio.ncip.Constants.BLOCKED_CONFIG, "LOCAL_BLOCKED");
+		p.setProperty("relais." + org.folio.ncip.Constants.OK_CONFIG, "LOCAL_OK");
+		ncipProperties.set(service, p);
+
+		Method getBlockedMessage = service.getClass().getDeclaredMethod("getBlockedMessage", String.class);
+		Method getOkMessage = service.getClass().getDeclaredMethod("getOkMessage", String.class);
+		getBlockedMessage.setAccessible(true);
+		getOkMessage.setAccessible(true);
+
+		assertEquals("LOCAL_BLOCKED", getBlockedMessage.invoke(service, "relais"));
+		assertEquals("LOCAL_OK", getOkMessage.invoke(service, "relais"));
+	}
+
+	@Test
+	public void checkPinIfNeededCallsManagerWhenPinAuthPresent() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		Method checkPinIfNeeded = service.getClass().getDeclaredMethod("checkPinIfNeeded",
+				LookupUserInitiationData.class,
+				org.folio.ncip.FolioRemoteServiceManager.class,
+				String.class);
+		checkPinIfNeeded.setAccessible(true);
+
+		LookupUserInitiationData initData = new LookupUserInitiationData();
+		AuthenticationInput pinInput = new AuthenticationInput();
+		pinInput.setAuthenticationInputType(new AuthenticationInputType(null, org.folio.ncip.Constants.AUTH_TYPE_PIN));
+		pinInput.setAuthenticationInputData("1234");
+		AuthenticationInput barcodeInput = new AuthenticationInput();
+		barcodeInput.setAuthenticationInputType(new AuthenticationInputType(null, "barcode"));
+		barcodeInput.setAuthenticationInputData("abc");
+		initData.setAuthenticationInputs(java.util.List.of(pinInput, barcodeInput));
+
+		FolioRemoteServiceManager manager = mock(FolioRemoteServiceManager.class);
+		checkPinIfNeeded.invoke(service, initData, manager, "user-1");
+
+		verify(manager).checkUserPin("user-1", "1234");
 	}
 
 	private LookupUserInitiationData initDataWithAgency(String agency) {

@@ -11,6 +11,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.RoutingContext;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -183,6 +184,15 @@ public class FolioNcipHelperTest {
                 .encode();
 
         assertEquals("ERROR: firstsecond", helper.processErrorResponse(body));
+    }
+
+    @Test
+    public void setUpMappingExecutesWithoutError() throws Exception {
+        FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), "{}", "{}");
+        Method method = FolioNcipHelper.class.getDeclaredMethod("setUpMapping");
+        method.setAccessible(true);
+
+        method.invoke(helper);
     }
 
     private static class StubFolioNcipHelper extends FolioNcipHelper {
