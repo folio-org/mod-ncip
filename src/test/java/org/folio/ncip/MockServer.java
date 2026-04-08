@@ -211,6 +211,12 @@ public class MockServer {
         String query = ctx.request().getParam("query");
         if (query.contains("at-014")) {
             ctx.response().setStatusCode(500).end();
+        } else if (query.contains("barcode==\"")) {
+            String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
+            String body = readLineByLine(mockFileName);
+            serverResponse(ctx, 200, APPLICATION_JSON, body);
+        } else if (query.contains("hrid==\"\"")) {
+            serverResponse(ctx, 200, APPLICATION_JSON, "{\"items\":[],\"totalRecords\":0}");
         } else {
             String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
             String body = readLineByLine(mockFileName);

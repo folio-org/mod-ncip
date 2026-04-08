@@ -224,6 +224,11 @@ public class ConfigToSettingsMigrationService {
                     String code = legacy.getString(Constants.CODE_KEY);
                     String expectedValue = legacy.getString(Constants.VALUE_KEY);
 
+                    if (configName == null || configName.isBlank()) {
+                        logger.warn("Skipping parity check for legacy config with blank configName. code={}", code);
+                        continue;
+                    }
+
                     String key = configName == null ? null : configName.toLowerCase();
                     JsonObject setting = key == null ? null : settingsByKey.get(key);
                     if (setting == null) {

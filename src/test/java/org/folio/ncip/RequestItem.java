@@ -12,9 +12,8 @@ import io.restassured.response.Response;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-
 /**
- * @author 
+ * @author
  *
  */
 public class RequestItem extends TestBase {
@@ -50,16 +49,29 @@ public class RequestItem extends TestBase {
 		assertTrue(body.contains(REQUESTER_ID));
 	}
 
-    @Test
-    public void callRequestItemTitleLocation() throws MalformedURLException {
-        Response response = postData("src/test/resources/mockdata/ncip-requestitem-titleLocation.xml");
-        String body = response.getBody().prettyPrint();
-        System.out.println(body);
-        assertEquals(200, response.getStatusCode());
-        assertTrue(body.contains(CREATED_REQUEST_ID));
-        assertTrue(body.contains(ITEM_IDENTIFIER));
-        assertTrue(body.contains(CALL_NUMBER));
-        assertTrue(body.contains(LOCATION));
-        assertTrue(body.contains(REQUESTER_ID));
-    }
+	@Test
+	public void callRequestItemWithBarcodeFallbackWhenHridMissing() throws MalformedURLException {
+		Response response = postData("src/test/resources/mockdata/ncip-requestitem-barcodeFallback.xml");
+		String body = response.getBody().prettyPrint();
+		System.out.println(body);
+		assertEquals(200, response.getStatusCode());
+		assertTrue(body.contains(CREATED_REQUEST_ID));
+		assertTrue(body.contains(ITEM_IDENTIFIER));
+		assertTrue(body.contains(CALL_NUMBER));
+		assertTrue(body.contains(LOCATION));
+		assertTrue(body.contains(REQUESTER_ID));
+	}
+
+	@Test
+	public void callRequestItemTitleLocation() throws MalformedURLException {
+		Response response = postData("src/test/resources/mockdata/ncip-requestitem-titleLocation.xml");
+		String body = response.getBody().prettyPrint();
+		System.out.println(body);
+		assertEquals(200, response.getStatusCode());
+		assertTrue(body.contains(CREATED_REQUEST_ID));
+		assertTrue(body.contains(ITEM_IDENTIFIER));
+		assertTrue(body.contains(CALL_NUMBER));
+		assertTrue(body.contains(LOCATION));
+		assertTrue(body.contains(REQUESTER_ID));
+	}
 }
