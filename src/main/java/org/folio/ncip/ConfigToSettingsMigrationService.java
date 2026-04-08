@@ -220,28 +220,7 @@ public class ConfigToSettingsMigrationService {
 
                 for (int i = 0; i < legacyConfigs.size(); i++) {
                     JsonObject legacy = legacyConfigs.getJsonObject(i);
-                    String configName = legacy.getString(Constants.CONFIG_KEY);
-                    String code = legacy.getString(Constants.CODE_KEY);
-                    String expectedValue = legacy.getString(Constants.VALUE_KEY);
-
-                    if (configName == null || configName.isBlank()) {
-                        logger.warn("Skipping parity check for legacy config with blank configName. code={}", code);
-                        continue;
-                    }
-
-                    String key = configName == null ? null : configName.toLowerCase();
-                    JsonObject setting = key == null ? null : settingsByKey.get(key);
-                    if (setting == null) {
-                        mismatches.add("Missing settings key for configName='" + configName + "'");
-                        continue;
-                    }
-
-                    JsonObject values = setting.getJsonObject(Constants.VALUE_KEY);
-                    String actual = values == null ? null : values.getString(code);
-                    if (actual == null || !actual.equals(expectedValue)) {
-                        mismatches.add("Mismatch for " + configName + "." + code
-                                + " expected='" + expectedValue + "' actual='" + actual + "'");
-                    }
+                    collectLegacyMismatch(legacy, settingsByKey, mismatches);
                 }
 
                 if (!mismatches.isEmpty()) {
@@ -258,6 +237,31 @@ public class ConfigToSettingsMigrationService {
                 promise.fail(e);
             }
         });
+    }
+
+    private void collectLegacyMismatch(JsonObject legacy, Map<String, JsonObject> settingsByKey,
+            List<String> mismatches) {
+        String configName = legacy.getString(Constants.CONFIG_KEY);
+        String code = legacy.getString(Constants.CODE_KEY);
+        String expectedValue = legacy.getString(Constants.VALUE_KEY);
+
+        if (configName == null || configName.isBlank()) {
+            logger.warn("Skipping parity check for legacy config with blank configName. code={}", code);
+            return;
+        }
+
+        JsonObject setting = settingsByKey.get(configName.toLowerCase());
+        if (setting == null) {
+            mismatches.add("Missing settings key for configName='" + configName + "'");
+            return;
+        }
+
+        JsonObject values = setting.getJsonObject(Constants.VALUE_KEY);
+        String actual = values == null ? null : values.getString(code);
+        if (actual == null || !actual.equals(expectedValue)) {
+            mismatches.add("Mismatch for " + configName + "." + code
+                    + " expected='" + expectedValue + "' actual='" + actual + "'");
+        }
     }
 
     private Future<Void> deleteLegacyConfigs(JsonObject transformedData) {
