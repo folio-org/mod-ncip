@@ -233,6 +233,27 @@ public class MainVerticleTest {
 	}
 
 	@Test
+	public void tenantInitFailureReturnsServerError(TestContext ctx) {
+		int appPort = findFreePort();
+		int okapiPort = findFreePort();
+		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
+
+		vertx.createHttpServer()
+				.requestHandler(req -> req.response().setStatusCode(500).end("fail"))
+				.listen(okapiPort)
+				.compose(x -> vertx.deployVerticle(new MainVerticle()))
+				.onComplete(ctx.asyncAssertSuccess(x -> {
+					vertx.executeBlocking(() -> {
+						request(appPort, okapiPort)
+								.post("/_/tenant")
+								.then()
+								.statusCode(500);
+						return null;
+					}).onComplete(ctx.asyncAssertSuccess());
+				}));
+	}
+
+	@Test
 	public void ncipReturnsSuccessWhenHelperSucceeds(TestContext ctx) {
 		int appPort = findFreePort();
 		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
