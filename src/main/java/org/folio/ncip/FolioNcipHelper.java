@@ -120,9 +120,7 @@ public class FolioNcipHelper {
 		String tenant = context.request().headers().get(Constants.X_OKAPI_TENANT);
 
 		// INITIALIZE THIS TENANTS TOOLKIT PROPERTIES WITH THE DEFAULT VALUES:
-		toolkitProperties.put(tenant, defaultToolkitObjects.get("toolkit"));
-		serviceContext.put(tenant, defaultToolkitObjects.get("servicecontext"));
-		translator.put(tenant, defaultToolkitObjects.get("translator"));
+		initializeTenantToolkitState(tenant);
 		// HAVE THEY OVERWRITTEN ANY OF THESE VALUES IN MOD-SETTINGS?
 		try {
 			initToolkit(context);
@@ -131,6 +129,7 @@ public class FolioNcipHelper {
 			logger.info("Unable to initialize custom toolkit properties.  Using default");
 			logger.info(e.getLocalizedMessage());
 		}
+		rebuildTenantToolkitObjects(tenant);
 
 		try {
 			initNcipProperties(context);
@@ -169,6 +168,27 @@ public class FolioNcipHelper {
 			throw e;
 		}
 		return responseMsgInputStream;
+	}
+
+	protected void initializeTenantToolkitState(String tenant) throws Exception {
+		Properties defaultToolkit = (Properties) defaultToolkitObjects.get("toolkit");
+		Properties tenantToolkit = new Properties();
+		if (defaultToolkit != null) {
+			tenantToolkit.putAll(defaultToolkit);
+		}
+
+		toolkitProperties.put(tenant, tenantToolkit);
+	}
+
+	protected void rebuildTenantToolkitObjects(String tenant) throws Exception {
+		Properties properties = (Properties) toolkitProperties.get(tenant);
+		if (properties == null) {
+			throw new Exception("Toolkit properties are missing for tenant " + tenant);
+		}
+
+		serviceContext.put(tenant,
+				ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
+		translator.put(tenant, TranslatorFactory.buildTranslator(null, properties));
 	}
 
 	/**
@@ -216,11 +236,6 @@ public class FolioNcipHelper {
 				logger.info("Overriding toolkit property: {} = {}", key, value);
 				properties.setProperty(key, value);
 			}
-
-			toolkitProperties.put(tenant, properties);
-			serviceContext.put(tenant,
-					ServiceValidatorFactory.buildServiceValidator(properties).getInitialServiceContext());
-			translator.put(tenant, TranslatorFactory.buildTranslator(null, properties));
 		} catch (Exception e) {
 			logger.fatal("Unable to initialize toolkit properties from mod-settings.");
 			logger.fatal(e.getLocalizedMessage());
@@ -257,15 +272,17 @@ public class FolioNcipHelper {
 		Properties properties = new Properties();
 
 		// APPLY DEFAULTS FROM ncip.properties FOR ANY PROPERTY NOT SET IN MOD-SETTINGS
-		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-		while (reader.ready()) {
-			String line = reader.readLine();
-			if (line == null || line.contains("#") || line.isBlank())
-				continue;
-			String[] parts = line.split("=", 2);
-			if (parts.length == 2 && !parts[1].isBlank()) {
-				properties.setProperty(parts[0].trim(), parts[1].trim());
+		try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(Constants.NCIP_PROP_FILE);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.contains("#") || line.isBlank()) {
+					continue;
+				}
+				String[] parts = line.split("=", 2);
+				if (parts.length == 2 && !parts[1].isBlank()) {
+					properties.setProperty(parts[0].trim(), parts[1].trim());
+				}
 			}
 		}
 

@@ -19,7 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -101,7 +100,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		FolioGatewayClient.put(uriString, body, okapiHeaders);
 	}
 
-	public CloseableHttpResponse callApiDelete(String uriString) throws Exception {
+	public int callApiDelete(String uriString) throws Exception {
 		return FolioGatewayClient.delete(uriString, okapiHeaders);
 	}
 

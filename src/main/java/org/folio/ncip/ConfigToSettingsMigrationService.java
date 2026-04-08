@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.folio.util.PercentCodec;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -95,6 +94,11 @@ public class ConfigToSettingsMigrationService {
                 String configName = config.getString(Constants.CONFIG_KEY);
                 String value = config.getString(Constants.VALUE_KEY);
 
+                if (configName == null || configName.isBlank()) {
+                    logger.warn("Skipping legacy config with blank configName. code={}", code);
+                    continue;
+                }
+
                 String groupKey = configName.toLowerCase();
 
                 if (!groupedValues.containsKey(groupKey)) {
@@ -159,11 +163,15 @@ public class ConfigToSettingsMigrationService {
 
                 try {
                     FolioGatewayClient.post(url, setting, okapiHeaders);
-                } catch (Exception postError) {
-                    // Idempotent parallel-safe path: if already exists, update by deterministic id.
-                    String putEndpoint = baseUrl + Constants.SETTINGS_URL + "/" + settingId;
-                    logger.info("POST failed for key {}, trying PUT upsert path", key);
-                    FolioGatewayClient.put(putEndpoint, setting, okapiHeaders);
+                } catch (FolioGatewayClient.HttpStatusException postError) {
+                    if (postError.getStatusCode() == 409) {
+                        // Idempotent path: record already exists, update by deterministic id.
+                        String putEndpoint = baseUrl + Constants.SETTINGS_URL + "/" + settingId;
+                        logger.info("POST conflict for key {}, trying PUT upsert path", key);
+                        FolioGatewayClient.put(putEndpoint, setting, okapiHeaders);
+                    } else {
+                        throw postError;
+                    }
                 }
 
                 // Verify the setting was created by fetching it back
@@ -268,14 +276,12 @@ public class ConfigToSettingsMigrationService {
                     }
 
                     String deleteEndpoint = baseUrl + "/configurations/entries/" + id;
-                    try (CloseableHttpResponse response = FolioGatewayClient.delete(deleteEndpoint, okapiHeaders)) {
-                        int code = response.getCode();
-                        if (code == 200 || code == 204 || code == 404) {
-                            deletedOrAlreadyGone++;
-                        } else {
-                            promise.fail(new Exception("Failed deleting legacy config id " + id + ", status=" + code));
-                            return;
-                        }
+                    int code = FolioGatewayClient.delete(deleteEndpoint, okapiHeaders);
+                    if (code == 200 || code == 204 || code == 404) {
+                        deletedOrAlreadyGone++;
+                    } else {
+                        promise.fail(new Exception("Failed deleting legacy config id " + id + ", status=" + code));
+                        return;
                     }
                 }
 

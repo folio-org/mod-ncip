@@ -3,6 +3,7 @@ package org.folio.ncip;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,49 @@ import java.util.Properties;
 import org.junit.Test;
 
 public class FolioNcipHelperTest {
+
+    @Test
+    public void initToolkitDoesNotLeakOverridesAcrossTenants() throws Exception {
+        String okapiUrl = "http://okapi";
+        String tenantA = "tenantA";
+        String tenantB = "tenantB";
+
+        String toolkitResponseA = new io.vertx.core.json.JsonObject()
+                .put("items", new io.vertx.core.json.JsonArray()
+                        .add(new io.vertx.core.json.JsonObject()
+                                .put("key", "toolkit")
+                                .put("value", new io.vertx.core.json.JsonObject()
+                                        .put("test.shared.override", "one"))))
+                .encode();
+
+        String toolkitResponseB = new io.vertx.core.json.JsonObject()
+                .put("items", new io.vertx.core.json.JsonArray()
+                        .add(new io.vertx.core.json.JsonObject()
+                                .put("key", "toolkit")
+                                .put("value", new io.vertx.core.json.JsonObject()
+                                        .put("test.shared.override", "two"))))
+                .encode();
+
+        MutableToolkitStubFolioNcipHelper helper = new MutableToolkitStubFolioNcipHelper(Promise.promise());
+
+        RoutingContext contextA = buildContext(tenantA, okapiUrl);
+        helper.initializeTenantToolkitState(tenantA);
+        helper.setToolkitResponse(toolkitResponseA);
+        helper.initToolkit(contextA);
+
+        RoutingContext contextB = buildContext(tenantB, okapiUrl);
+        helper.initializeTenantToolkitState(tenantB);
+        helper.setToolkitResponse(toolkitResponseB);
+        helper.initToolkit(contextB);
+
+        Properties tenantAProps = (Properties) helper.toolkitProperties.get(tenantA);
+        Properties tenantBProps = (Properties) helper.toolkitProperties.get(tenantB);
+        Properties defaults = (Properties) helper.defaultToolkitObjects.get("toolkit");
+
+        assertEquals("one", tenantAProps.getProperty("test.shared.override"));
+        assertEquals("two", tenantBProps.getProperty("test.shared.override"));
+        assertTrue(defaults.getProperty("test.shared.override") == null);
+    }
 
     @Test
     public void initNcipPropertiesKeepsGlobalDefaultsWhenAgencyMissingProperty() throws Exception {
@@ -128,5 +172,46 @@ public class FolioNcipHelperTest {
             }
             throw new IllegalArgumentException("Unexpected URL: " + uriString);
         }
+    }
+
+    private static class MutableToolkitStubFolioNcipHelper extends FolioNcipHelper {
+        private String toolkitResponse = new io.vertx.core.json.JsonObject()
+                .put("items", new io.vertx.core.json.JsonArray())
+                .encode();
+
+        MutableToolkitStubFolioNcipHelper(Promise<Void> promise) {
+            super(promise);
+        }
+
+        void setToolkitResponse(String toolkitResponse) {
+            this.toolkitResponse = toolkitResponse;
+        }
+
+        @Override
+        public String callApiGet(String uriString, MultiMap okapiHeaders) {
+            if (uriString.contains(Constants.SETTINGS_URL)) {
+                return toolkitResponse;
+            }
+            if (uriString.contains(Constants.ADDRESS_TYPES)) {
+                return new io.vertx.core.json.JsonObject().put("addressTypes", new io.vertx.core.json.JsonArray())
+                        .encode();
+            }
+            throw new IllegalArgumentException("Unexpected URL: " + uriString);
+        }
+    }
+
+    private RoutingContext buildContext(String tenant, String okapiUrl) {
+        MultiMap headers = MultiMap.caseInsensitiveMultiMap()
+                .add(Constants.X_OKAPI_TENANT, tenant)
+                .add(Constants.X_OKAPI_URL, okapiUrl);
+
+        HttpServerRequest request = mock(HttpServerRequest.class);
+        when(request.getHeader(Constants.X_OKAPI_TENANT)).thenReturn(tenant);
+        when(request.getHeader(Constants.X_OKAPI_URL)).thenReturn(okapiUrl);
+        when(request.headers()).thenReturn(headers);
+
+        RoutingContext context = mock(RoutingContext.class);
+        when(context.request()).thenReturn(request);
+        return context;
     }
 }

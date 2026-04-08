@@ -19,6 +19,19 @@ public class FolioGatewayClient {
 
     private static final Logger logger = Logger.getLogger(FolioGatewayClient.class);
 
+    public static class HttpStatusException extends Exception {
+        private final int statusCode;
+
+        public HttpStatusException(int statusCode, String message) {
+            super(message);
+            this.statusCode = statusCode;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+    }
+
     public static String get(String url, MultiMap headers) throws Exception {
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
@@ -66,7 +79,7 @@ public class FolioGatewayClient {
                 int code = response.getCode();
                 if (code > 399) {
                     logger.error("API error response body: " + responseBody);
-                    throw new Exception(processErrorResponse(responseBody));
+                    throw new HttpStatusException(code, processErrorResponse(responseBody));
                 }
                 return responseBody;
             }
@@ -101,15 +114,26 @@ public class FolioGatewayClient {
         }
     }
 
-    public static CloseableHttpResponse delete(String url, MultiMap headers) throws Exception {
+    public static int delete(String url, MultiMap headers) throws Exception {
 
-        CloseableHttpClient client = HttpClients.createDefault();
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
 
-        HttpDelete request = new HttpDelete(url);
-        applyTimeout(request);
-        applyHeaders(request, headers);
+            HttpDelete request = new HttpDelete(url);
+            applyTimeout(request);
+            applyHeaders(request, headers);
 
-        return client.execute(request);
+            try (CloseableHttpResponse response = client.execute(request)) {
+                String responseBody = response.getEntity() != null
+                        ? EntityUtils.toString(response.getEntity())
+                        : "";
+                int code = response.getCode();
+                if (code > 399 && code != 404) {
+                    logger.error("API error response body: " + responseBody);
+                    throw new Exception(processErrorResponse(responseBody));
+                }
+                return code;
+            }
+        }
     }
 
     private static void applyTimeout(HttpUriRequestBase request) {
