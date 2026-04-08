@@ -14,12 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -381,10 +379,7 @@ public class MockServer {
 
     private void test(RoutingContext ctx) {
 
-        logger.info("gotx: " + ctx.body());
-
-        String id = UUID.randomUUID().toString();
-        JsonObject body = ctx.body().asJsonObject();
+        logger.info("got: " + ctx.body());
     }
 
     private static String readLineByLine(String filePath) {
