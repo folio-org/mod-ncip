@@ -1,0 +1,20 @@
+# Maven build output
+target/
+dependency-reduced-pom.xml
+
+# Local VS Code run configuration
+src/main/java/org/folio/ncip/Main.java
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db

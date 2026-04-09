@@ -10,6 +10,7 @@
         </InitiationHeader>
         <UserId>
             <UserIdentifierValue>8377630</UserIdentifierValue>
+            <UserIdentifierType>barcode</UserIdentifierType>
         </UserId>
         <RequestId>
             <RequestIdentifierValue>requestId1</RequestIdentifierValue>

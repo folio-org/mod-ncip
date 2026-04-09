@@ -1,15 +1,19 @@
 {
-"id": "${artifactId}-${version}",
+  "id": "${artifactId}-${version}",
   "name": "NCIP",
-   "provides": [
+  "provides": [
     {
       "id": "ncip",
       "version": "1.0",
-       "handlers": [
+      "handlers": [
         {
-          "methods": [ "POST" ],
+          "methods": [
+            "POST"
+          ],
           "pathPattern": "/ncip",
-          "permissionsRequired": ["ncip.post"],
+          "permissionsRequired": [
+            "ncip.post"
+          ],
           "modulePermissions": [
             "users.collection.get",
             "patron-blocks.automated-patron-blocks.collection.get",
@@ -51,17 +55,24 @@
             "inventory-storage.service-points.item.get",
             "owners.collection.get",
             "feefines.collection.get",
-            "accounts.item.post",  
-            "circulation.requests.item.get",  
+            "accounts.item.post",
+            "circulation.requests.item.get",
             "circulation.requests.item.put",
             "note.types.collection.get",
-            "circulation.loans.add-info.post"
-        ]
+            "circulation.loans.add-info.post",
+            "mod-settings.entries.collection.get",
+            "mod-settings.entries.item.get",
+            "mod-settings.global.read.mod-ncip"
+          ]
         },
         {
-          "methods": [ "GET" ],
+          "methods": [
+            "GET"
+          ],
           "pathPattern": "/ncipconfigcheck",
-          "permissionsRequired": ["ncip.ncipconfigcheck.get"],
+          "permissionsRequired": [
+            "ncip.ncipconfigcheck.get"
+          ],
           "modulePermissions": [
             "inventory-storage.all",
             "inventory-storage.service-points.collection.get",
@@ -70,56 +81,94 @@
             "inventory-storage.material-types.collection.get",
             "configuration.entries.collection.get",
             "configuration.entries.item.get",
-            "inventory-storage.loan-types.collection.get"
+            "inventory-storage.loan-types.collection.get",
+            "mod-settings.entries.collection.get",
+            "mod-settings.entries.item.get",
+            "mod-settings.global.read.mod-ncip"
           ]
-         
+        }
+      ]
+    },
+    {
+      "id": "_tenant",
+      "version": "1.0",
+      "interfaceType": "system",
+      "handlers": [
+        {
+          "methods": [
+            "POST"
+          ],
+          "pathPattern": "/_/tenant",
+          "modulePermissions": [
+            "mod-settings.entries.collection.get",
+            "mod-settings.entries.item.get",
+            "mod-settings.global.read.mod-ncip",
+            "mod-settings.global.write.mod-ncip",
+            "configuration.entries.collection.get",
+            "configuration.entries.item.get",
+            "configuration.entries.item.delete"
+          ]
         }
       ]
     }
   ],
-   "requires": [
-      {
-        "id":"instance-types",
-        "version" : "2.0"
-      },
-      {
+  "requires": [
+    {
+      "id": "instance-types",
+      "version": "2.0"
+    },
+    {
       "id": "configuration",
       "version": "2.0"
-      },
-      {
-        "id":"identifier-types",
-        "version" : "1.2"
-      },
-      {
-        "id":"material-types",
-        "version":"2.2"
-      },
-      {
-        "id":"locations",
-        "version":"3.0"
-      },
-      {
-        "id":"service-points",
-        "version":"3.2"
-      },
-      {
-        "id":"loan-types",
-        "version":"2.2"
-      },
-      {
-        "id":"holdings-storage",
-        "version":"6.0 7.0 8.0"
-      },
-      {
-        "id":"inventory",
-        "version":"10.2 11.0 12.0 13.0 14.0"
-      },
-      {
-        "id":"circulation",
-        "version":"14.0"
-      }
+    },
+    {
+      "id": "identifier-types",
+      "version": "1.2"
+    },
+    {
+      "id": "material-types",
+      "version": "2.2"
+    },
+    {
+      "id": "locations",
+      "version": "3.0"
+    },
+    {
+      "id": "service-points",
+      "version": "3.2"
+    },
+    {
+      "id": "loan-types",
+      "version": "2.2"
+    },
+    {
+      "id": "holdings-storage",
+      "version": "6.0 7.0 8.0"
+    },
+    {
+      "id": "inventory",
+      "version": "10.2 11.0 12.0 13.0 14.0"
+    },
+    {
+      "id": "circulation",
+      "version": "14.0"
+    },
+    {
+      "id": "settings",
+      "version": "1.2"
+    }
   ],
   "permissionSets": [
+    {
+      "permissionName": "mod-settings.global.read.mod-ncip",
+      "displayName": "Read settings for mod-ncip",
+      "description": "Read settings for mod-ncip"
+    },
+    {
+      "permissionName": "mod-settings.global.write.mod-ncip",
+      "displayName": "Write settings for mod-ncip",
+      "description": "Write settings for mod-ncip"
+    },
     {
       "permissionName": "ncip.post",
       "displayName": "NCIP Request",
@@ -136,7 +185,8 @@
       "description": "Entire set of permissions needed to use NCIP",
       "subPermissions": [
         "ncip.post",
-        "ncip.ncipconfigcheck.get"
+        "ncip.ncipconfigcheck.get",
+        "mod-settings.global.read.mod-ncip.get"
       ]
     }
   ],
@@ -146,11 +196,18 @@
     "dockerArgs": {
       "HostConfig": {
         "Memory": 357913941,
-        "PortBindings": { "8081/tcp": [ { "HostPort": "%p" } ] }
+        "PortBindings": {
+          "8081/tcp": [
+            {
+              "HostPort": "%p"
+            }
+          ]
+        }
       }
     },
     "env": [
-      { "name": "JAVA_OPTIONS",
+      {
+        "name": "JAVA_OPTIONS",
         "value": "-XX:MaxRAMPercentage=66.0"
       }
     ]

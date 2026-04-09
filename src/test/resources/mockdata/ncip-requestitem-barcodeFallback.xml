@@ -1,0 +1,26 @@
+<NCIPMessage version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
+    <RequestItem>
+        <InitiationHeader>
+            <FromAgencyId>
+                <AgencyId>Relais</AgencyId>
+            </FromAgencyId>
+            <ToAgencyId>
+                <AgencyId>Lehigh University</AgencyId>
+            </ToAgencyId>
+        </InitiationHeader>
+        <UserId>
+            <UserIdentifierValue>8377630</UserIdentifierValue>
+            <UserIdentifierType>barcode</UserIdentifierType>
+        </UserId>
+        <RequestId>
+            <RequestIdentifierValue>0000005</RequestIdentifierValue>
+        </RequestId>
+        <RequestType>Page</RequestType>
+        <RequestScopeType>Item</RequestScopeType>
+        <BibliographicId>
+            <BibliographicRecordId>
+                <BibliographicRecordIdentifier></BibliographicRecordIdentifier>
+            </BibliographicRecordId>
+        </BibliographicId>
+    </RequestItem>
+</NCIPMessage>
