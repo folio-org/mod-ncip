@@ -25,8 +25,7 @@ public class MainVerticle extends AbstractVerticle {
 
 	@Override
 	public void start(Promise<Void> startPromise) throws Exception {
-		final String portStr = System.getProperty(SYS_PORT,
-				System.getProperty("http.port", DEFAULT_PORT));
+		final String portStr = System.getProperty(SYS_PORT, DEFAULT_PORT);
 		final int port = Integer.parseInt(portStr);
 		logger.info("mod-ncip is using port: " + port);
 
