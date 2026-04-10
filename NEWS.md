@@ -1,3 +1,12 @@
+## 1.17.0 2026-04-10
+ * [MODNCIP-73](https://folio-org.atlassian.net/browse/MODNCIP-73) Upgrade commons-lang from legacy 2.6 to 3
+ * [MODNCIP-87](https://folio-org.atlassian.net/browse/MODNCIP-87) Upgrade module to Vert.x 5.0
+ * [MODNCIP-93](https://folio-org.atlassian.net/browse/MODNCIP-93) After upgrade, missing default configuations for other AgencyIds
+ * [MODNCIP-92](https://folio-org.atlassian.net/browse/MODNCIP-92) After mod-ncip is deployed & steady - InvocationTargetException error is intermittently returned for some services 
+ * [MODNCIP-96](https://folio-org.atlassian.net/browse/MODNCIP-96) Setup dependabot for your module
+ * [MODNCIP-72](https://folio-org.atlassian.net/browse/MODNCIP-72) Upgrade httpclient from deprecated 4 to 5
+ * [MODNCIP-64](https://folio-org.atlassian.net/browse/MODNCIP-64) change to use mod-settings
+
 ## 1.16.1 2025-09-25
 * [MODNCIP-90](https://folio-org.atlassian.net/browse/MODNCIP-90) RequestItem service - make hrid optional (Sunflower)
 
