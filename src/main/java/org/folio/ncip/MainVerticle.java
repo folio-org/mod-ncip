@@ -64,13 +64,13 @@ public class MainVerticle extends AbstractVerticle {
 
 	protected void handleTenantGet(RoutingContext ctx) {
   		ctx.response()
-    	.setStatusCode(200)
-    	.putHeader("Content-Type", "application/json")
-    	.end("{\"complete\": true}");
+    	  .setStatusCode(200)
+    	  .putHeader("Content-Type", "application/json")
+    	  .end("{\"complete\": true}");
 	}
 
 	protected void handleTenantDelete(RoutingContext ctx) {
-  		ctx.response().setStatusCode(204).end();
+  		 ctx.response().setStatusCode(204).end();
 	}
 
 	protected void ncipConfigCheck(RoutingContext ctx) {
