@@ -58,7 +58,6 @@
             "accounts.item.post",
             "circulation.requests.item.get",
             "circulation.requests.item.put",
-            "note.types.collection.get",
             "circulation.loans.add-info.post",
             "mod-settings.entries.collection.get",
             "mod-settings.entries.item.get",
@@ -89,28 +88,30 @@
         }
       ]
     },
-    {
-      "id": "_tenant",
-      "version": "1.0",
-      "interfaceType": "system",
-      "handlers": [
-        {
-          "methods": [
-            "POST"
-          ],
-          "pathPattern": "/_/tenant",
-          "modulePermissions": [
-            "mod-settings.entries.collection.get",
-            "mod-settings.entries.item.get",
-            "mod-settings.global.read.mod-ncip",
-            "mod-settings.global.write.mod-ncip",
-            "configuration.entries.collection.get",
-            "configuration.entries.item.get",
-            "configuration.entries.item.delete"
-          ]
-        }
-      ]
-    }
+  {
+    "id": "_tenant",
+    "version": "1.0",
+    "interfaceType": "system",
+    "handlers": [
+      {
+        "methods": ["POST"],
+        "pathPattern": "/_/tenant",
+        "modulePermissions": [
+          "mod-settings.entries.collection.get",
+          "mod-settings.entries.item.get",
+          "mod-settings.global.read.mod-ncip",
+          "mod-settings.global.write.mod-ncip",
+          "configuration.entries.collection.get",
+          "configuration.entries.item.get",
+          "configuration.entries.item.delete"
+        ]
+      },
+      {
+        "methods": ["GET", "DELETE"],
+        "pathPattern": "/_/tenant/{id}"
+      }
+    ]
+  }
   ],
   "requires": [
     {
@@ -177,7 +178,7 @@
     {
       "permissionName": "ncip.ncipconfigcheck.get",
       "displayName": "NCIP - configuration check",
-      "description": "Check NCIP configuraitons"
+      "description": "Check NCIP configurations"
     },
     {
       "permissionName": "ncip.all",
@@ -186,7 +187,7 @@
       "subPermissions": [
         "ncip.post",
         "ncip.ncipconfigcheck.get",
-        "mod-settings.global.read.mod-ncip.get"
+        "mod-settings.global.read.mod-ncip"
       ]
     }
   ],

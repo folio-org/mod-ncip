@@ -35,6 +35,8 @@ public class MainVerticle extends AbstractVerticle {
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
 		router.route(HttpMethod.POST, "/_/tenant").handler(this::handleTenant);
+		router.route(HttpMethod.GET, "/_/tenant/:id").handler(this::handleTenantGet);
+		router.route(HttpMethod.DELETE, "/_/tenant/:id").handler(this::handleTenantDelete);
 		router.route(HttpMethod.POST, "/ncip").handler(this::handleNcip);
 		router.route(HttpMethod.GET, "/ncipconfigcheck").handler(this::ncipConfigCheck);
 		router.route(HttpMethod.GET, "/admin/health").handler(this::healthCheck);
@@ -58,6 +60,17 @@ public class MainVerticle extends AbstractVerticle {
 					logger.error("Tenant initialization failed", e);
 					ctx.fail(e);
 				});
+	}
+
+	protected void handleTenantGet(RoutingContext ctx) {
+  		ctx.response()
+    	  .setStatusCode(200)
+    	  .putHeader("Content-Type", "application/json")
+    	  .end("{\"complete\": true}");
+	}
+
+	protected void handleTenantDelete(RoutingContext ctx) {
+  		 ctx.response().setStatusCode(204).end();
 	}
 
 	protected void ncipConfigCheck(RoutingContext ctx) {
