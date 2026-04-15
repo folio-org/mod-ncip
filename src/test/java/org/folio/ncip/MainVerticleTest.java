@@ -255,41 +255,41 @@ public class MainVerticleTest {
 
 	@Test
 	public void tenantGetReturnsCompleteTrue(TestContext ctx) {
-	  int appPort = findFreePort();
-	
-	  System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
-	
-	  vertx.deployVerticle(new MainVerticle())
-	    .onComplete(ctx.asyncAssertSuccess(x -> {
-	      vertx.executeBlocking(() -> {
-	        request(appPort, null)
-	          .get("/_/tenant/test-job-id")
-	          .then()
-	          .statusCode(200)
-	          .body("complete", is(true));
-	
-	        return null;
-	      }).onComplete(ctx.asyncAssertSuccess());
-	    }));
+		int appPort = findFreePort();
+
+		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
+
+		vertx.deployVerticle(new MainVerticle())
+				.onComplete(ctx.asyncAssertSuccess(x -> {
+					vertx.executeBlocking(() -> {
+						request(appPort, null)
+								.get("/_/tenant/test-job-id")
+								.then()
+								.statusCode(200)
+								.body("complete", is(true));
+
+						return null;
+					}).onComplete(ctx.asyncAssertSuccess());
+				}));
 	}
-	
+
 	@Test
 	public void tenantDeleteReturnsNoContent(TestContext ctx) {
-	  int appPort = findFreePort();
-	
-	  System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
-	
-	  vertx.deployVerticle(new MainVerticle())
-	    .onComplete(ctx.asyncAssertSuccess(x -> {
-	      vertx.executeBlocking(() -> {
-	        request(appPort, null)
-	          .delete("/_/tenant/test-job-id")
-	          .then()
-	          .statusCode(204);
-	
-	        return null;
-	      }).onComplete(ctx.asyncAssertSuccess());
-	    }));
+		int appPort = findFreePort();
+
+		System.setProperty(Constants.SYS_PORT, String.valueOf(appPort));
+
+		vertx.deployVerticle(new MainVerticle())
+				.onComplete(ctx.asyncAssertSuccess(x -> {
+					vertx.executeBlocking(() -> {
+						request(appPort, null)
+								.delete("/_/tenant")
+								.then()
+								.statusCode(204);
+
+						return null;
+					}).onComplete(ctx.asyncAssertSuccess());
+				}));
 	}
 
 	@Test
