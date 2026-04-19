@@ -175,7 +175,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.13.0</version>
+			<version>5.23.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -192,7 +192,7 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>5.5.0</version>
+			<version>6.0.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -245,7 +245,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.13.0</version>
+				<version>3.15.0</version>
 				<configuration>
 					<release>17</release>
 					<encoding>UTF-8</encoding>
@@ -255,7 +255,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>3.5.0</version>
 				<executions>
 					<execution>
 						<id>filter-descriptor-inputs</id>
@@ -307,7 +307,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>3.5.5</version>
 				<configuration>
 					<includes>
 						<include>**/*Test.java</include>
@@ -319,7 +319,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>3.6.2</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -346,7 +346,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.3.1</version>
 				<configuration>
 					<preparationGoals>clean verify</preparationGoals>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
