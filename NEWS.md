@@ -1,3 +1,5 @@
+## 1.17.1 2026-04-24
+  * Correction to log formatting and fix to moduleDescriptor
 ## 1.17.0 2026-04-10
  * [MODNCIP-73](https://folio-org.atlassian.net/browse/MODNCIP-73) Upgrade commons-lang from legacy 2.6 to 3
  * [MODNCIP-87](https://folio-org.atlassian.net/browse/MODNCIP-87) Upgrade module to Vert.x 5.0
