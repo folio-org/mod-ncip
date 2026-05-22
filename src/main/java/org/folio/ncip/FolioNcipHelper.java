@@ -300,7 +300,8 @@ public class FolioNcipHelper {
 			if (items == null || items.isEmpty()) {
 				logger.error("No NCIP agency settings found in mod-settings. QUERY: {}", settingsEndpoint);
 				ncipProperties.remove(tenant);
-				throw new Exception("No NCIP agency settings found in mod-settings");
+				//REMOVE EXCEPTION - THE SERVICES THAT REQUIRE SETTINGS CHECK FOR THEM
+				//throw new Exception("No NCIP agency settings found in mod-settings");
 			}
 
 			// EACH ITEM IS ONE AGENCY - APPLY ITS PROPERTIES AS agencyId.propertyCode
