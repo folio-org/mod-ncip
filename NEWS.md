@@ -1,3 +1,9 @@
+## 1.17.2 2026-05-26
+* [MODNCIP-101](https://folio-org.atlassian.net/browse/MODNCIP-101) allow requests with no settings
+
+## 1.17.1 2026-05-01
+* [MODNCIP-102](https://folio-org.atlassian.net/browse/MODNCIP-102) use version 2.0 for _tenant endpoint
+
 ## 1.17.0 2026-04-10
  * [MODNCIP-73](https://folio-org.atlassian.net/browse/MODNCIP-73) Upgrade commons-lang from legacy 2.6 to 3
  * [MODNCIP-87](https://folio-org.atlassian.net/browse/MODNCIP-87) Upgrade module to Vert.x 5.0
