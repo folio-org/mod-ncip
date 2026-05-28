@@ -60,4 +60,39 @@ public class FolioRemoteServiceManagerTest {
         assertTrue(decodedUrl.contains("externalSystemId=="));
         assertTrue(!decodedUrl.contains("ExternalSystemId=="));
     }
+
+    @Test
+    public void deleteItemEncodesSpecialCharactersInBarcodeLookupQuery() throws Exception {
+        AtomicReference<String> requestedUrl = new AtomicReference<>();
+        FolioRemoteServiceManager manager = new FolioRemoteServiceManager() {
+            @Override
+            public String callApiGet(String uriString) {
+                requestedUrl.set(uriString);
+                return "{\"items\":[],\"totalRecords\":0}";
+            }
+        };
+
+        MultiMap headers = MultiMap.caseInsensitiveMultiMap();
+        headers.add(Constants.X_OKAPI_URL, "http://localhost:8082");
+        manager.setOkapiHeaders(headers);
+
+        manager.deleteItem("abc+123", "diku");
+
+        String rawUrl = requestedUrl.get();
+        String decodedUrl = URLDecoder.decode(rawUrl, StandardCharsets.UTF_8);
+
+        assertTrue(rawUrl.contains("%2B"));
+        assertTrue(decodedUrl.contains("barcode==\"abc+123\""));
+    }
+
+    @Test
+    public void requestItemBarcodeFallbackBuildsEncodedLookupUrlForPlusSign() throws Exception {
+        FolioRemoteServiceManager manager = new FolioRemoteServiceManager();
+
+        String rawUrl = manager.buildItemSearchByBarcodeUrl("http://localhost:8082", "abc+123");
+        String decodedUrl = URLDecoder.decode(rawUrl, StandardCharsets.UTF_8);
+
+        assertTrue(rawUrl.contains("%2B"));
+        assertTrue(decodedUrl.contains("barcode==\"abc+123\""));
+    }
 }

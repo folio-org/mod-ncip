@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NCIPMessage
+    xmlns="http://www.niso.org/2008/ncip"
+    version="http://www.niso.org/schemas/ncip/v2_02/ncip_v2_02.xsd">
+    <DeleteItem>
+        <InitiationHeader>
+            <FromAgencyId>
+                <AgencyId>Relais</AgencyId>
+            </FromAgencyId>
+            <ToAgencyId>
+                <AgencyId>bugfest</AgencyId>
+            </ToAgencyId>
+        </InitiationHeader>
+        <ItemId>
+            <AgencyId>bugfest</AgencyId>
+            <ItemIdentifierValue>11183161</ItemIdentifierValue>
+        </ItemId>
+    </DeleteItem>
+</NCIPMessage>

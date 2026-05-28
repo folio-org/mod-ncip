@@ -54,9 +54,9 @@ public class FolioNcipService {
 
 	protected void validateItemIdIsValid(ItemId itemId) throws FolioNcipException {
 
-		final Pattern idPattern = Pattern.compile("^[a-zA-Z0-9\\s\\.\\-_]+$");
-		if (!idPattern.matcher(itemId.getItemIdentifierValue()).matches()
-				|| itemId.getItemIdentifierValue().length() > 100) {
+		String itemIdentifierValue = itemId.getItemIdentifierValue();
+		if (itemIdentifierValue.trim().isEmpty()
+				|| itemIdentifierValue.length() > 100) {
 			FolioNcipException exception = new FolioNcipException("Item id is invalid");
 			throw exception;
 		}

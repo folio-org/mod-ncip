@@ -1,3 +1,6 @@
+## 1.17.3 2026-05-28
+* [MODNCIP-99](https://folio-org.atlassian.net/browse/MODNCIP-99) Mod-ncip rejects item barcodes containing special characters (e.g., “+”) due to restrictive validation pattern
+
 ## 1.17.2 2026-05-26
 * [MODNCIP-101](https://folio-org.atlassian.net/browse/MODNCIP-101) allow requests with no settings
 
