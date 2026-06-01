@@ -45,7 +45,7 @@ public class Constants {
 	public static final String PICKUP_LOCATION_MISSING = "Pickup location is missing";
 	public static final String REQUEST_ID_MISSING = "Request ID Missing";
 	public static final String FROM_AGENCY_MISSING = "Could not determine FromAgency";
-	public static final String COULD_NOT_DETERMINE_USER = "User id missing from request or user id provided in authentication input does not exist";
+	public static final String COULD_NOT_DETERMINE_USER = "User id missing from request or user id provided in authentication input does not exist (or has no barcode)";
 	public static final String REQUEST_ITEM_PROBLEM = "Problem performing RequestItem";
 	public static final String REQUEST_ITEM_INPUT_PROBLEM = "Problem occurred validating input (user id or item id)";
 	public static final String REQUEST_ITEM_MISSING_PROBLEM = "Problem occurred while fetching item";
