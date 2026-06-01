@@ -134,8 +134,9 @@ public class FolioNcipHelper {
 		try {
 			initNcipProperties(context);
 		} catch (Exception e) {
-			logger.error("Unable to initialize NCIP properties with mod-settings", e);
-			throw e;
+			// A FAILURE LOADING SETTINGS MUST NOT BLOCK THE NCIP REQUEST (HISTORICAL BEHAVIOR).
+			// SERVICES THAT REQUIRE SETTINGS VALIDATE THEM AND RETURN A PROPER NCIP PROBLEM RESPONSE.
+			logger.error("Unable to initialize NCIP properties with mod-settings.  Proceeding without them.", e);
 		}
 
 		InputStream stream = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
@@ -298,10 +299,12 @@ public class FolioNcipHelper {
 			JsonArray items = jsonObject.getJsonArray("items");
 
 			if (items == null || items.isEmpty()) {
-				logger.error("No NCIP agency settings found in mod-settings. QUERY: {}", settingsEndpoint);
-				ncipProperties.remove(tenant);
-				//REMOVE EXCEPTION - THE SERVICES THAT REQUIRE SETTINGS CHECK FOR THEM
-				//throw new Exception("No NCIP agency settings found in mod-settings");
+				// NO SETTINGS IS NOT FATAL. SERVICES THAT REQUIRE SETTINGS VALIDATE THEM AND
+				// RETURN A PROPER NCIP PROBLEM RESPONSE (E.G. LOOKUPUSER WORKS WITHOUT THEM).
+				// PROCEED WITH THE DEFAULTS LOADED FROM ncip.properties (AND ADDRESS TYPES BELOW).
+				logger.info("No NCIP agency settings found in mod-settings. Proceeding with defaults. QUERY: {}",
+						settingsEndpoint);
+				items = new JsonArray();
 			}
 
 			// EACH ITEM IS ONE AGENCY - APPLY ITS PROPERTIES AS agencyId.propertyCode
@@ -336,9 +339,12 @@ public class FolioNcipHelper {
 				}
 			}
 		} catch (Exception e) {
+			// No remove(tenant) needed: settings are reloaded from mod-settings on every
+			// request, and a successful run overwrites this tenant's entry via put(...) below,
+			// so there is no stale state to clear. Calling remove here would only force a null
+			// downstream. The throw aborts this request; ncipProcess logs it and continues.
 			logger.fatal("Unable to initialize NCIP properties from mod-settings.");
 			logger.error("NCIP init failure", e);
-			ncipProperties.remove(tenant);
 			throw e;
 		}
 

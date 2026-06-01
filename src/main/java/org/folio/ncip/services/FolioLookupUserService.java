@@ -369,11 +369,21 @@ public class FolioLookupUserService extends FolioNcipService implements LookupUs
 			String authType = authenticationInput.getAuthenticationInputType().getValue();
 			String authValue = authenticationInput.getAuthenticationInputData();
 
-			JsonObject patronDetailsAsJson = ((FolioRemoteServiceManager) serviceManager)
-					.lookupPatronRecordBy(authType, authValue);
-			barcode = patronDetailsAsJson.getString("barcode");
-			if (barcode != null && !barcode.equalsIgnoreCase(""))
-				return barcode;
+			// TOLERATE PER-INPUT FAILURES: an AuthenticationInput may legitimately not resolve to
+			// a user - e.g. a "pin" input (not a valid patron lookup type) or a value that matches
+			// no user (lookupPatronRecordBy returns null). Skip it and try the next input instead
+			// of failing the whole lookup. Restores pre-1.17 behavior.
+			try {
+				JsonObject patronDetailsAsJson = ((FolioRemoteServiceManager) serviceManager)
+						.lookupPatronRecordBy(authType, authValue);
+				if (patronDetailsAsJson == null)
+					continue;
+				barcode = patronDetailsAsJson.getString("barcode");
+				if (barcode != null && !barcode.equalsIgnoreCase(""))
+					return barcode;
+			} catch (Exception e) {
+				logger.error("unable to get barcode value from input", e);
+			}
 
 		}
 		if (barcode != null && barcode.equalsIgnoreCase(""))
