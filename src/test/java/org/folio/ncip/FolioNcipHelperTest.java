@@ -252,6 +252,52 @@ public class FolioNcipHelperTest {
     }
 
     @Test
+    public void initNcipPropertiesProceedsWithDefaultsWhenNoSettingsExist() throws Exception {
+        String tenant = "diku";
+        String okapiUrl = "http://okapi";
+
+        // mod-settings returns an empty items array (no NCIP settings configured).
+        String settingsResponse = new io.vertx.core.json.JsonObject()
+                .put("items", new io.vertx.core.json.JsonArray())
+                .encode();
+        String addressTypesResponse = new io.vertx.core.json.JsonObject()
+                .put("addressTypes", new io.vertx.core.json.JsonArray())
+                .encode();
+
+        FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), settingsResponse, addressTypesResponse);
+
+        // Must NOT throw - a tenant with no settings should still be able to run
+        // services such as LookupUser that do not depend on agency settings.
+        helper.initNcipProperties(buildContext(tenant, okapiUrl));
+
+        Properties loaded = (Properties) helper.ncipProperties.get(tenant);
+        assertNotNull(loaded);
+        // Defaults from ncip.properties are still applied.
+        assertEquals("other", loaded.getProperty("cancel.request.reason.name"));
+    }
+
+    @Test
+    public void initNcipPropertiesProceedsWhenSettingsResponseHasNoItemsField() throws Exception {
+        String tenant = "diku";
+        String okapiUrl = "http://okapi";
+
+        // Response without an "items" field - getJsonArray("items") returns null.
+        // Previously this threw a NullPointerException at items.size().
+        String settingsResponse = new io.vertx.core.json.JsonObject().encode();
+        String addressTypesResponse = new io.vertx.core.json.JsonObject()
+                .put("addressTypes", new io.vertx.core.json.JsonArray())
+                .encode();
+
+        FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), settingsResponse, addressTypesResponse);
+
+        helper.initNcipProperties(buildContext(tenant, okapiUrl));
+
+        Properties loaded = (Properties) helper.ncipProperties.get(tenant);
+        assertNotNull(loaded);
+        assertEquals("other", loaded.getProperty("cancel.request.reason.name"));
+    }
+
+    @Test
     public void setUpMappingExecutesWithoutError() throws Exception {
         FolioNcipHelper helper = new StubFolioNcipHelper(Promise.promise(), "{}", "{}");
         Method method = FolioNcipHelper.class.getDeclaredMethod("setUpMapping");

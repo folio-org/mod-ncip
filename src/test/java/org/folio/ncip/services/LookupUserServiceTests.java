@@ -168,6 +168,71 @@ public class LookupUserServiceTests {
 	}
 
 	@Test
+	public void retrieveAuthenticationInputTypeOfSkipsThrowingInputAndResolvesBarcode() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		Method method = service.getClass().getDeclaredMethod("retrieveAuthenticationInputTypeOf",
+				LookupUserInitiationData.class,
+				org.extensiblecatalog.ncip.v2.service.RemoteServiceManager.class);
+		method.setAccessible(true);
+
+		LookupUserInitiationData initData = new LookupUserInitiationData();
+		// PIN listed FIRST so the loop hits the throwing lookup before the resolvable barcode.
+		AuthenticationInput pinInput = new AuthenticationInput();
+		pinInput.setAuthenticationInputType(new AuthenticationInputType(null, org.folio.ncip.Constants.AUTH_TYPE_PIN));
+		pinInput.setAuthenticationInputData("1234");
+		AuthenticationInput barcodeInput = new AuthenticationInput();
+		barcodeInput.setAuthenticationInputType(new AuthenticationInputType(null, "barcode"));
+		barcodeInput.setAuthenticationInputData("value-1");
+		initData.setAuthenticationInputs(java.util.List.of(pinInput, barcodeInput));
+
+		FolioRemoteServiceManager serviceManager = new FolioRemoteServiceManager() {
+			@Override
+			public JsonObject lookupPatronRecordBy(String type, String value) throws Exception {
+				if (org.folio.ncip.Constants.AUTH_TYPE_PIN.equalsIgnoreCase(type)) {
+					throw new Exception("invalid patron lookup type provided: " + type);
+				}
+				return new JsonObject().put("barcode", "123456");
+			}
+		};
+
+		// A throwing input must not abort the whole lookup; the barcode input still resolves.
+		String resolved = (String) method.invoke(service, initData, serviceManager);
+		assertEquals("123456", resolved);
+	}
+
+	@Test
+	public void retrieveAuthenticationInputTypeOfSkipsNotFoundInputAndResolvesNext() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		Method method = service.getClass().getDeclaredMethod("retrieveAuthenticationInputTypeOf",
+				LookupUserInitiationData.class,
+				org.extensiblecatalog.ncip.v2.service.RemoteServiceManager.class);
+		method.setAccessible(true);
+
+		LookupUserInitiationData initData = new LookupUserInitiationData();
+		AuthenticationInput missing = new AuthenticationInput();
+		missing.setAuthenticationInputType(new AuthenticationInputType(null, "barcode"));
+		missing.setAuthenticationInputData("not-found");
+		AuthenticationInput found = new AuthenticationInput();
+		found.setAuthenticationInputType(new AuthenticationInputType(null, "username"));
+		found.setAuthenticationInputData("jdoe");
+		initData.setAuthenticationInputs(java.util.List.of(missing, found));
+
+		FolioRemoteServiceManager serviceManager = new FolioRemoteServiceManager() {
+			@Override
+			public JsonObject lookupPatronRecordBy(String type, String value) {
+				// A not-found patron returns null - must be tolerated (no NPE) and the loop continues.
+				if ("not-found".equals(value)) {
+					return null;
+				}
+				return new JsonObject().put("barcode", "789012");
+			}
+		};
+
+		String resolved = (String) method.invoke(service, initData, serviceManager);
+		assertEquals("789012", resolved);
+	}
+
+	@Test
 	public void performServiceReturnsProblemWhenAgencyHeaderMissing() throws Exception {
 		FolioLookupUserService service = new FolioLookupUserService();
 		LookupUserInitiationData initData = mock(LookupUserInitiationData.class);
@@ -234,6 +299,46 @@ public class LookupUserServiceTests {
 		LookupUserResponseData response = service.performService(initData, null, manager);
 		assertNotNull(response);
 		assertNull(response.getProblems());
+	}
+
+	@Test
+	public void performServiceResolvesUserViaAuthInputsWhenPinPresentAndVerifiesPin() throws Exception {
+		FolioLookupUserService service = new FolioLookupUserService();
+		LookupUserInitiationData initData = initDataWithAgency("relais");
+		when(initData.getUserId()).thenReturn(null);
+
+		// PIN input listed FIRST (its patron lookup throws), barcode SECOND (resolves the user).
+		// This is exactly the ordering the dropped per-input try/catch used to tolerate; before
+		// the fix this whole request failed with an "Authentication failed" problem.
+		AuthenticationInput pinInput = new AuthenticationInput();
+		pinInput.setAuthenticationInputType(new AuthenticationInputType(null, org.folio.ncip.Constants.AUTH_TYPE_PIN));
+		pinInput.setAuthenticationInputData("1234");
+		AuthenticationInput barcodeInput = new AuthenticationInput();
+		barcodeInput.setAuthenticationInputType(new AuthenticationInputType(null, "barcode"));
+		barcodeInput.setAuthenticationInputData("barcode-1");
+		when(initData.getAuthenticationInputs()).thenReturn(java.util.List.of(pinInput, barcodeInput));
+
+		FolioRemoteServiceManager manager = mock(FolioRemoteServiceManager.class);
+		when(manager.getNcipProperties()).thenReturn(new Properties());
+		when(manager.lookupPatronRecordBy(org.folio.ncip.Constants.AUTH_TYPE_PIN, "1234"))
+				.thenThrow(new Exception("invalid patron lookup type provided: pin"));
+		when(manager.lookupPatronRecordBy("barcode", "barcode-1"))
+				.thenReturn(new JsonObject().put("barcode", "barcode-1"));
+		when(manager.lookupUser(org.mockito.ArgumentMatchers.any(UserId.class))).thenReturn(new JsonObject()
+				.put("id", "uuid-1")
+				.put("userUuid", "uuid-1")
+				.put("personal", new JsonObject().put("firstName", "First").put("lastName", "Last"))
+				.put("manualblocks", new io.vertx.core.json.JsonArray())
+				.put("automatedPatronBlocks", new io.vertx.core.json.JsonArray())
+				.put("active", true));
+
+		LookupUserResponseData response = service.performService(initData, null, manager);
+
+		// End-to-end: the throwing PIN input did not abort the lookup, the barcode resolved the
+		// user, no problem was produced, and the PIN was still verified via checkUserPin.
+		assertNotNull(response);
+		assertNull(response.getProblems());
+		verify(manager).checkUserPin("uuid-1", "1234");
 	}
 
 	@Test

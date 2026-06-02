@@ -548,8 +548,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				if (initData != null && initData.getRequestId() != null) {
 					String barcode = initData.getRequestId().getRequestIdentifierValue();
 					if (barcode != null && !barcode.isEmpty()) {
-						searchUrl = baseUrl + (Constants.ITEM_SEARCH_BY_BARCODE_URL)
-								.replace("$barcode$", barcode);
+						searchUrl = buildItemSearchByBarcodeUrl(baseUrl, barcode);
 						logger.info("using barcode");
 						logger.info(searchUrl);
 					}
@@ -937,11 +936,16 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		return dtf.format(now);
 	}
 
+	String buildItemSearchByBarcodeUrl(String baseUrl, String barcode) {
+		String query = "barcode==" + StringUtil.cqlEncode(barcode);
+		return baseUrl + Constants.ITEM_URL + "?limit=1&query=" + PercentCodec.encode(query);
+	}
+
 	public void deleteItem(String itemId, String agencyId) throws Exception {
 		try {
 			// Find item to delete
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
-			String searchUrl = baseUrl + Constants.ITEM_SEARCH_BY_BARCODE_URL.replace("$barcode$", itemId);
+			String searchUrl = buildItemSearchByBarcodeUrl(baseUrl, itemId);
 			String itemResponseString = callApiGet(searchUrl);
 
 			JsonObject itemResponse = new JsonObject(itemResponseString);

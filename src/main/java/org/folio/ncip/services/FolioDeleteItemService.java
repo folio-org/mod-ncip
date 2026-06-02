@@ -38,7 +38,7 @@ public class FolioDeleteItemService extends FolioNcipService implements DeleteIt
         try {
             requesterAgencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
             if (requesterAgencyId == null || requesterAgencyId.trim().equalsIgnoreCase("")) {
-                throw new FolioNcipException("Agency ID could nto be determined");
+                throw new FolioNcipException("Agency ID could not be determined");
             }
         } catch (FolioNcipException e) {
             LOGGER.error("Could not determine agency id from initiation header.");
@@ -49,7 +49,7 @@ public class FolioDeleteItemService extends FolioNcipService implements DeleteIt
 
         try {
             ((FolioRemoteServiceManager)serviceManager).deleteItem(itemId.getItemIdentifierValue(), requesterAgencyId.toLowerCase());
-        } catch(Exception  e) {
+        } catch(Exception e) {
             Problem problem = new Problem(new ProblemType(Constants.DELETE_ITEM_PROBLEM), Constants.UNKNOWN_DATA_ELEMENT,
                     Constants.DELETE_ITEM_PROBLEM, e.getMessage());
             return addProblem(responseData, problem);
