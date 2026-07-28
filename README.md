@@ -134,8 +134,7 @@ curl -X POST \
    }'
 ```
 
-In Trillium, the configurations are automatically moved to mod-settings (https://github.com/folio-org/mod-settings) during the upgrade. The are now grouped by the agency id (formerly stored in the 'configName').  
-Details:
+In Trillium, the configurations are automatically moved to mod-settings (https://github.com/folio-org/mod-settings) during the upgrade. 
 
 
 - scope should always be 'mod-ncip'<br>
