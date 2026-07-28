@@ -110,9 +110,7 @@ https://github.com/folio-org/edge-ncip
 
 
 ## mod-configuration setup
-Up to the Sunflower version configuration values are stored in mod-configuration:
-
-Note: The instructions below refer to adding entries to mod-configuration.  This is an example of how you could do that:
+Up to the Sunflower version configuration values are stored in mod-configuration.  For example:
 
 ```java
 curl -X POST \
