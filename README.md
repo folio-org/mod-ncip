@@ -138,9 +138,9 @@ In Trillium, the configurations are automatically moved to mod-settings during t
 Details:
 
 
-- scope should always be 'mod-ncip'
-- key: this should be set to the value provided previously stored in the 'configName'.  It is the agencyId.
-- value: example below - all configuration values for the 'From Agency' are grouped in one value:
+- scope should always be 'mod-ncip'<br>
+- key: this should be set to the value provided previously stored in the 'configName'.  It is the agencyId.<br>
+- value: example below - all configuration values for the 'From Agency' are grouped in one value: <br>
 
 <img width="804" height="550" alt="image-20260716-192357" src="https://github.com/user-attachments/assets/b1686afc-9738-46f4-bdf0-a809ddf3198f" />
 
