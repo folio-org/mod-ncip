@@ -110,9 +110,7 @@ https://github.com/folio-org/edge-ncip
 
 
 ## mod-configuration setup
-
-This document is a shortcut for bare minimum initial setup/testing for the DIKU tenant.  It includes step-by-step instructions with references to Python scripts for DIKU tenant reference values on the snapshot image:
-https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
+Up to the Sunflower version configuration values are stored in mod-configuration:
 
 Note: The instructions below refer to adding entries to mod-configuration.  This is an example of how you could do that:
 
