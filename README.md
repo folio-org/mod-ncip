@@ -25,7 +25,9 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 2. If you will be exposing this service externally and will be using the [edge-ncip module](https://github.com/folio-org/edge-ncip), you will need to setup an API key as described [in the readme file of the edge-common module](https://github.com/folio-org/edge-common)
 
-3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:
+3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:  
+
+*IMPORTANT - In the Trillium FOLIO version these configurations are automatically moved to mod-settings during the upgrade process.  Configuration values are stored together in one row grouped by Agency ID.  Please see more details in the mod-configuration setup section of this readme file*
 
     * (1) instance.type.name   (Settings > Inventory > Instances > Resource Type)
     * (2) instance.source
@@ -108,11 +110,7 @@ https://github.com/folio-org/edge-ncip
 
 
 ## mod-configuration setup
-
-This document is a shortcut for bare minimum initial setup/testing for the DIKU tenant.  It includes step-by-step instructions with references to Python scripts for DIKU tenant reference values on the snapshot image:
-https://docs.google.com/document/d/1wwaAaMXg6L_V5hEjJU72rYTGdBdF2Zzk_iTD0x4UeHU/edit
-
-Note: The instructions below refer to adding entries to mod-configuration.  This is an example of how you could do that:
+Up to the Sunflower version configuration values are stored in mod-configuration.  For example:
 
 ```java
 curl -X POST \
@@ -131,6 +129,16 @@ curl -X POST \
      "value": "RESHARE"
    }'
 ```
+
+In Trillium, the configurations are automatically moved to mod-settings (https://github.com/folio-org/mod-settings) during the upgrade. 
+
+
+- scope should always be 'mod-ncip'<br>
+- key: this should be set to the value previously stored in the 'configName'.  It is the fromAgencyId.<br>
+- value: example below - all configuration values for the 'From Agency' are grouped in one json entry: <br>
+
+<img width="804" height="550" alt="image-20260716-192357" src="https://github.com/user-attachments/assets/b1686afc-9738-46f4-bdf0-a809ddf3198f" />
+
 
 There are three types of settings that can exist in mod-configuration for the NCIP module:
 
