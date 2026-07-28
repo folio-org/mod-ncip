@@ -27,7 +27,7 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 3. There are settings that have to be setup in mod-configuration for the NCIP services to work (more about that below).  The values assigned to these settings must exist in FOLIO.  This is because FOLIO requires specific values to be set when actions occur.  For example, the AcceptItem service creates an instance.  The NCIP module has to know what instance.type.name to use. Here is a list of the configurations you will need to establish values for in FOLIO:  
 
-*IMPORTANT - In the Trillium FOLIO version these configurations are automatically moved to mod-settings during the upgrade process.  Configuration values are stored together in one row grouped by Agency ID*
+*IMPORTANT - In the Trillium FOLIO version these configurations are automatically moved to mod-settings during the upgrade process.  Configuration values are stored together in one row grouped by Agency ID.  Please see more in the mod-configuration setup section of this readme file*
 
     * (1) instance.type.name   (Settings > Inventory > Instances > Resource Type)
     * (2) instance.source
@@ -134,14 +134,12 @@ curl -X POST \
    }'
 ```
 
-In Trillium, the configurations are automatically moved to mod-settings, grouped by the agency id (formerly stored in the 'configName').  For example:
+In Trillium, the configurations are automatically moved to mod-settings during the upgrade. The are now grouped by the agency id (formerly stored in the 'configName').  
+Details:
 
 
-
-In mod-settings the ncip configurations use the following values:
-
-scope: mod-ncip
-key: this should be set to the value provided in the ‘NCIP_FROM_AGENCY’ field in the jenkins job
+scope should always be 'mod-ncip'
+key: this should be set to the value provided previously stored in the 'configName'.  It is the agencyId.
 value: example below - all configuration values for the 'From Agency' are grouped in one value:
 
 <img width="804" height="550" alt="image-20260716-192357" src="https://github.com/user-attachments/assets/b1686afc-9738-46f4-bdf0-a809ddf3198f" />
