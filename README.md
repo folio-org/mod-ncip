@@ -134,6 +134,19 @@ curl -X POST \
    }'
 ```
 
+In Trillium, the configurations are automatically moved to mod-settings, grouped by the agency id (formerly stored in the 'configName').  For example:
+
+
+
+In mod-settings the ncip configurations use the following values:
+
+scope: mod-ncip
+key: this should be set to the value provided in the ‘NCIP_FROM_AGENCY’ field in the jenkins job
+value: example below - all configuration values for the 'From Agency' are grouped in one value:
+
+<img width="804" height="550" alt="image-20260716-192357" src="https://github.com/user-attachments/assets/b1686afc-9738-46f4-bdf0-a809ddf3198f" />
+
+
 There are three types of settings that can exist in mod-configuration for the NCIP module:
 
 ### Required Configurations:
