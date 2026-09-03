@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -1038,12 +1039,16 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	 */
 	public JsonObject lookupPatronRecordBy(String type, String value) throws Exception {
 		// LOOKUP THE PATRON
-		List<String> validTypes = Arrays.asList("barcode","externalsystemid","username");
-		if (!validTypes.contains(type)) {
+		List<String> validTypes = Arrays.asList("barcode", "externalsystemid", "username");
+		String normalizedType = type == null ? null : type.toLowerCase(Locale.ROOT);
+		if (!validTypes.contains(normalizedType)) {
 			throw new Exception("invalid patron lookup type provided: " + type);
 		}
 
-		if (type != null && type.equalsIgnoreCase("externalSystemId")) type = "externalSystemId";
+		if ("externalsystemid".equals(normalizedType))
+			type = "externalSystemId";
+		else
+			type = normalizedType;
 		value = StringUtil.cqlEncode(value);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String query = "(" + type + "==" + value + ")";

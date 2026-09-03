@@ -1,3 +1,6 @@
+## 1.16.2 2026-09-03
+* [MODNCIP-108](https://folio-org.atlassian.net/browse/MODNCIP-108) Fix case-sensitive AuthenticationInputType check in lookupPatronRecordBy causing intermittent LookupUser failures (Sunflower backport)
+
 ## 1.16.1 2025-09-25
 * [MODNCIP-90](https://folio-org.atlassian.net/browse/MODNCIP-90) RequestItem service - make hrid optional (Sunflower)
 
