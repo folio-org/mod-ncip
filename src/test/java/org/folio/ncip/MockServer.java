@@ -34,6 +34,12 @@ import javax.ws.rs.core.MediaType;
 
 public class MockServer {
 
+    private final List<String> itemQueries = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    List<String> getItemQueries() {
+        return itemQueries;
+    }
+
     private static FolioNcipHelper folioNcipHelper;
 
     private static final Logger logger = LoggerFactory.getLogger(MockServer.class);
@@ -207,13 +213,11 @@ public class MockServer {
 
     private void items(RoutingContext ctx) {
         String query = ctx.request().getParam("query");
+        itemQueries.add(query);
         if (query.contains("at-014")) {
             ctx.response().setStatusCode(500).end();
-        } else if (query.contains("barcode==\"")) {
-            String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
-            String body = readLineByLine(mockFileName);
-            serverResponse(ctx, 200, APPLICATION_JSON, body);
-        } else if (query.contains("hrid==\"\"")) {
+        } else if (query.equals("barcode==\"missing-requestitem-barcode\"")
+                || query.contains("hrid==\"\"")) {
             serverResponse(ctx, 200, APPLICATION_JSON, "{\"items\":[],\"totalRecords\":0}");
         } else {
             String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";

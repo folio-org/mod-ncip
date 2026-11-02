@@ -10,6 +10,22 @@ Version 2.0. See the file "[LICENSE](LICENSE)" for more information.
 NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 
+## RequestItem identifiers
+
+For `Title` scope, `BibliographicId` contains the instance HRID; `ItemId` is ignored.
+
+For every other scope, including `Item`, `Bibliographic Item`, and an empty or
+missing scope, `ItemId/ItemIdentifierValue` is the item barcode and takes precedence
+over `BibliographicId`. If the item identifier
+is absent or blank, `BibliographicId/BibliographicRecordId/BibliographicRecordIdentifier`
+is used as the item HRID for compatibility with existing clients. A supplied
+barcode that does not match an item does not fall back to the HRID.
+
+`RequestId` identifies the request and is never used as an item barcode. Clients
+using the previous RequestId barcode fallback must send the barcode in `ItemId`
+instead. Responses continue to return the FOLIO request UUID in
+`RequestId`.
+
 ## Preparation
 1. The NCIP module requires a FOLIO user with the following permissions:
 ```

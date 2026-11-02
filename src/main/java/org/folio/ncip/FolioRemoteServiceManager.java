@@ -510,13 +510,12 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 	}
 
 	public JsonObject requestItem(RequestItemInitiationData initData) throws Exception {
+		RequestItemIdentifier identifier = RequestItemIdentifier.resolve(initData);
 		String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 		String agencyId = initData.getInitiationHeader().getFromAgencyId().getAgencyId().getValue();
 		agencyId = agencyId == null ? agencyId : agencyId.toLowerCase();
 		initProperties(agencyId, baseUrl);
-		String hrid = initData.getBibliographicId(0).getBibliographicRecordId().getBibliographicRecordIdentifier();
-		final boolean titleRequest = initData.getRequestScopeType() != null
-				&& initData.getRequestScopeType().getValue().toLowerCase().contains(Constants.TITLE);
+		final boolean titleRequest = identifier.isTitleRequest();
 		final String requestType = REQUEST_TYPE.getOrDefault(initData.getRequestType().getValue().toLowerCase(),
 				Constants.PAGE);
 		String pickUpLocationCode = null;
@@ -539,21 +538,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			throw new FolioNcipException(Constants.USER_NOT_FOUND);
 		try {
 
-			String searchUrl = baseUrl + (titleRequest ? Constants.INSTANCE_SEARCH_URL : Constants.ITEM_SEARCH_URL)
-					.replace("$hrid$", hrid);
-
-			// This allows the place request service to work with only the barcode in the
-			// request. This is a fallback when hrid is missing.
-			if ((hrid == null || hrid.isEmpty()) && !titleRequest) {
-				if (initData != null && initData.getRequestId() != null) {
-					String barcode = initData.getRequestId().getRequestIdentifierValue();
-					if (barcode != null && !barcode.isEmpty()) {
-						searchUrl = buildItemSearchByBarcodeUrl(baseUrl, barcode);
-						logger.info("using barcode");
-						logger.info(searchUrl);
-					}
-				}
-			}
+			String searchUrl = identifier.searchUrl(baseUrl);
 
 			String responseString = callApiGet(searchUrl);
 			JsonObject response = new JsonObject(responseString);
@@ -597,7 +582,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				addNoteIfNeeded(agencyId, returnValues.getString(Constants.ID),
 						initData.getRequestId().getRequestIdentifierValue(), baseUrl);
 			} else {
-				logger.error("Found total of {} items by hrid {}", totalRecords, hrid);
+				logger.error("Found total of {} records for RequestItem lookup {}", totalRecords, searchUrl);
 				throw new FolioNcipException(Constants.REQUEST_ITEM_MISSING_PROBLEM);
 			}
 		} catch (Exception exception) {
