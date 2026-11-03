@@ -38,6 +38,8 @@ public class RequestItemBarcodeTest {
         assertTrue(body.contains("<ns1:ItemIdentifierValue>0000005</ns1:ItemIdentifierValue>"));
         assertTrue(body.contains("de627598-d468-41e0-a849-450940478477"));
         assertEquals("barcode==\"0000005\"", lastItemQuery());
+        assertEquals("Item", lastPostedRequest().getString("requestLevel"));
+        assertNotNull(lastPostedRequest().getString("itemId"));
     }
 
     @Test
@@ -47,8 +49,8 @@ public class RequestItemBarcodeTest {
     }
 
     @Test
-    public void everyNonTitleScopeUsesBarcodeFirstOnTheWire() {
-        for (String scope : Arrays.asList("Bibliographic Item", "", null, "Other")) {
+    public void otherScopesUseBarcodeFirstOnTheWire() {
+        for (String scope : Arrays.asList("", null, "Other")) {
             assertSuccess(post(scope, "<ItemId><ItemIdentifierValue>0000005</ItemIdentifierValue></ItemId>"
                     + bib("different-item-hrid"), "ill-request-123"));
             assertEquals("barcode==\"0000005\"", lastItemQuery());
@@ -56,10 +58,29 @@ public class RequestItemBarcodeTest {
     }
 
     @Test
-    public void everyNonTitleScopeRetainsHridFallbackOnTheWire() {
-        for (String scope : Arrays.asList("Bibliographic Item", "", null, "Other")) {
+    public void otherScopesRetainHridFallbackOnTheWire() {
+        for (String scope : Arrays.asList("", null, "Other")) {
             assertSuccess(post(scope, bib("itemHrid1"), "ill-request-123"));
             assertEquals("hrid==\"itemHrid1\"", lastItemQuery());
+        }
+    }
+
+    @Test
+    public void bibliographicScopesCreateTitleRequestsOnTheWire() {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item", "tItLe", "bIbLiOgRaPhIc ItEm")) {
+            for (String itemId : Arrays.asList("",
+                    "<ItemId><ItemIdentifierValue>ignored-barcode</ItemIdentifierValue></ItemId>")) {
+                int itemQueriesBefore = server.getItemQueries().size();
+                int instanceQueriesBefore = server.getInstanceQueries().size();
+                assertSuccess(post(scope, itemId + bib("instanceHrid1"), "ill-request-123"));
+                assertEquals(itemQueriesBefore, server.getItemQueries().size());
+                assertEquals(instanceQueriesBefore + 1, server.getInstanceQueries().size());
+                assertEquals("hrid==\"instanceHrid1\"", server.getInstanceQueries().get(instanceQueriesBefore));
+                assertEquals("Title", lastPostedRequest().getString("requestLevel"));
+                assertNotNull(lastPostedRequest().getString("instanceId"));
+                assertFalse(lastPostedRequest().containsKey("itemId"));
+                assertFalse(lastPostedRequest().containsKey("holdingsRecordId"));
+            }
         }
     }
 
@@ -98,11 +119,19 @@ public class RequestItemBarcodeTest {
     }
 
     @Test
-    public void titleCannotUseItemIdInPlaceOfInstanceHrid() {
-        String body = post("Title", "<ItemId><ItemIdentifierValue>0000005</ItemIdentifierValue></ItemId>",
-                "ill-request-123");
-        assertTrue(body.contains("Problem"));
-        assertTrue(body.contains("Bibliographic id missing"));
+    public void bibliographicScopesCannotUseItemIdInPlaceOfInstanceHrid() {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item")) {
+            int itemQueriesBefore = server.getItemQueries().size();
+            int instanceQueriesBefore = server.getInstanceQueries().size();
+            int requestsBefore = server.getPostedRequests().size();
+            String body = post(scope, "<ItemId><ItemIdentifierValue>0000005</ItemIdentifierValue></ItemId>",
+                    "ill-request-123");
+            assertTrue(body.contains("Problem"));
+            assertTrue(body.contains("Bibliographic id missing"));
+            assertEquals(itemQueriesBefore, server.getItemQueries().size());
+            assertEquals(instanceQueriesBefore, server.getInstanceQueries().size());
+            assertEquals(requestsBefore, server.getPostedRequests().size());
+        }
     }
 
     @Test
@@ -142,6 +171,10 @@ public class RequestItemBarcodeTest {
 
     private String lastItemQuery() {
         return server.getItemQueries().get(server.getItemQueries().size() - 1);
+    }
+
+    private io.vertx.core.json.JsonObject lastPostedRequest() {
+        return server.getPostedRequests().get(server.getPostedRequests().size() - 1);
     }
 
     private void assertSuccess(String body) {

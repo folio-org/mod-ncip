@@ -12,14 +12,23 @@ NISO Circulation Interchange Protocol (NCIP)  support in FOLIO
 
 ## RequestItem identifiers
 
-For `Title` scope, `BibliographicId` contains the instance HRID; `ItemId` is ignored.
+For `Bibliographic Item` scope and its supported alias `Title`, `BibliographicId`
+contains the instance HRID; `ItemId` is ignored. Both create a FOLIO Title-level
+request. Scope comparisons are case-insensitive.
 
-For every other scope, including `Item`, `Bibliographic Item`, and an empty or
+For every other scope, including `Item` and an empty or
 missing scope, `ItemId/ItemIdentifierValue` is the item barcode and takes precedence
 over `BibliographicId`. If the item identifier
 is absent or blank, `BibliographicId/BibliographicRecordId/BibliographicRecordIdentifier`
 is used as the item HRID for compatibility with existing clients. A supplied
 barcode that does not match an item does not fall back to the HRID.
+
+NCIP 2.02 requires `RequestScopeType` for RequestItem and specifies no default
+([Part 1, section 5.4.15](https://groups.niso.org/higherlogic/ws/public/download/8967/z39-83-1-2012_NCIP.pdf)).
+The standard scope values are `Bibliographic Item` and `Item`
+([Part 2, Appendix B](https://groups.niso.org/higherlogic/ws/public/download/8968/z39-83-2-2012_NCIP.pdf)).
+Accepting an empty or missing scope with Item behavior is a local compatibility
+fallback, not an NCIP default. Clients should always supply an explicit scope.
 
 `RequestId` identifies the request and is never used as an item barcode. Clients
 using the previous RequestId barcode fallback must send the barcode in `ItemId`

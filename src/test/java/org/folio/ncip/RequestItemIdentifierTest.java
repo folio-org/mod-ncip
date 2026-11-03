@@ -62,14 +62,18 @@ public class RequestItemIdentifierTest {
     }
 
     @Test
-    public void titleScopeUsesInstanceHridAndIgnoresItemId() throws Exception {
-        assertLookup(request("Title", "ignored-barcode", "instance-hrid"),
-                "/inventory/instances", "hrid==\"instance-hrid\"", true);
+    public void bibliographicScopesUseInstanceHridAndIgnoreItemId() throws Exception {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item", "tItLe", "bIbLiOgRaPhIc ItEm")) {
+            for (String barcode : Arrays.asList(null, "ignored-barcode")) {
+                assertLookup(request(scope, barcode, "instance-hrid"),
+                        "/inventory/instances", "hrid==\"instance-hrid\"", true);
+            }
+        }
     }
 
     @Test
-    public void everyNonTitleScopePrefersBarcode() throws Exception {
-        for (String scope : Arrays.asList("Item", "Bibliographic Item", "", null, "Other")) {
+    public void otherScopesPreferBarcode() throws Exception {
+        for (String scope : Arrays.asList("Item", "", null, "Other", "Not Title")) {
             assertLookup(request(scope, "barcode-1", "different-item-hrid"),
                     "/inventory/items", "barcode==\"barcode-1\"", false);
             assertLookup(request(scope, "barcode-1", null),
@@ -78,8 +82,8 @@ public class RequestItemIdentifierTest {
     }
 
     @Test
-    public void everyNonTitleScopeFallsBackToItemHridWhenBarcodeIsMissing() throws Exception {
-        for (String scope : Arrays.asList("Item", "Bibliographic Item", "", null, "Other")) {
+    public void otherScopesFallBackToItemHridWhenBarcodeIsMissing() throws Exception {
+        for (String scope : Arrays.asList("Item", "", null, "Other")) {
             assertLookup(request(scope, null, "item-hrid"),
                     "/inventory/items", "hrid==\"item-hrid\"", false);
             assertLookup(request(scope, " \t", "item-hrid"),
@@ -95,7 +99,7 @@ public class RequestItemIdentifierTest {
 
     @Test
     public void requestIdCannotSubstituteForItemIdentifier() {
-        for (String scope : Arrays.asList("Item", "Bibliographic Item", "", null, "Other")) {
+        for (String scope : Arrays.asList("Item", "Title", "Bibliographic Item", "", null, "Other")) {
             for (String hrid : Arrays.asList(null, "", " \t")) {
                 RequestItemInitiationData data = request(scope, null, hrid);
                 RequestId requestId = new RequestId();
@@ -107,9 +111,14 @@ public class RequestItemIdentifierTest {
     }
 
     @Test
-    public void titleRequiresBibliographicIdEvenWhenItemIdIsPresent() {
-        assertThrows(FolioNcipException.class,
-                () -> RequestItemIdentifier.resolve(request("Title", "barcode-1", null)));
+    public void bibliographicScopesRequireBibliographicIdEvenWhenItemIdIsPresent() {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item")) {
+            for (String hrid : Arrays.asList(null, "", " \t")) {
+                FolioNcipException exception = assertThrows(FolioNcipException.class,
+                        () -> RequestItemIdentifier.resolve(request(scope, "barcode-1", hrid)));
+                assertEquals("Bibliographic id missing", exception.getMessage());
+            }
+        }
     }
 
     @Test
