@@ -10,6 +10,7 @@ import org.junit.Test;
 import io.restassured.response.Response;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -50,16 +51,14 @@ public class RequestItem extends TestBase {
 	}
 
 	@Test
-	public void callRequestItemWithBarcodeFallbackWhenHridMissing() throws MalformedURLException {
+	public void requestIdCannotSubstituteForMissingItemIdentifiers() throws MalformedURLException {
 		Response response = postData("src/test/resources/mockdata/ncip-requestitem-barcodeFallback.xml");
 		String body = response.getBody().prettyPrint();
 		System.out.println(body);
 		assertEquals(200, response.getStatusCode());
-		assertTrue(body.contains(CREATED_REQUEST_ID));
-		assertTrue(body.contains(ITEM_IDENTIFIER));
-		assertTrue(body.contains(CALL_NUMBER));
-		assertTrue(body.contains(LOCATION));
-		assertTrue(body.contains(REQUESTER_ID));
+		assertTrue(body.contains("Problem"));
+		assertTrue(body.contains("Item id missing"));
+		assertFalse(body.contains(CREATED_REQUEST_ID));
 	}
 
 	@Test
