@@ -21,7 +21,7 @@ public final class RequestItemIdentifier {
 
     public static RequestItemIdentifier resolve(RequestItemInitiationData data) throws FolioNcipException {
         String scope = data.getRequestScopeType() == null ? null : data.getRequestScopeType().getValue();
-        boolean titleRequest = scope != null && scope.toLowerCase(java.util.Locale.ROOT).contains(Constants.TITLE);
+        boolean titleRequest = "Title".equalsIgnoreCase(scope) || "Bibliographic Item".equalsIgnoreCase(scope);
 
         if (!titleRequest && data.getItemIds() != null && !data.getItemIds().isEmpty()) {
             ItemId itemId = data.getItemId(0);
