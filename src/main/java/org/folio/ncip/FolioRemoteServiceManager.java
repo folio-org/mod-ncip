@@ -41,6 +41,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public class FolioRemoteServiceManager implements RemoteServiceManager {
@@ -141,7 +142,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		}
 
 		DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
 		String returnDate = dtf.format(now);
 
 		String itemBarcode = initData.getItemId().getItemIdentifierValue();
@@ -394,7 +395,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 			request.put(Constants.HOLDINGS_RECORD_ID, holdingsUuid.toString());
 			request.put(Constants.PICKUP_SERVICE_POINT_ID, sPointId);
 			DateTimeFormatter dtf = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-			ZonedDateTime now = ZonedDateTime.now();
+			ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
 			request.put(Constants.REQUEST_DATE, dtf.format(now));
 
 			url = baseUrl + Constants.REQUEST_URL;
@@ -565,7 +566,8 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 				request.put(Constants.REQUEST_TYPE, requestType);
 				request.put(Constants.FULFILLMENT_PREFERENCE, getProperty(agencyId, "request.fulfillment_preference"));
 				request.put(Constants.REQUESTER_ID, user.getString(Constants.ID));
-				request.put(Constants.REQUEST_DATE, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()));
+				request.put(Constants.REQUEST_DATE,
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now(ZoneId.systemDefault())));
 				String servicePointId;
 				if (pickUpLocationCode != null) {
 					servicePointId = getServicePointId(pickUpLocationCode, baseUrl);
@@ -917,7 +919,7 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 
 	private String getDateTimeNowString() {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_FOR_CIRC);
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 		return dtf.format(now);
 	}
 
@@ -1003,6 +1005,9 @@ public class FolioRemoteServiceManager implements RemoteServiceManager {
 		try {
 			String baseUrl = okapiHeaders.get(Constants.X_OKAPI_URL);
 			JsonObject user = lookupPatronRecord(userId);
+			if (user == null) {
+				throw new FolioNcipException(Constants.USER_NOT_FOUND);
+			}
 			return addDefaultPatronFee(fiscalTransactionInformation, user.getString(Constants.ID),
 					user.getString(Constants.PATRON_GROUP), baseUrl);
 		} catch (Exception exception) {
