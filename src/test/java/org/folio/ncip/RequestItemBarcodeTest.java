@@ -102,20 +102,22 @@ public class RequestItemBarcodeTest {
     }
 
     @Test
-    public void missingIdentifiersReturnNcipProblemInsteadOfUsingRequestId() {
-        int before = server.getItemQueries().size();
-        String body = post("Item", bib(""), "0000005");
-        assertTrue(body.contains("Problem"));
-        assertTrue(body.contains("Item id missing"));
-        assertFalse(body.contains("de627598-d468-41e0-a849-450940478477"));
-        assertEquals(before, server.getItemQueries().size());
+    public void missingIdentifiersFallBackToRequestIdAsBarcode() {
+        for (String identifiers : Arrays.asList(bib(""), "")) {
+            String body = post("Item", identifiers, "0000005");
+            assertSuccess(body);
+            assertTrue(body.contains("de627598-d468-41e0-a849-450940478477"));
+            assertEquals("barcode==\"0000005\"", lastItemQuery());
+        }
     }
 
     @Test
     public void entirelyAbsentIdentifiersReturnNcipProblem() {
-        String body = post("Item", "", "0000005");
+        int before = server.getItemQueries().size();
+        String body = post("Item", "", null);
         assertTrue(body.contains("Problem"));
         assertTrue(body.contains("Item id missing"));
+        assertEquals(before, server.getItemQueries().size());
     }
 
     @Test

@@ -98,16 +98,46 @@ public class RequestItemIdentifierTest {
     }
 
     @Test
-    public void requestIdCannotSubstituteForItemIdentifier() {
-        for (String scope : Arrays.asList("Item", "Title", "Bibliographic Item", "", null, "Other")) {
+    public void requestIdIsBarcodeFallbackForItemScopesWhenItemIdAndHridAreMissing() throws Exception {
+        for (String scope : Arrays.asList("Item", "", null, "Other")) {
             for (String hrid : Arrays.asList(null, "", " \t")) {
-                RequestItemInitiationData data = request(scope, null, hrid);
-                RequestId requestId = new RequestId();
-                requestId.setRequestIdentifierValue("looks-like-a-barcode");
-                data.setRequestId(requestId);
+                assertLookup(withRequestId(request(scope, null, hrid), "looks-like-a-barcode"),
+                        "/inventory/items", "barcode==\"looks-like-a-barcode\"", false);
+            }
+        }
+    }
+
+    @Test
+    public void requestIdIsNotUsedWhenItemIdOrHridIsPresent() throws Exception {
+        assertLookup(withRequestId(request("Item", "barcode-1", null), "request-id"),
+                "/inventory/items", "barcode==\"barcode-1\"", false);
+        assertLookup(withRequestId(request("Item", null, "itemHrid1"), "request-id"),
+                "/inventory/items", "hrid==\"itemHrid1\"", false);
+    }
+
+    @Test
+    public void requestIdCannotSubstituteForInstanceHrid() {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item")) {
+            for (String hrid : Arrays.asList(null, "", " \t")) {
+                RequestItemInitiationData data = withRequestId(request(scope, null, hrid), "looks-like-a-barcode");
                 assertThrows(FolioNcipException.class, () -> RequestItemIdentifier.resolve(data));
             }
         }
+    }
+
+    @Test
+    public void blankRequestIdDoesNotTriggerFallback() {
+        for (String requestId : Arrays.asList("", " \t")) {
+            RequestItemInitiationData data = withRequestId(request("Item", null, null), requestId);
+            assertThrows(FolioNcipException.class, () -> RequestItemIdentifier.resolve(data));
+        }
+    }
+
+    private RequestItemInitiationData withRequestId(RequestItemInitiationData data, String value) {
+        RequestId requestId = new RequestId();
+        requestId.setRequestIdentifierValue(value);
+        data.setRequestId(requestId);
+        return data;
     }
 
     @Test

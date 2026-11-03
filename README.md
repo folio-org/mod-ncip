@@ -30,10 +30,12 @@ The standard scope values are `Bibliographic Item` and `Item`
 Accepting an empty or missing scope with Item behavior is a local compatibility
 fallback, not an NCIP default. Clients should always supply an explicit scope.
 
-`RequestId` identifies the request and is never used as an item barcode. Clients
-using the previous RequestId barcode fallback must send the barcode in `ItemId`
-instead. Responses continue to return the FOLIO request UUID in
-`RequestId`.
+For non-Title requests where both `ItemId` and the HRID are absent or blank,
+`RequestId/RequestIdentifierValue` is used as the item barcode. This is a
+compatibility fallback for existing ILL clients that send the barcode only in
+`RequestId`; new clients should send the barcode in `ItemId`. A warning is logged
+whenever the fallback is used. Responses continue to return the FOLIO request
+UUID in `RequestId`.
 
 ## Preparation
 1. The NCIP module requires a FOLIO user with the following permissions:

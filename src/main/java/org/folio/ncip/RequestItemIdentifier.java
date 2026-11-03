@@ -1,6 +1,8 @@
 package org.folio.ncip;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.RequestItemInitiationData;
@@ -9,6 +11,8 @@ import org.folio.util.StringUtil;
 
 /** Resolves RequestItem identifiers without treating the request ID as an item ID. */
 public final class RequestItemIdentifier {
+    private static final Logger LOGGER = LogManager.getLogger(RequestItemIdentifier.class);
+
     private final String value;
     private final boolean titleRequest;
     private final boolean barcode;
@@ -34,6 +38,15 @@ public final class RequestItemIdentifier {
                 ? null : data.getBibliographicId(0);
         String hrid = bibliographicId == null || bibliographicId.getBibliographicRecordId() == null
                 ? null : bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier();
+        // Compatibility fallback: some ILL clients send the item barcode only in
+        // RequestId, with no ItemId and an empty BibliographicRecordIdentifier.
+        if (StringUtils.isBlank(hrid) && !titleRequest && data.getRequestId() != null
+                && StringUtils.isNotBlank(data.getRequestId().getRequestIdentifierValue())) {
+            String barcode = data.getRequestId().getRequestIdentifierValue();
+            LOGGER.warn("RequestItem has no ItemId or BibliographicRecordIdentifier; "
+                    + "using RequestId {} as the item barcode", barcode);
+            return new RequestItemIdentifier(barcode, false, true);
+        }
         if (StringUtils.isBlank(hrid)) {
             throw new FolioNcipException(titleRequest ? "Bibliographic id missing" : "Item id missing");
         }

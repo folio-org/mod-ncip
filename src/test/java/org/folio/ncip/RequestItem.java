@@ -51,14 +51,13 @@ public class RequestItem extends TestBase {
 	}
 
 	@Test
-	public void requestIdCannotSubstituteForMissingItemIdentifiers() throws MalformedURLException {
+	public void requestIdIsUsedAsBarcodeWhenItemIdentifiersAreMissing() throws MalformedURLException {
 		Response response = postData("src/test/resources/mockdata/ncip-requestitem-barcodeFallback.xml");
 		String body = response.getBody().prettyPrint();
-		System.out.println(body);
 		assertEquals(200, response.getStatusCode());
-		assertTrue(body.contains("Problem"));
-		assertTrue(body.contains("Item id missing"));
-		assertFalse(body.contains(CREATED_REQUEST_ID));
+		assertFalse(body.contains("Problem"));
+		assertTrue(body.contains(CREATED_REQUEST_ID));
+		assertTrue(body.contains(ITEM_IDENTIFIER));
 	}
 
 	@Test
