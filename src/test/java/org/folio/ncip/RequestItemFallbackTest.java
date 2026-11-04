@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import io.restassured.response.Response;
+import io.restassured.RestAssured;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import org.junit.AfterClass;
@@ -19,12 +20,15 @@ public class RequestItemFallbackTest extends TestBase {
 
     @BeforeClass
     public static void beforeClass() throws InterruptedException, ExecutionException, TimeoutException {
+        // Other test classes install global headers; these requests need this mock server's headers.
+        RestAssured.reset();
         mockServer = new MockServer(Utils.nextFreePort());
         mockServer.start();
     }
 
     @AfterClass
     public static void afterClass() {
+        RestAssured.reset();
         if (mockServer != null) {
             mockServer.close();
         }
