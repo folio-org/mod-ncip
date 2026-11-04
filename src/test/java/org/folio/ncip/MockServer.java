@@ -228,6 +228,7 @@ public class MockServer {
         if (query.contains("at-014")) {
             ctx.response().setStatusCode(500).end();
         } else if (query.equals("barcode==\"missing-requestitem-barcode\"")
+                || query.equals("hrid==\"missing-requestitem-hrid\"")
                 || query.contains("hrid==\"\"")) {
             serverResponse(ctx, 200, APPLICATION_JSON, "{\"items\":[],\"totalRecords\":0}");
         } else {

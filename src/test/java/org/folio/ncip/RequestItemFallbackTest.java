@@ -31,13 +31,25 @@ public class RequestItemFallbackTest extends TestBase {
     }
 
     @Test
-    public void requestIdCannotSubstituteForMissingItemIdentifiers() throws Exception {
+    public void missingItemIdAndEmptyBibliographicIdUseLegacyRequestIdBarcode() throws Exception {
         Response response = postData("src/test/resources/mockdata/ncip-requestitem-barcodeFallback.xml");
         String body = response.getBody().prettyPrint();
 
         assertEquals(200, response.getStatusCode());
-        assertTrue(body.contains("Problem"));
-        assertTrue(body.contains("Item id missing"));
-        assertFalse(body.contains(CREATED_REQUEST_ID));
+        assertFalse(body.contains("Problem"));
+        assertTrue(body.contains(CREATED_REQUEST_ID));
+        assertTrue(body.contains("<ns1:ItemIdentifierValue>0000005</ns1:ItemIdentifierValue>"));
+        assertTrue(mockServer.getItemQueries().contains("barcode==\"0000005\""));
+    }
+
+    @Test
+    public void productionStylePrefixedXmlUsesLegacyRequestIdBarcode() throws Exception {
+        Response response = postData("src/test/resources/mockdata/ncip-requestitem-legacy-prefixed.xml");
+        String body = response.getBody().asString();
+
+        assertEquals(200, response.getStatusCode());
+        assertFalse(body.contains("Problem"));
+        assertTrue(body.contains(CREATED_REQUEST_ID));
+        assertTrue(mockServer.getItemQueries().contains("barcode==\"TEST-ITEM-0001\""));
     }
 }

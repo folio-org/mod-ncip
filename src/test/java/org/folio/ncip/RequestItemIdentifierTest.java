@@ -98,16 +98,62 @@ public class RequestItemIdentifierTest {
     }
 
     @Test
-    public void requestIdCannotSubstituteForItemIdentifier() {
-        for (String scope : Arrays.asList("Item", "Title", "Bibliographic Item", "", null, "Other")) {
-            for (String hrid : Arrays.asList(null, "", " \t")) {
-                RequestItemInitiationData data = request(scope, null, hrid);
-                RequestId requestId = new RequestId();
-                requestId.setRequestIdentifierValue("looks-like-a-barcode");
-                data.setRequestId(requestId);
-                assertThrows(FolioNcipException.class, () -> RequestItemIdentifier.resolve(data));
+    public void legacyRequestIdBarcodeIsUsedOnlyWhenItemIdAndHridAreMissingOrBlank() throws Exception {
+        for (String scope : Arrays.asList("Item", "", null, "Other")) {
+            for (String barcode : Arrays.asList(null, "", " \t")) {
+                for (String hrid : Arrays.asList(null, "", " \t")) {
+                    assertLookup(withRequestId(request(scope, barcode, hrid), "legacy-barcode"),
+                            "/inventory/items", "barcode==\"legacy-barcode\"", false);
+                }
             }
         }
+    }
+
+    @Test
+    public void explicitIdentifiersTakePrecedenceOverLegacyRequestId() throws Exception {
+        for (String scope : Arrays.asList("Item", "", null, "Other")) {
+            assertLookup(withRequestId(request(scope, "barcode-1", "item-hrid"), "legacy-barcode"),
+                    "/inventory/items", "barcode==\"barcode-1\"", false);
+            for (String barcode : Arrays.asList(null, "", " \t")) {
+                assertLookup(withRequestId(request(scope, barcode, "item-hrid"), "legacy-barcode"),
+                        "/inventory/items", "hrid==\"item-hrid\"", false);
+            }
+        }
+    }
+
+    @Test
+    public void legacyRequestIdBarcodeIsCqlEscapedAndUrlEncoded() throws Exception {
+        assertLookup(withRequestId(request("Item", "", ""), "A+B & \"C\"\\D/é"),
+                "/inventory/items", "barcode==\"A+B & \\\"C\\\"\\\\D/é\"", false);
+    }
+
+    @Test
+    public void missingOrBlankRequestIdCannotSupplyLegacyBarcode() {
+        for (String requestId : Arrays.asList(null, "", " \t")) {
+            RequestItemInitiationData data = withRequestId(request("Item", "", ""), requestId);
+            FolioNcipException exception = assertThrows(FolioNcipException.class,
+                    () -> RequestItemIdentifier.resolve(data));
+            assertEquals("Item id missing", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void requestIdCannotSubstituteForInstanceHrid() {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item", "tItLe", "bIbLiOgRaPhIc ItEm")) {
+            for (String hrid : Arrays.asList(null, "", " \t")) {
+                RequestItemInitiationData data = withRequestId(request(scope, null, hrid), "legacy-barcode");
+                FolioNcipException exception = assertThrows(FolioNcipException.class,
+                        () -> RequestItemIdentifier.resolve(data));
+                assertEquals("Bibliographic id missing", exception.getMessage());
+            }
+        }
+    }
+
+    private RequestItemInitiationData withRequestId(RequestItemInitiationData data, String value) {
+        RequestId requestId = new RequestId();
+        requestId.setRequestIdentifierValue(value);
+        data.setRequestId(requestId);
+        return data;
     }
 
     @Test

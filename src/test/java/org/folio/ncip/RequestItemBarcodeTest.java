@@ -102,20 +102,51 @@ public class RequestItemBarcodeTest {
     }
 
     @Test
-    public void missingIdentifiersReturnNcipProblemInsteadOfUsingRequestId() {
+    public void legacyRequestIdBarcodeWorksWithMissingOrBlankItemIdentifiers() {
+        for (String scope : Arrays.asList("Item", "", null, "Other")) {
+            for (String itemId : Arrays.asList("", "<ItemId/>",
+                    "<ItemId><ItemIdentifierValue> </ItemIdentifierValue></ItemId>")) {
+                for (String bibliographicId : Arrays.asList("", bib(""), bib(" "))) {
+                    String body = post(scope, itemId + bibliographicId, "0000005");
+                    assertSuccess(body);
+                    assertTrue(body.contains("de627598-d468-41e0-a849-450940478477"));
+                    assertEquals("barcode==\"0000005\"", lastItemQuery());
+                    assertEquals("Item", lastPostedRequest().getString("requestLevel"));
+                }
+            }
+        }
+    }
+
+    @Test
+    public void unknownHridDoesNotFallBackToRequestId() {
         int before = server.getItemQueries().size();
-        String body = post("Item", bib(""), "0000005");
+        int requestsBefore = server.getPostedRequests().size();
+        String body = post("Item", bib("missing-requestitem-hrid"), "0000005");
         assertTrue(body.contains("Problem"));
-        assertTrue(body.contains("Item id missing"));
-        assertFalse(body.contains("de627598-d468-41e0-a849-450940478477"));
-        assertEquals(before, server.getItemQueries().size());
+        assertEquals(before + 1, server.getItemQueries().size());
+        assertEquals("hrid==\"missing-requestitem-hrid\"", lastItemQuery());
+        assertEquals(requestsBefore, server.getPostedRequests().size());
     }
 
     @Test
     public void entirelyAbsentIdentifiersReturnNcipProblem() {
-        String body = post("Item", "", "0000005");
+        String body = post("Item", "", null);
         assertTrue(body.contains("Problem"));
         assertTrue(body.contains("Item id missing"));
+    }
+
+    @Test
+    public void titleScopesCannotUseLegacyRequestIdBarcodeOnTheWire() {
+        for (String scope : Arrays.asList("Title", "Bibliographic Item")) {
+            int itemsBefore = server.getItemQueries().size();
+            int instancesBefore = server.getInstanceQueries().size();
+            int requestsBefore = server.getPostedRequests().size();
+            String body = post(scope, bib(""), "0000005");
+            assertTrue(body.contains("Bibliographic id missing"));
+            assertEquals(itemsBefore, server.getItemQueries().size());
+            assertEquals(instancesBefore, server.getInstanceQueries().size());
+            assertEquals(requestsBefore, server.getPostedRequests().size());
+        }
     }
 
     @Test
