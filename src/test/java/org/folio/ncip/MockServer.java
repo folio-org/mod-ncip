@@ -219,7 +219,8 @@ public class MockServer {
         itemQueries.add(query);
         if (query.contains("at-014")) {
             ctx.response().setStatusCode(500).end();
-        } else if (query.equals("barcode==\"missing-requestitem-barcode\"")) {
+        } else if (query.equals("barcode==\"missing-requestitem-barcode\"")
+                || query.equals("hrid==\"missing-requestitem-hrid\"")) {
             serverResponse(ctx, 200, APPLICATION_JSON, "{\"items\":[],\"totalRecords\":0}");
         } else {
             String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
