@@ -2,6 +2,7 @@ package org.folio.ncip;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import io.vertx.core.MultiMap;
@@ -9,9 +10,31 @@ import io.vertx.core.json.JsonObject;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
+import org.extensiblecatalog.ncip.v2.service.FiscalTransactionInformation;
+import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.junit.Test;
 
 public class FolioRemoteServiceManagerTest {
+
+    @Test
+    public void createUserFiscalTransactionRejectsUnknownPatron() throws Exception {
+        FolioRemoteServiceManager manager = new FolioRemoteServiceManager() {
+            @Override
+            public String callApiGet(String uriString) {
+                return "{\"users\":[]}";
+            }
+        };
+        MultiMap headers = MultiMap.caseInsensitiveMultiMap();
+        headers.add(Constants.X_OKAPI_URL, "http://localhost:8082");
+        manager.setOkapiHeaders(headers);
+        UserId userId = new UserId();
+        userId.setUserIdentifierValue("missing-patron");
+
+        FolioNcipException exception = assertThrows(FolioNcipException.class,
+                () -> manager.createUserFiscalTransaction(userId, new FiscalTransactionInformation()));
+
+        assertEquals(Constants.USER_NOT_FOUND, exception.getMessage());
+    }
 
     @Test
     public void lookupPatronRecordByAcceptsMixedCaseBarcodeType() throws Exception {
