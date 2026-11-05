@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -33,6 +34,22 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import javax.ws.rs.core.MediaType;
 
 public class MockServer {
+
+    private final List<String> itemQueries = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private final List<String> instanceQueries = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private final List<JsonObject> postedRequests = new java.util.concurrent.CopyOnWriteArrayList<>();
+
+    List<String> getItemQueries() {
+        return itemQueries;
+    }
+
+    List<String> getInstanceQueries() {
+        return instanceQueries;
+    }
+
+    List<JsonObject> getPostedRequests() {
+        return postedRequests;
+    }
 
     private static FolioNcipHelper folioNcipHelper;
 
@@ -207,13 +224,12 @@ public class MockServer {
 
     private void items(RoutingContext ctx) {
         String query = ctx.request().getParam("query");
+        itemQueries.add(query);
         if (query.contains("at-014")) {
             ctx.response().setStatusCode(500).end();
-        } else if (query.contains("barcode==\"")) {
-            String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
-            String body = readLineByLine(mockFileName);
-            serverResponse(ctx, 200, APPLICATION_JSON, body);
-        } else if (query.contains("hrid==\"\"")) {
+        } else if (query.equals("barcode==\"missing-requestitem-barcode\"")
+                || query.equals("hrid==\"missing-requestitem-hrid\"")
+                || query.contains("hrid==\"\"")) {
             serverResponse(ctx, 200, APPLICATION_JSON, "{\"items\":[],\"totalRecords\":0}");
         } else {
             String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "itemsByHrid-get.json";
@@ -229,6 +245,7 @@ public class MockServer {
     }
 
     private void instances(RoutingContext ctx) {
+        instanceQueries.add(ctx.request().getParam("query"));
         String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "instancesByHrid-get.json";
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
@@ -253,6 +270,7 @@ public class MockServer {
     }
 
     private void requestsPost(RoutingContext ctx) {
+        postedRequests.add(ctx.body().asJsonObject());
         String mockFileName = TestConstants.PATH_TO_MOCK_FILES + "requests-post.json";
         String body = readLineByLine(mockFileName);
         serverResponse(ctx, 200, APPLICATION_JSON, body);
