@@ -2,7 +2,6 @@ package org.folio.ncip.services;
 
 import io.vertx.core.json.JsonObject;
 import org.apache.log4j.Logger;
-import org.extensiblecatalog.ncip.v2.service.BibliographicId;
 import org.extensiblecatalog.ncip.v2.service.ItemDescription;
 import org.extensiblecatalog.ncip.v2.service.ItemId;
 import org.extensiblecatalog.ncip.v2.service.ItemIdentifierType;
@@ -26,8 +25,8 @@ import org.extensiblecatalog.ncip.v2.service.UserId;
 import org.extensiblecatalog.ncip.v2.service.UserIdentifierType;
 import org.extensiblecatalog.ncip.v2.service.UserOptionalFields;
 import org.folio.ncip.Constants;
-import org.folio.ncip.FolioNcipException;
 import org.folio.ncip.FolioRemoteServiceManager;
+import org.folio.ncip.RequestItemIdentifier;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -42,13 +41,11 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 			RemoteServiceManager serviceManager) {
 		logger.info("RequestItemService");
 
-		BibliographicId bibliographicId = initData.getBibliographicId(0);
 		UserId userId = initData.getUserId();
-		logger.info("accept bibliographic id : " + bibliographicId);
 
 		try {
 			validateUserId(userId);
-			validateBibliographicIdIsPresent(bibliographicId);
+			RequestItemIdentifier.resolve(initData);
 			initData.getRequestType().getValue();
 			validateRequestIdIsPresent(initData.getRequestId());
 		}
@@ -131,12 +128,4 @@ public class FolioRequestItemService extends FolioNcipService implements Request
 		return responseData;
 	}
 
-	protected void validateBibliographicIdIsPresent(BibliographicId bibliographicId) throws FolioNcipException {
-
-		if (bibliographicId == null || bibliographicId.getBibliographicRecordId() == null ||
-				bibliographicId.getBibliographicRecordId().getBibliographicRecordIdentifier() == null) {
-			throw new FolioNcipException("Item id missing");
-		}
-
-	}
 }
