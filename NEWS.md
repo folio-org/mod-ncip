@@ -1,3 +1,10 @@
+## 1.16.3 2026-11-16
+* [MODNCIP-111](https://folio-org.atlassian.net/browse/MODNCIP-111) Fix RequestItem identifiers and bibliographic scope handling (Sunflower backport)
+  * For non-title requests, `ItemId` is now used as the item barcode and takes precedence over the bibliographic HRID
+  * `Bibliographic Item` scope now creates a Title-level request, the same as `Title`
+  * Item lookups are now CQL-escaped
+  * The legacy `RequestId` barcode fallback is kept for non-title requests with no `ItemId` or HRID, and now logs a warning
+
 ## 1.16.2 2026-09-03
 * [MODNCIP-108](https://folio-org.atlassian.net/browse/MODNCIP-108) Fix case-sensitive AuthenticationInputType check in lookupPatronRecordBy causing intermittent LookupUser failures (Sunflower backport)
 
