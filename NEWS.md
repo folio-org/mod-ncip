@@ -1,5 +1,6 @@
 ## 1.18.0 IN PROGRESS
 * [MODNCIP-107](https://folio-org.atlassian.net/browse/MODNCIP-107) Add DeployConfig.json (ADR-0013 Configuration Management)
+* [MODNCIP-111](https://folio-org.atlassian.net/browse/MODNCIP-111) Fix RequestItem identifiers and bibliographic scope handling
 
 ## 1.17.4 2026-11-20
 * [MODNCIP-111](https://folio-org.atlassian.net/browse/MODNCIP-111) Fix RequestItem identifiers and bibliographic scope handling
