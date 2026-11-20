@@ -1,0 +1,349 @@
+{
+  "description": "mod-ncip deployment configuration template (see ADR-0013, Module configuration management).",
+  "moduleDefaults": {
+    "resources": [
+      {
+        "name": "cpu",
+        "value": "64",
+        "description": "CPU request/limit for the mod-ncip container"
+      },
+      {
+        "name": "memory",
+        "value": "1024",
+        "description": "Memory hard limit for the mod-ncip container (MiB)"
+      },
+      {
+        "name": "memoryReservation",
+        "value": "896",
+        "description": "Memory reservation (soft limit) for the mod-ncip container (MiB)"
+      }
+    ],
+    "java": [
+      {
+        "name": "xmx",
+        "value": "768m",
+        "description": "Maximum Java heap size"
+      },
+      {
+        "name": "MaxMetaspaceSize",
+        "value": "128m",
+        "description": "Maximum Java metaspace size"
+      },
+      {
+        "name": "MetaspaceSize",
+        "value": "88m",
+        "description": "Initial Java metaspace size"
+      }
+    ],
+    "deployment": {
+      "isHaSupported": true,
+      "replicasRecommendedCount": 2,
+      "description": "mod-ncip is stateless (no database) and supports multiple replicas. Adjust replicas based on expected NCIP request volume."
+    },
+    "kong": {
+      "timeouts": {
+        "connect": "60s",
+        "send": "60s",
+        "read": "120s"
+      },
+      "description": "Read timeout set to 120s, above the 30s service_manager_timeout_ms, so slow NCIP responses are not cut off."
+    },
+    "EnvVars": [
+      {
+        "name": "ENV",
+        "value": null,
+        "description": "Name of the deployment environment.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "JAVA_OPTIONS",
+        "value": "-Dport=8081 -Dlog_level=INFO -Dservice_manager_timeout_ms=30000",
+        "description": "JVM options carrying the module's system properties: port, log level and the timeout in milliseconds for calls to FOLIO APIs; use a different port than the sidecar's 8081 when deployed with a sidecar.",
+        "type": "CONFIG",
+        "essential": false
+      }
+    ]
+  },
+  "sidecarDefaults": {
+    "resources": [
+      {
+        "name": "cpu",
+        "value": "64",
+        "description": "CPU request/limit for container"
+      },
+      {
+        "name": "memory",
+        "value": "1024",
+        "description": "Memory hard limit for container (MiB)"
+      },
+      {
+        "name": "memoryReservation",
+        "value": "512",
+        "description": "Memory reservation / soft limit (MiB)"
+      }
+    ],
+    "java": [
+      {
+        "name": "xms",
+        "value": "128m",
+        "description": "Initial Java heap size"
+      },
+      {
+        "name": "xmx",
+        "value": "256m",
+        "description": "Maximum Java heap size"
+      },
+      {
+        "name": "MaxMetaspaceSize",
+        "value": "256m",
+        "description": "Maximum Java metaspace size"
+      },
+      {
+        "name": "UseZGC",
+        "value": "true",
+        "description": "Use the low-pause ZGC garbage collector"
+      }
+    ],
+    "EnvVars": [
+      {
+        "name": "ENV",
+        "value": null,
+        "description": "Name of the deployment environment.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "MODULE_NAME",
+        "value": "mod-ncip",
+        "description": "Name of the backend module this sidecar fronts.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "MODULE_VERSION",
+        "value": null,
+        "description": "Version of the mod-ncip module deployed alongside this sidecar.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "MODULE_URL",
+        "value": null,
+        "description": "Internal URL at which the mod-ncip container is reachable from its sidecar.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "JAVA_OPTS",
+        "value": "-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager",
+        "description": "Additional JVM options for the sidecar process, with heap and GC settings supplied separately.",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SIDECAR_MODULE_PATH_PREFIX_STRATEGY",
+        "value": "STRIP",
+        "description": "How the module path prefix is handled when forwarding requests to the module.",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "SIDECAR_FORWARD_UNKNOWN_REQUESTS",
+        "value": true,
+        "description": "Forwards requests the sidecar does not recognise to the gateway.",
+        "type": "FUNCTIONAL",
+        "essential": false
+      },
+      {
+        "name": "SIDECAR_FORWARD_UNKNOWN_REQUESTS_DESTINATION",
+        "value": null,
+        "description": "Gateway URL that unrecognised requests are forwarded to.",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "ALLOW_CROSS_TENANT_REQUESTS",
+        "value": true,
+        "description": "Allows requests that cross tenant boundaries.",
+        "type": "FUNCTIONAL",
+        "essential": false
+      },
+      {
+        "name": "SECRET_STORE_TYPE",
+        "value": null,
+        "description": "Type of secret store the sidecar reads credentials from.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "SECRET_STORE_AWS_SSM_REGION",
+        "value": null,
+        "description": "AWS region of the SSM secret store, used when SECRET_STORE_TYPE is AWS_SSM.",
+        "type": "CONFIG",
+        "essential": false
+      },
+      {
+        "name": "KC_URL",
+        "value": null,
+        "description": "Base URL of Keycloak.",
+        "type": "KC",
+        "essential": true
+      },
+      {
+        "name": "KC_SERVICE_CLIENT_ID",
+        "value": "sidecar-module-access-client",
+        "description": "Keycloak client ID the sidecar uses for module access.",
+        "type": "KC",
+        "essential": false
+      },
+      {
+        "name": "KC_ADMIN_CLIENT_ID",
+        "value": "folio-backend-admin-client",
+        "description": "Keycloak client ID used for admin operations.",
+        "type": "KC",
+        "essential": false
+      },
+      {
+        "name": "KC_LOGIN_CLIENT_SUFFIX",
+        "value": "-application",
+        "description": "Suffix appended to the tenant name to form the Keycloak login client ID.",
+        "type": "KC",
+        "essential": false
+      },
+      {
+        "name": "KC_URI_VALIDATION_ENABLED",
+        "value": false,
+        "description": "Enables validation of redirect URIs in Keycloak.",
+        "type": "KC",
+        "essential": false
+      },
+      {
+        "name": "KC_AUTHORIZATION_CACHE_MAX_SIZE",
+        "value": "5000",
+        "description": "Maximum number of Keycloak authorization results cached, in entries.",
+        "type": "CACHE",
+        "essential": false
+      },
+      {
+        "name": "TOKEN_CACHE_MAX_CAPACITY",
+        "value": "5000",
+        "description": "Maximum number of tokens cached, in entries.",
+        "type": "CACHE",
+        "essential": false
+      },
+      {
+        "name": "TOKEN_CACHE_REFRESH_PRIOR_EXPIRATION",
+        "value": "60",
+        "description": "Seconds before expiry at which a cached token is refreshed.",
+        "type": "CACHE",
+        "essential": false
+      },
+      {
+        "name": "AM_CLIENT_URL",
+        "value": null,
+        "description": "URL of the mgr-applications service.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "TM_CLIENT_URL",
+        "value": null,
+        "description": "URL of the mgr-tenants service.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "TE_CLIENT_URL",
+        "value": null,
+        "description": "URL of the mgr-tenant-entitlements service.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "MOD_USERS_URL",
+        "value": null,
+        "description": "URL of the mod-users service.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "MOD_USERS_KEYCLOAK_URL",
+        "value": null,
+        "description": "URL of the mod-users-keycloak service.",
+        "type": "CONFIG",
+        "essential": true
+      },
+      {
+        "name": "KAFKA_HOST",
+        "value": null,
+        "description": "Kafka bootstrap host.",
+        "type": "KAFKA",
+        "essential": true
+      },
+      {
+        "name": "KAFKA_PORT",
+        "value": "9094",
+        "description": "Kafka bootstrap port.",
+        "type": "KAFKA",
+        "essential": false
+      },
+      {
+        "name": "KAFKA_SECURITY_PROTOCOL",
+        "value": null,
+        "description": "Security protocol used to connect to Kafka, for example SSL.",
+        "type": "KAFKA",
+        "essential": false
+      },
+      {
+        "name": "REQUEST_TIMEOUT",
+        "value": "604800000",
+        "description": "Request timeout in milliseconds applied by the sidecar.",
+        "type": "QUARKUS",
+        "essential": false
+      },
+      {
+        "name": "QUARKUS_REST_CLIENT_CONNECT_TIMEOUT",
+        "value": "180000",
+        "description": "REST client connect timeout in milliseconds.",
+        "type": "QUARKUS",
+        "essential": false
+      },
+      {
+        "name": "QUARKUS_REST_CLIENT_READ_TIMEOUT",
+        "value": "180000",
+        "description": "REST client read timeout in milliseconds.",
+        "type": "QUARKUS",
+        "essential": false
+      },
+      {
+        "name": "QUARKUS_REST_CLIENT_SEND_TIMEOUT",
+        "value": "180000",
+        "description": "REST client send timeout in milliseconds.",
+        "type": "QUARKUS",
+        "essential": false
+      },
+      {
+        "name": "QUARKUS_HTTP_LIMITS_MAX_BODY_SIZE",
+        "value": "200M",
+        "description": "Maximum HTTP request body size accepted by the sidecar.",
+        "type": "QUARKUS",
+        "essential": false
+      },
+      {
+        "name": "QUARKUS_HTTP_LIMITS_MAX_INITIAL_LINE_LENGTH",
+        "value": "8192",
+        "description": "Maximum length in bytes of the HTTP request line.",
+        "type": "QUARKUS",
+        "essential": false
+      },
+      {
+        "name": "QUARKUS_VERTX_EVENT_LOOPS_POOL_SIZE",
+        "value": "1",
+        "description": "Number of Vert.x event loop threads.",
+        "type": "QUARKUS",
+        "essential": false
+      }
+    ]
+  }
+}
