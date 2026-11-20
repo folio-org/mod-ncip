@@ -1,6 +1,13 @@
 ## 1.18.0 IN PROGRESS
 * [MODNCIP-107](https://folio-org.atlassian.net/browse/MODNCIP-107) Add DeployConfig.json (ADR-0013 Configuration Management)
 
+## 1.17.4 2026-11-20
+* [MODNCIP-111](https://folio-org.atlassian.net/browse/MODNCIP-111) Fix RequestItem identifiers and bibliographic scope handling
+  * For non-title requests, `ItemId` is now used as the item barcode and takes precedence over the bibliographic HRID
+  * `Bibliographic Item` scope now creates a Title-level request, the same as `Title`
+  * Item lookups are now CQL-escaped
+  * The legacy `RequestId` barcode fallback is kept for non-title requests with no `ItemId` or HRID, and now logs a warning
+
 ## 1.17.3 2026-05-28
 * [MODNCIP-99](https://folio-org.atlassian.net/browse/MODNCIP-99) Mod-ncip rejects item barcodes containing special characters (e.g., “+”) due to restrictive validation pattern
 * [MODNCIP-94](https://folio-org.atlassian.net/browse/MODNCIP-94) mod-ncip: Use GitHub Workflows for Maven
