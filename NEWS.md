@@ -1,3 +1,6 @@
+## 1.18.0 IN PROGRESS
+* [MODNCIP-107](https://folio-org.atlassian.net/browse/MODNCIP-107) Add DeployConfig.json (ADR-0013 Configuration Management)
+
 ## 1.17.3 2026-05-28
 * [MODNCIP-99](https://folio-org.atlassian.net/browse/MODNCIP-99) Mod-ncip rejects item barcodes containing special characters (e.g., “+”) due to restrictive validation pattern
 * [MODNCIP-94](https://folio-org.atlassian.net/browse/MODNCIP-94) mod-ncip: Use GitHub Workflows for Maven
